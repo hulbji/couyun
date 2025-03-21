@@ -1,0 +1,236 @@
+import re
+import os
+import tkinter as tk
+from tkinter import ttk, messagebox
+from PIL import Image, ImageTk
+
+from common import show_all_rhythm, current_dir
+from shi_rhythm import real_shi
+from ci_rhythm import real_ci
+
+ico_path = os.path.join(current_dir, 'picture', 'ei.ico')
+png_path = os.path.join(current_dir, 'picture', 'ei.png')
+
+
+def extract_chinese_and_remove_parentheses(text):
+    text_without_parentheses = re.sub(r'[(（].*?[)）]', '', text)
+    chinese_text = re.sub(r'[^\u4e00-\u9fff]', '', text_without_parentheses)
+    return chinese_text
+
+
+def load_background_image(image_path):
+    """加载并调整背景图片大小"""
+    image = Image.open(image_path)
+    image = image.resize((800, 531), Image.Resampling.LANCZOS)
+    return ImageTk.PhotoImage(image)
+
+
+def settings(mode):
+    if mode == 'p':
+        return 30, 40, 7, 5
+    if mode == 'c':
+        return 30, 70, 7, 5
+    return 15, 30, 7, 5
+
+
+class RhythmCheckerGUI:
+    def __init__(self, roots):
+        self.scrollbar_x = None
+        self.root = roots
+        self.root.iconbitmap(ico_path)
+        self.root.resizable(width=False, height=False)
+        self.root.title("凑韵")
+        self.root.geometry("800x531")
+        self.background_image = load_background_image(png_path)
+        self.background_label = tk.Label(self.root, image=self.background_image)
+        self.background_label.place(relwidth=1, relheight=1)
+        self.current_yun_shu = None
+        self.input_text = None
+        self.output_text = None
+        self.main_interface = None
+        self.cipai_var = None
+        self.yunshu_reverse_map = None
+        self.yunshu_var = None
+        self.yun_shu_combobox = {1: '平水韵', 2: '中华通韵', 3: "中华新韵"}
+        self.create_main_interface()
+
+    def create_main_interface(self):
+        default_font = ("微软雅黑", 12)
+        self.main_interface = ttk.Frame(self.root)
+        self.main_interface.pack(pady=100)
+        title_label = ttk.Label(self.main_interface, text="凑韵诗词格律校验工具", font=("微软雅黑", 16))
+        title_label.pack(pady=10)
+        button_frame = ttk.Frame(self.main_interface)
+        button_frame.pack(pady=10)
+        poem_button = tk.Button(button_frame, text="诗校验", command=self.open_poem_interface, font=default_font,
+                                bg="#c9a6eb", width=20)
+        poem_button.pack(side=tk.TOP, padx=5, pady=10)
+        ci_button = tk.Button(button_frame, text="词校验", command=self.open_ci_interface, font=default_font,
+                              bg="#c9a6eb", width=20)
+        ci_button.pack(side=tk.TOP, padx=5, pady=10)
+        check_char_button = tk.Button(button_frame, text="查字", command=self.open_char_interface,
+                                      font=default_font, bg="#c9a6eb", width=20)
+        check_char_button.pack(side=tk.TOP, padx=5, pady=10)
+
+    def create_generic_interface(self, title_text, hint_text, button_text, command_func, mode):
+        self.main_interface.pack_forget()
+        generic_interface = ttk.Frame(self.root)
+        generic_interface.pack(pady=60 if mode == 's' else 20)
+        title_label = ttk.Label(generic_interface, text=title_text, font=("微软雅黑", 16))
+        title_label.pack(pady=10)
+        if mode != 's':
+            if mode == 'c':
+                self.yun_shu_combobox[1] = '词林正韵'
+            else:
+                self.yun_shu_combobox[1] = '平水韵'
+            yunshu_frame = ttk.Frame(generic_interface)
+            yunshu_frame.pack(pady=5, anchor=tk.W)
+            yunshu_label = ttk.Label(yunshu_frame, text="选择韵书:", font=("微软雅黑", 12))
+            yunshu_label.pack(side=tk.LEFT, padx=5)
+            self.yunshu_var = tk.StringVar()
+            self.yunshu_var.set(self.yun_shu_combobox[1])
+            yunshu_combobox = ttk.Combobox(yunshu_frame, textvariable=self.yunshu_var, font=("微软雅黑", 12), width=15,
+                                           state="readonly")
+            yunshu_combobox['values'] = list(self.yun_shu_combobox.values())
+            yunshu_combobox.pack(side=tk.LEFT, padx=5)
+            self.yunshu_reverse_map = {value: key for key, value in self.yun_shu_combobox.items()}
+            self.yunshu_var.trace("w", lambda name, index, the_mode: self.on_yunshu_change())
+            self.current_yun_shu = 1
+        if mode == 'c':
+            cipai_frame = ttk.Frame(generic_interface)
+            cipai_frame.pack(pady=5, anchor=tk.W)
+            cipai_label = ttk.Label(cipai_frame, text="输入词牌:", font=("微软雅黑", 12))
+            cipai_label.pack(side=tk.LEFT, padx=5)
+            self.cipai_var = tk.StringVar()
+            cipai_entry = ttk.Entry(cipai_frame, textvariable=self.cipai_var, font=("微软雅黑", 12), width=15)
+            cipai_entry.pack(side=tk.LEFT, padx=5)
+        frame = ttk.Frame(generic_interface)
+        frame.pack(pady=10)
+        input_label = ttk.Label(frame, text=hint_text, font=("微软雅黑", 12))
+        input_label.pack(side=tk.TOP, pady=10, anchor=tk.W)
+        input_text = tk.Text(frame, width=settings(mode)[0], height=1 if mode == 's' else 10, font=("微软雅黑", 12))
+        input_text.pack(side=tk.TOP if mode == 's' else tk.LEFT, padx=5)
+
+        # 创建输出文本框
+        output_text = tk.Text(frame, width=settings(mode)[1], height=10, font=("微软雅黑", 12), wrap=tk.NONE,
+                              state=tk.DISABLED)
+        output_text.pack(side=tk.TOP if mode == 's' else tk.LEFT, padx=5)
+        if mode == 'c':
+            self.scrollbar_x = ttk.Scrollbar(frame, orient=tk.HORIZONTAL, command=output_text.xview)
+            output_text.configure(xscrollcommand=self.scrollbar_x.set)
+            self.scrollbar_x.pack(side=tk.BOTTOM, fill=tk.X)
+            self.scrollbar_x.place(relx=0, rely=1, relwidth=1, height=0)
+        button_frame = ttk.Frame(generic_interface)
+        button_frame.pack(pady=10)
+        analyze_button = tk.Button(button_frame, text=button_text,
+                                   command=lambda: command_func(input_text, output_text), font=("微软雅黑", 12),
+                                   bg="#c9a6eb", width=settings(mode)[2])
+        analyze_button.pack(side=tk.LEFT, padx=5)
+        back_button = tk.Button(button_frame, text="返回", command=self.return_to_main, font=("微软雅黑", 12),
+                                bg="#c9a6eb", width=settings(mode)[3])
+        back_button.pack(side=tk.RIGHT, padx=5)
+        output_text.pack_forget()
+
+        return input_text, output_text
+
+    def on_yunshu_change(self):
+        selected_yunshu = self.yunshu_var.get()
+        self.current_yun_shu = self.yunshu_reverse_map[selected_yunshu]
+
+    def open_poem_interface(self):
+        self.input_text, self.output_text = self.create_generic_interface(
+            title_text="诗校验",
+            hint_text='请输入需要分析的律诗或绝句：',
+            button_text="开始分析",
+            command_func=self.check_poem,
+            mode='p'
+        )
+
+    def open_ci_interface(self):
+        self.input_text, self.output_text = self.create_generic_interface(
+            title_text="词校验",
+            hint_text='请输入需要分析的词：',
+            button_text="开始分析",
+            command_func=self.check_ci,
+            mode='c'
+        )
+
+    def open_char_interface(self):
+        self.input_text, self.output_text = self.create_generic_interface(
+            title_text="查字",
+            hint_text='请输入需要查询的汉字：',
+            button_text="开始查询",
+            command_func=self.check_char,
+            mode='s'
+        )
+
+    def return_to_main(self):
+        for widget in self.root.winfo_children():
+            if widget != self.main_interface:
+                widget.pack_forget()
+        self.main_interface.pack(pady=100)
+
+    def check_poem(self, input_text, output_text):
+        text = input_text.get("1.0", tk.END).strip()
+        if not text:
+            messagebox.showwarning("找茬是吧", "请输入需要校验的诗！")
+            return
+        processed_text = extract_chinese_and_remove_parentheses(text)
+        len_shi = len(processed_text)
+        if len_shi not in [20, 40, 28, 56]:
+            messagebox.showwarning("要不检查下？", f"诗的字数不正确，可能有无法识别的生僻字，你输入了{len_shi}字")
+            input_text.delete("1.0", tk.END)
+            input_text.insert(tk.END, processed_text)
+            return
+        else:
+            result = real_shi(self.current_yun_shu, processed_text)
+            output_text.pack(side=tk.RIGHT, padx=5)
+            output_text.config(state=tk.NORMAL)
+            output_text.delete("1.0", tk.END)
+            output_text.insert(tk.END, result)
+            output_text.config(state=tk.DISABLED)
+
+    def check_ci(self, input_text, output_text):
+        text = input_text.get("1.0", tk.END).strip()
+        if not text:
+            messagebox.showwarning("找茬是吧", "请输入需要校验的词！")
+            return
+        cipai = self.cipai_var.get().strip()
+        if not cipai:
+            messagebox.showwarning("找茬是吧", "请输入词牌！")
+            return
+        processed_text = extract_chinese_and_remove_parentheses(text)
+        result = real_ci(self.current_yun_shu, cipai, processed_text)
+        if result == 0:
+            messagebox.showwarning("要不检查下？", "不能找到你输入的词牌")
+        elif result == 1:
+            messagebox.showwarning("要不检查下？", "内容无法匹配词牌格式")
+        else:
+            self.scrollbar_x.place(relx=0.35, rely=0.94, relwidth=0.65, height=20)
+            output_text.pack(side=tk.RIGHT, padx=5)
+            output_text.config(state=tk.NORMAL)
+            output_text.delete("1.0", tk.END)
+            output_text.insert(tk.END, result)
+            output_text.config(state=tk.DISABLED)
+
+    @staticmethod
+    def check_char(input_text, output_text):
+        text = input_text.get("1.0", tk.END).strip()
+        if not text:
+            messagebox.showwarning("找茬是吧", "请输入需要查询的汉字！")
+            return
+        if len(text) != 1:
+            messagebox.showwarning("找茬是吧", "请输入单个汉字！")
+            return
+        result = show_all_rhythm(text)
+        output_text.pack(side=tk.BOTTOM, padx=5)
+        output_text.config(state=tk.NORMAL)
+        output_text.delete("1.0", tk.END)
+        output_text.insert(tk.END, result)
+        output_text.config(state=tk.DISABLED)
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = RhythmCheckerGUI(root)  # 词牌又出问题了，还是先修BUG吧。
+    root.mainloop()  # 后续添加功能 1、对排律的检测 2、多音字 3、词牌自定义格式 4、修订平水韵表
