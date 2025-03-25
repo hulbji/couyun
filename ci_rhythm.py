@@ -271,7 +271,7 @@ def show_ci(ge_lju_final, text_final, yun_final, your_lju_final):
         result += text_final[_] + ' '
         result += yun_final[_] + '\n'
         result += your_lju_final[_] + '\n\n'
-    return result
+    return result.rstrip() + '\n'
 
 
 def real_ci(current_yun_shu, ci_pai_name, ci_content):
@@ -312,7 +312,7 @@ def real_ci(current_yun_shu, ci_pai_name, ci_content):
             yun_info_list.append(yun_info)  # 分割后词韵信息
         real_ci_right = ping_ze_right(ci_content, remain, current_yun_shu)
         yun_final_list = yun_right_list(real_ci_lis, real_ci_right)  # 分割后词格律正确信息
-        ci_result += '\n' + show_ci(cut_list, my_cut_text, yun_info_list, yun_final_list) + '\n'
+        ci_result += '\n' + show_ci(cut_list, my_cut_text, yun_info_list, yun_final_list)
         final_result = result_check(post_result, ci_result)
         post_result = final_result
     end_time = time.time()
