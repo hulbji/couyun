@@ -1,15 +1,22 @@
+"""词校验模块内容，支持三韵。"""
+
 import time
 import os
 import pingshui_rhythm as ps
 
 from ci_cut import *
 from ci_show import *
-from result_check import result_check
-from common import hanzi_to_yun, current_dir
+from common import hanzi_to_yun, current_dir, result_check, cn_nums
 
 
-def search_ci(input_name):
-    """从词牌名称读取编号。"""
+def search_ci(input_name: str) -> str | None:
+    """
+    从词牌名称，在词牌索引中读取编号。
+    Args:
+        input_name: 词牌实际名称
+    Returns:
+        词牌的编号值（字符串），如果没有，返回None
+    """
     file_path = os.path.join(current_dir, 'ci_list', 'ci_index.txt')
     with open(file_path, 'r', encoding='utf-8') as file:
         ci_dict = {}
@@ -23,8 +30,14 @@ def search_ci(input_name):
     return None
 
 
-def ci_type_extraction(ci_number):
-    """提取此编号词牌的格式，不同的格式以两行存储。"""
+def ci_type_extraction(ci_number: str) -> list[list[str]]:
+    """
+    提取此编号词牌的格式，不同的格式以两行存储。
+    Args:
+        ci_number: 词牌的编号值
+    Returns:
+        词牌所有格式的列表，列表中的列表包含每一个格式的例词内容，格律和词牌描述。
+    """
     file_path = os.path.join(current_dir, 'ci_list', f'cipai_{ci_number}.txt')
     with open(file_path, 'r', encoding='utf-8') as file:
         content = file.read()
@@ -57,8 +70,17 @@ def ci_type_extraction(ci_number):
     return processed_sections
 
 
-def process_rhyme_data(rhyme_words, rhyme_position):
-    """将不需要的“句、读”以及特殊情况下的和声词移出。"""
+def process_rhyme_data(rhyme_words: list, rhyme_position: list) -> tuple[list, list]:
+    """
+    给定句读及韵标识词的列表以及其在词中位置的列表，将不需要的“句、读”以及特殊情况下的和声词及其位置从两列表移出。
+    Args:
+        rhyme_words: 给定句读及韵标识词的列表
+        rhyme_position: 标识词在词中位置的列表
+    Returns:
+        返回两个值：
+            只含韵标识词的列表
+            修正后标识词在词中位置的列表
+    """
     chars_to_remove = "竹枝女儿举棹年少句读\u3000"
     processed_rhyme_words = []
     processed_rhyme_position = []
@@ -70,8 +92,20 @@ def process_rhyme_data(rhyme_words, rhyme_position):
     return processed_rhyme_words, processed_rhyme_position
 
 
-def extract_rhyme_words(example_ci, ci_rhythm, ci_rule):
-    """提取一个格式中的韵位置，以及格律的平仄，以列表表示。"""
+def extract_rhyme_words(example_ci: str, ci_rhythm: str, ci_rule: list) -> tuple[list, list[list[int]], str, list[int]]:
+    """
+    提取一个格式中的韵位置，以及格律的平仄，以列表表示。
+    Args:
+        example_ci: 例词的内容
+        ci_rhythm: 词的格律
+        ci_rule: 词牌韵脚数目的列表，分别告诉每一段有几个韵脚
+    Returns:
+        返回四个值：
+            只含韵标识词的列表
+            标识词在词中位置的嵌套列表，列表中每个列表表示词的每一段
+            删去标识词句读韵等的词的格律
+            标识词在词中位置的列表
+    """
     rhyme_words = []  # 用于存储提取的韵脚词汇
     rhyme_positions = []  # 用于存储实际韵脚的位置
     remaining_str = []  # 用于存储剩余的字符
@@ -99,12 +133,20 @@ def extract_rhyme_words(example_ci, ci_rhythm, ci_rule):
     rhyme_words.append(current_word)
     remaining_str = "".join(remaining_str)
     rhyme_words, rhyme_positions = process_rhyme_data(rhyme_words, rhyme_positions)
-    rhyme_positions = split_yun_place(rhyme_positions, ci_rule)
-    return rhyme_words, rhyme_positions, remaining_str
+    proceeded_rhyme_positions = split_yun_place(rhyme_positions, ci_rule)
+    return rhyme_words, proceeded_rhyme_positions, remaining_str, rhyme_positions
 
 
-def ping_ze_right(text, cipai, yun_shu):
-    """检验一首词是否符合一个词牌特定格式的平仄。"""
+def ping_ze_right(text: str, cipai: str, yun_shu: int) -> list[str | bool]:
+    """
+    检验一首词是否符合一个词牌特定格式的平仄。
+    Args:
+        text: 校验的词汉字内容
+        cipai: 删去标识词句读韵等的词的格律
+        yun_shu: 使用的韵书代码
+    Returns:
+        平仄正误的列表 True对 False错 "duo"多音字无法判断
+    """
     yun_shu = int(yun_shu)
     result = []
     for hanzi_num in range(len(text)):
@@ -121,8 +163,15 @@ def ping_ze_right(text, cipai, yun_shu):
     return result
 
 
-def split_yun_place(all_yun, split_method):
-    """将提取到的韵脚位置按照段落分割。"""
+def split_yun_place(all_yun: list[int], split_method: list[int]) -> list[list[int]]:
+    """
+    将提取到的韵脚位置按照段落分割。
+    Args:
+        all_yun: 标识词在词中位置的列表
+        split_method: 词牌韵脚数目的列表，分别告诉每一段有几个韵脚
+    Returns:
+        标识词在词中位置的嵌套列表，列表中每个列表表示词的每一段
+    """
     result = []
     start = 0
     for length in split_method:
@@ -132,8 +181,14 @@ def split_yun_place(all_yun, split_method):
     return result
 
 
-def find_ci_part(ci_info):
-    """提取词牌中分段信息，每一段几个韵。"""
+def find_ci_part(ci_info: str) -> list[int]:
+    """
+    提取词牌中分段信息，每一段几个韵。
+    Args:
+        ci_info: 词牌描述，包括字数、段数、押韵情况
+    Returns:
+        词牌韵脚数目的列表，分别告诉每一段有几个韵脚
+    """
     parts = ci_info.split("句")
     segments = [part.strip() for part in parts[1:]] if len(parts) > 1 else []
     result = []
@@ -158,18 +213,25 @@ def find_ci_part(ci_info):
         first_segment = result[0]
         result += [first_segment, first_segment]
 
-    hanzi_to_num = {"一": 1, "二": 2, "两": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9, "十": 10}
     sum_list = []
     for segment in result:
         # 转换并求和
         sum_value = 0
         for hanzi in segment:
-            sum_value += hanzi_to_num.get(hanzi, 0)
+            sum_value += cn_nums[hanzi]
         sum_list.append(sum_value)
     return sum_list
 
 
-def yun_jiao_classify(yun_jiao_position, hint_list, only_flat=False):
+def yun_jiao_classify(yun_jiao_position: list[list[int]], hint_list: list[str]) -> dict:
+    """
+    根据韵脚列表与韵标识词的列表分类韵
+    Args:
+        yun_jiao_position: 嵌套的韵脚列表
+        hint_list: 韵标识词的列表
+    Returns:
+        将韵脚进行分类的字典
+    """
     flattened = []
     indices = []
     current = 0
@@ -178,8 +240,6 @@ def yun_jiao_classify(yun_jiao_position, hint_list, only_flat=False):
         flattened.extend(sublist)
         current += len(sublist)
     positions = indices[1:]  # 平展列表并保留分段位置
-    if only_flat:
-        return flattened
     for _ in range(len(flattened)):
         if hint_list[_] == '叶':
             flattened[_] = - flattened[_]
@@ -239,12 +299,21 @@ def yun_jiao_classify(yun_jiao_position, hint_list, only_flat=False):
     return result
 
 
-def find_type(text, all_types, yun_shu):
+def find_type(text: str, all_types: list[list[str]], yun_shu: int) -> list[int] | None:
+    """
+    根据输入的文字以及词牌的全部格式格式，通过平仄确定可能的格式。
+    Args:
+        text: 词牌的汉字内容
+        all_types: 词牌所有格式的列表，列表中的列表包含每一个格式的例词内容，格律和词牌描述
+        yun_shu: 使用韵书的代码
+    Returns:
+        所有可能格式的编号的列表
+    """
     count_list = []
     for single_type in range(len(all_types)):
         ci, rhythm, rule = all_types[single_type]
         num_rule = find_ci_part(rule)
-        yun_words, yun_position, remain_words = extract_rhyme_words(ci, rhythm, num_rule)
+        yun_words, yun_position, remain_words = extract_rhyme_words(ci, rhythm, num_rule)[0:3]
         if len(remain_words) != len(text):
             continue
         right_list = ping_ze_right(text, remain_words, yun_shu)
@@ -264,24 +333,43 @@ def find_type(text, all_types, yun_shu):
     return correct_types
 
 
-def show_ci(ge_lju_final, text_final, yun_final, your_lju_final):
+def show_ci(ge_lyu_final: list, text_final: list, yun_final: list, your_lyu_final: list) -> str:
+    """
+    将所有得到的结果组合称为最终的结果
+    Args:
+        ge_lyu_final: 词的格律
+        text_final: 输入的词的内容
+        yun_final: 押韵结果
+        your_lyu_final: 平仄符合与否的结果
+    Returns:
+        组合的结果
+    """
     result = ''
-    for _ in range(len(ge_lju_final)):
-        result += ge_lju_final[_] + '\n'
+    for _ in range(len(ge_lyu_final)):
+        result += ge_lyu_final[_] + '\n'
         result += text_final[_] + ' '
         result += yun_final[_] + '\n'
-        result += your_lju_final[_] + '\n\n'
+        result += your_lyu_final[_] + '\n\n'
     return result.rstrip() + '\n'
 
 
-def real_ci(current_yun_shu, ci_pai_name, ci_content):
+def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str) -> str | int:
+    """
+    校验词牌的最终方法
+    Args:
+        yun_shu: 使用的韵书代码
+        ci_pai_name: 输入的词牌名
+        ci_content: 输入的词内容（已经除去了除汉字以外的内容）
+    Returns:
+        校验结果。如果输入的词牌没有对应，返回 0，如果词内容不能与词牌匹配，返回 1
+    """
     ci_num = search_ci(ci_pai_name)
     if ci_num is None:
         return 0
     type_list = ci_type_extraction(ci_num)
     start_time = time.time()
     final_result = post_result = ''
-    correct_types = find_type(ci_content, type_list, current_yun_shu)
+    correct_types = find_type(ci_content, type_list, yun_shu)
     if not correct_types:
         return 1
     for correct_type in correct_types:
@@ -289,10 +377,9 @@ def real_ci(current_yun_shu, ci_pai_name, ci_content):
         ci_result += f'你的格式为 格{num_to_cn(correct_type + 1)}' + '\n'
         ci, rhythm, rule = type_list[correct_type]
         num_rule = find_ci_part(rule)
-        wds, pos, remain = extract_rhyme_words(ci, rhythm, num_rule)
+        wds, pos, remain, yun_jiao_pos = extract_rhyme_words(ci, rhythm, num_rule)
         cipai_text = type_list[correct_type][0]
         ci_form_str = type_list[correct_type][1]
-        yun_jiao_pos = yun_jiao_classify(pos, wds, only_flat=True)
         yun_jiao_class = yun_jiao_classify(pos, wds)
         yun_list = [ci_content[i] for i in yun_jiao_pos]
         real_ci_lis = split_cipai_text(cipai_text, yun_jiao_pos)
@@ -300,17 +387,17 @@ def real_ci(current_yun_shu, ci_pai_name, ci_content):
         my_cut_text = replace_user_ci_text(ci_content, real_ci_lis)  # 分割后词内容
         yun_num_list = []
         for yun_jiao in yun_list:
-            yun_num_list += hanzi_to_yun(yun_jiao, current_yun_shu, ci_lin=True)
+            yun_num_list += hanzi_to_yun(yun_jiao, yun_shu, ci_lin=True)
 
         yun_df = yun_data_process(yun_jiao_pos, yun_list, yun_jiao_class, yun_num_list)
         yun_info_list = []
         for df_row in yun_df.itertuples():
-            yun_hanzi = ci_yun_list_to_hanzi_yun(df_row.yun_num, current_yun_shu)
+            yun_hanzi = ci_yun_list_to_hanzi_yun(df_row.yun_num, yun_shu)
             yun_group = f'第{num_to_cn(df_row.group)}组韵'
             is_yayun = f'{"" if df_row.is_yayun else "不"}押韵'
             yun_info = yun_hanzi + ' ' + yun_group + ' ' + is_yayun
             yun_info_list.append(yun_info)  # 分割后词韵信息
-        real_ci_right = ping_ze_right(ci_content, remain, current_yun_shu)
+        real_ci_right = ping_ze_right(ci_content, remain, yun_shu)
         yun_final_list = yun_right_list(real_ci_lis, real_ci_right)  # 分割后词格律正确信息
         ci_result += '\n' + show_ci(cut_list, my_cut_text, yun_info_list, yun_final_list)
         final_result = result_check(post_result, ci_result)

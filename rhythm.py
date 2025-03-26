@@ -42,6 +42,7 @@ class RhythmCheckerGUI:
         self.root.title("凑韵")
         self.root.geometry("800x531")
         self.background_image = load_background_image(png_path)
+        # noinspection PyTypeChecker
         self.background_label = tk.Label(self.root, image=self.background_image)
         self.background_label.place(relwidth=1, relheight=1)
         self.current_yun_shu = None
@@ -232,5 +233,5 @@ class RhythmCheckerGUI:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = RhythmCheckerGUI(root)  # 词牌又出问题了，还是先修BUG吧。
-    root.mainloop()  # 后续添加功能 1、对排律的检测 2、多音字 3、词牌自定义格式 4、修订平水韵表
+    app = RhythmCheckerGUI(root)
+    root.mainloop()  # 后续添加功能 1、对排律的检测 2、词牌自定义格式

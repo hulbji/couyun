@@ -1,10 +1,22 @@
+"""韵脚的所有信息整合为数据框"""
+
 import pandas as pd
 import new_rhythm as nw
 from collections import Counter
 from num_to_cn import num_to_cn
 
 
-def yun_data_process(yun_jiao_pos, yun_list, yun_jiao_class, yun_num_list):
+def yun_data_process(yun_jiao_pos: list[int], yun_list: list[str], yun_jiao_class: dict,
+                     yun_num_list: list[list[int]]) -> pd.DataFrame:
+    """
+    根据韵脚位置、韵脚列表、韵脚分类、每个字的韵数字代码列表组成的列表
+    构造包含韵位置、韵脚汉字、每个字的韵数字代码列表、是否为叶韵、韵组别、是否正确押韵的数据框
+    Args:
+        yun_jiao_pos: 韵脚位置
+        yun_list: 韵脚列表
+        yun_jiao_class: 韵脚分类
+        yun_num_list: 每个字的韵数字代码列表组成的列表
+    """
     df = pd.DataFrame({
         "pos": yun_jiao_pos,
         "hanzi": yun_list,
@@ -53,16 +65,21 @@ def yun_data_process(yun_jiao_pos, yun_list, yun_jiao_class, yun_num_list):
         if most_common is not None:
             yun_num = row['yun_num']
             xie_yun = row['xie_yun']
-            # 处理 yun_num 列表
             processed = [-num for num in yun_num] if xie_yun else yun_num
-            # 检查 most_common 是否在 processed 中
             if most_common in processed:
                 df.at[index, "is_yayun"] = True
-
     return df
 
 
-def ci_yun_list_to_hanzi_yun(yun_list, yun_shu):
+def ci_yun_list_to_hanzi_yun(yun_list: list[int], yun_shu: int):
+    """
+    将数字表示的韵部转换为汉字表示的韵部
+    Args:
+        yun_list: 单个字的韵数字代码列表
+        yun_shu: 使用的韵书代码
+    Returns:
+        汉字表示的韵部
+    """
     yun_shu = int(yun_shu)
     if yun_shu == 1:
         hanzi_yun_list = []
@@ -79,7 +96,15 @@ def ci_yun_list_to_hanzi_yun(yun_list, yun_shu):
     return nw.show_yun(yun_list, nw.tong_yun, nw.tong_hanzi)
 
 
-def yun_right_list(ci_seperate_lis, ci_content_right):
+def yun_right_list(ci_seperate_lis: list[str], ci_content_right: list[bool | str]):
+    """
+    根据分割好的词列表以及布尔平仄正误列表得到分割好的字符串平仄正误列表
+    Args:
+        ci_seperate_lis: 分割好的词列表
+        ci_content_right: 布尔平仄正误列表
+    Returns:
+        分割好的字符串平仄正误列表
+    """
     conversion = {True: '〇', 'duo': '中', False: '错'}
     result_list = []
     ptr = 0

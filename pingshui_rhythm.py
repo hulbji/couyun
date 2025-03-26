@@ -13,8 +13,14 @@ rhythm_correspond = {1: 1, 2: 1, 3: 2, 4: 3, 5: 3, 6: 4, 7: 4, 8: 3, 9: [5, 10],
                      22: 2, 23: 11, 24: 11, 25: 11, 26: 12, 27: 13, 28: 14, 29: 14, 30: 14}
 
 
-def traverse_lists_and_find(search_hanzi):
-    """查找并返回包含特定字符串的列表。"""
+def traverse_lists_and_find(search_hanzi: str) -> list[list]:
+    """
+    查找并返回包含特定字符串的列表。
+    Args:
+        search_hanzi: 单个汉字
+    Returns:
+        在 hanzi_class.py 中包含这一汉字的所有列表的列表
+    """
     matching_list = []
     for var_name in dir(hanzi_class):
         var = getattr(hanzi_class, var_name)
@@ -24,8 +30,14 @@ def traverse_lists_and_find(search_hanzi):
     return matching_list
 
 
-def matching_list_to_rhythm_name(matching_list):
-    """将韵表列表转换为韵律名称。"""
+def matching_list_to_rhythm_name(matching_list: list[list]) -> list[str]:
+    """
+    将韵表列表转换为韵律名称。
+    Args:
+        matching_list: 包含某一汉字的所有列表的列表
+    Returns:
+        描述汉字所在韵部的列表
+    """
     rhythm_name_list = []
     for single_list in matching_list:
         rh1 = abs(int(single_list[1])) - 1
@@ -40,10 +52,18 @@ def matching_list_to_rhythm_name(matching_list):
     return rhythm_name_list
 
 
-def hanzi_rhythm(search_str, showit=False, only_ping_ze=False, ci_lin=False):
-    """根据汉字查找韵律信息。"""
+def hanzi_rhythm(search_str: str, showit=False, only_ping_ze=False, ci_lin=False) -> bool | str | list:
+    """
+    根据汉字查找韵律信息。
+    Args:
+        search_str: 查询的汉字
+        showit: 是否展示
+        only_ping_ze: 仅告知平仄
+        ci_lin: 输出词林正韵而非平水韵结果
+    Returns:
+        输出对应的展示或平仄或韵部的数字代码列表
+    """
     matching_lists = traverse_lists_and_find(search_str)
-
     if showit:
         result = ''
         real_rhythm = matching_list_to_rhythm_name(matching_lists)

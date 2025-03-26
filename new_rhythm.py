@@ -1,13 +1,11 @@
-"""
-新韵模块添加在此处，支持新韵和通韵。
-"""
+"""新韵模块，支持新韵和通韵。"""
 
 import math
 from num_to_cn import num_to_cn
 from pypinyin import pinyin, Style
 from pypinyin_dict.pinyin_data import kxhc1983
 
-kxhc1983.load()
+kxhc1983.load()  # 使用现代汉语词典
 
 xin_yun = {1: ['a', 'ia', 'ua'], 2: ['o', 'e', 'uo'], 3: ['ie', 'ue', 've'], 4: ['ai', 'uai'],
            5: ['ei', 'uei', 'ui'], 6: ['ao', 'iao'], 7: ['ou', 'iu', 'iou'], 8: ['an', 'ian', 'uan', 'van'],
@@ -23,8 +21,14 @@ xin_hanzi = ['麻', '波', '皆', '开', '微', '豪', '尤', '寒', '文', '唐
 tong_hanzi = ['啊', '喔', '鹅', '衣', '乌', '迂', '哀', '欸', '熬', '欧', '安', '恩', '昂', '英', '雍', '儿']
 
 
-def get_new_yun(hanzi):
-    """给定一个汉字，返回其所有韵母和声调的列表。"""
+def get_new_yun(hanzi: str) -> list:
+    """
+    给定一个汉字，返回其所有韵母和声调的列表。
+    Args:
+        hanzi: 给定的汉字
+    Returns:
+        该汉字所有读音的韵母和声调的列表
+    """
     hanzi_pinyin = pinyin(hanzi, style=Style.FINALS_TONE3, heteronym=True)[0]
     yun_list = []
     for _ in range(len(hanzi_pinyin)):
@@ -38,8 +42,15 @@ def get_new_yun(hanzi):
     return yun_list
 
 
-def convert_yun(yun_list, rhyme_dict):
-    """将拼音韵转换为对应的新韵或通韵韵部。"""
+def convert_yun(yun_list: list, rhyme_dict: dict) -> list:
+    """
+    将拼音韵转换为对应的新韵或通韵韵部。
+    Args:
+        yun_list: 汉字所有读音的韵母和声调的列表
+        rhyme_dict: 使用的新韵或通韵韵母韵部对照字典
+    Returns:
+        韵部的列表
+    """
     converted_list = []
     for yun, pingze in yun_list:
         # 遍历字典，找到韵母对应的类别
@@ -53,10 +64,16 @@ def convert_yun(yun_list, rhyme_dict):
     return converted_list
 
 
-def new_ping_ze(a_yun_list):
-    """根据新韵返回平仄，或多音。"""
+def new_ping_ze(yun_list: list) -> str:
+    """
+    根据新韵通韵返回平仄，或多音。
+    Args:
+        yun_list: 韵部的列表
+    Returns:
+        平仄结果 0多音 1平 2仄
+    """
     ping = ze = False
-    for converted_yun in a_yun_list:
+    for converted_yun in yun_list:
         if not converted_yun[-1]:
             ping = True
         else:
@@ -64,8 +81,16 @@ def new_ping_ze(a_yun_list):
     return '0' if ping and ze else ('1' if ping else '2')
 
 
-def show_yun(hanzi, yun_rule, yun_hanzi):
-    """展示一个汉字或直接给定韵列表的新韵、通韵韵部。"""
+def show_yun(hanzi: str | list, yun_rule: dict, yun_hanzi: list) -> str:
+    """
+    展示一个汉字或直接给定韵列表的新韵、通韵韵部。
+    Args:
+        hanzi: 一个汉字或直接给定的韵列表
+        yun_rule: 使用的新韵或通韵韵母韵部对照字典
+        yun_hanzi: 新韵或通韵韵部的部汉字
+    Returns:
+        汉字或列表对应的新韵、通韵韵部
+    """
     if type(hanzi) is str:
         hanzi_yun_list = convert_yun(get_new_yun(hanzi), yun_rule)
     else:
