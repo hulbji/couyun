@@ -1,3 +1,5 @@
+"""平水韵相关模块"""
+
 from num_to_cn import num_to_cn  # 自用数字转换汉字代码
 import hanzi_class  # 平水韵表
 

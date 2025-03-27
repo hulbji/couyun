@@ -24,7 +24,7 @@ def split_cipai_text(cipai_text: str, yun_jiao_places: list) -> list:
     return cut_list
 
 
-def split_yun_str_by_ci(ci_list: list[str], yun_str: str, yun_list: list[str], ci_num: int) -> list[str]:
+def split_yun_str_by_ci(ci_list: list[str], yun_str: str, yun_list: list[str], ci_num: str) -> list[str]:
     """
     通过分割好的例词列表，原始的词格律字符串，韵的标识列表，词牌代号，拆分原始的词格律字符串使其与分割好的例词列表匹配。
     Args:

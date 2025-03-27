@@ -1,3 +1,5 @@
+"""凑韵诗词格律检测工具主体tk模块，使用方法请参照README文件。"""
+
 import re
 import os
 import tkinter as tk
@@ -12,7 +14,8 @@ ico_path = os.path.join(current_dir, 'picture', 'ei.ico')
 png_path = os.path.join(current_dir, 'picture', 'ei.png')
 
 
-def extract_chinese_and_remove_parentheses(text):
+def extract_chinese_and_remove_parentheses(text: str) -> str:
+    """删除输入文本中的非汉字部分以及括号内的部分"""
     text_without_parentheses = re.sub(r'[(（].*?[)）]', '', text)
     chinese_text = re.sub(r'[^\u4e00-\u9fff]', '', text_without_parentheses)
     return chinese_text
@@ -26,6 +29,7 @@ def load_background_image(image_path):
 
 
 def settings(mode):
+    """根据模式调整窗口大小"""
     if mode == 'p':
         return 30, 40, 7, 5
     if mode == 'c':
@@ -34,6 +38,36 @@ def settings(mode):
 
 
 class RhythmCheckerGUI:
+    """
+        诗词格律检测工具的图形用户界面。
+        基于Tkinter，允许用户进行诗、词的格律校验以及单个汉字的查询。
+        提供了直观的输入输出界面，并支持不同的韵书选择。
+
+        Attributes:
+            root (tk.Tk): Tkinter主窗口对象。
+            background_image (ImageTk.PhotoImage): 背景图片。
+            background_label (tk.Label): 用于显示背景图片的标签。
+            current_yun_shu (int): 当前选择的韵书编号。
+            input_text (tk.Text): 输入文本框组件。
+            output_text (tk.Text): 输出文本框组件。
+            main_interface (ttk.Frame): 主界面框架。
+            cipai_var (tk.StringVar): 词牌输入的变量绑定。
+            yunshu_var (tk.StringVar): 韵书选择的变量绑定。
+            yun_shu_combobox (dict): 韵书选项的映射字典。
+            scrollbar_x (ttk.Scrollbar): 水平滚动条组件。
+
+        Methods:
+            create_main_interface(): 创建主界面布局。
+            create_generic_interface(title_text, hint_text, button_text, command_func, mode): 创建通用的校验界面。
+            on_yunshu_change(): 处理韵书选择变化的回调函数。
+            open_poem_interface(): 打开诗校验界面。
+            open_ci_interface(): 打开词校验界面。
+            open_char_interface(): 打开查字界面。
+            return_to_main(): 返回主界面。
+            check_poem(input_text, output_text): 对输入的诗进行格律校验。
+            check_ci(input_text, output_text): 对输入的词进行格律校验。
+            check_char(input_text, output_text): 对输入的汉字进行查询。
+    """
     def __init__(self, roots):
         self.scrollbar_x = None
         self.root = roots
