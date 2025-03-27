@@ -215,7 +215,6 @@ def find_ci_part(ci_info: str) -> list[int]:
 
     sum_list = []
     for segment in result:
-        # 转换并求和
         sum_value = 0
         for hanzi in segment:
             sum_value += cn_nums[hanzi]
