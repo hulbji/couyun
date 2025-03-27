@@ -241,7 +241,7 @@ def yun_jiao_classify(yun_jiao_position: list[list[int]], hint_list: list[str]) 
         current += len(sublist)
     positions = indices[1:]  # 平展列表并保留分段位置
     for _ in range(len(flattened)):
-        if hint_list[_] == '叶':
+        if '叶' in hint_list[_]:
             flattened[_] = - flattened[_]
 
     n = len(hint_list)
@@ -266,6 +266,8 @@ def yun_jiao_classify(yun_jiao_position: list[list[int]], hint_list: list[str]) 
             elif '仄韵' in hint_list[i] and two == {'平'}:
                 switch = True
                 count2 -= 1
+            elif '换叶' in hint_list[i]:
+                count += 1
             else:
                 count = 0
                 count2 = -1
@@ -303,7 +305,7 @@ def find_type(text: str, all_types: list[list[str]], yun_shu: int) -> list[int] 
     """
     根据输入的文字以及词牌的全部格式格式，通过平仄确定可能的格式。
     Args:
-        text: 词牌的汉字内容
+        text: 输入词汉字内容
         all_types: 词牌所有格式的列表，列表中的列表包含每一个格式的例词内容，格律和词牌描述
         yun_shu: 使用韵书的代码
     Returns:
@@ -400,6 +402,21 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str) -> str | int:
         real_ci_right = ping_ze_right(ci_content, remain, yun_shu)
         yun_final_list = yun_right_list(real_ci_lis, real_ci_right)  # 分割后词格律正确信息
         ci_result += '\n' + show_ci(cut_list, my_cut_text, yun_info_list, yun_final_list)
+        if correct_type == 23 and ci_num == '658':  # 水龙吟格二十四特殊处理
+            ci_result += f'\n仄句\n{ci_content[-1]}\n'
+            last_yun_list = hanzi_to_yun(ci_content[-1], yun_shu, ci_lin=True)[0]
+            last_ping = last_ze = False
+            for _ in last_yun_list:
+                if _ > 0:
+                    last_ping = True
+                else:
+                    last_ze = True
+            if last_ping and last_ze:
+                ci_result += '中\n'
+            elif last_ping:
+                ci_result += '错\n'
+            else:
+                ci_result += '〇\n'
         final_result = result_check(post_result, ci_result)
         post_result = final_result
     end_time = time.time()
