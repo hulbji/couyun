@@ -1,12 +1,10 @@
 """词校验模块内容，支持三韵。"""
 
 import time
-import os
-import pingshui_rhythm as ps
 
 from ci_cut import *
 from ci_show import *
-from common import hanzi_to_yun, current_dir, result_check, cn_nums
+from common import *
 
 
 def search_ci(input_name: str) -> str | None:
@@ -57,8 +55,8 @@ def ci_type_extraction(ci_number: str) -> list[list[str]]:
         even_lines = []
 
         for i in range(0, len(lines), 2):
-            odd_line = lines[i]  # 当前行（奇数行）
-            even_line = lines[i + 1]  # 下一行（偶数行）
+            odd_line = lines[i]
+            even_line = lines[i + 1]
             odd_line_padded = odd_line.ljust(len(even_line), '\u3000')
             odd_lines.append(odd_line_padded)
             even_lines.append(even_line)
@@ -150,10 +148,7 @@ def ping_ze_right(text: str, cipai: str, yun_shu: int) -> list[str | bool]:
     yun_shu = int(yun_shu)
     result = []
     for hanzi_num in range(len(text)):
-        if yun_shu == 1:  # 平水韵
-            ping_ze = ps.hanzi_rhythm(text[hanzi_num], only_ping_ze=True)
-        else:
-            ping_ze = nw.new_ping_ze(nw.get_new_yun(text[hanzi_num]))
+        ping_ze = hanzi_to_pingze(text[hanzi_num], yun_shu)
         if ping_ze == '0':
             result.append('duo')
         elif ping_ze == '1':
@@ -388,7 +383,7 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str) -> str | int:
         my_cut_text = replace_user_ci_text(ci_content, real_ci_lis)  # 分割后词内容
         yun_num_list = []
         for yun_jiao in yun_list:
-            yun_num_list += hanzi_to_yun(yun_jiao, yun_shu, ci_lin=True)
+            yun_num_list.append(hanzi_to_yun(yun_jiao, yun_shu, ci_lin=True))
 
         yun_df = yun_data_process(yun_jiao_pos, yun_list, yun_jiao_class, yun_num_list)
         yun_info_list = []
@@ -399,20 +394,14 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str) -> str | int:
             yun_info = yun_hanzi + ' ' + yun_group + ' ' + is_yayun
             yun_info_list.append(yun_info)  # 分割后词韵信息
         real_ci_right = ping_ze_right(ci_content, remain, yun_shu)
-        yun_final_list = yun_right_list(real_ci_lis, real_ci_right)  # 分割后词格律正确信息
+        yun_final_list = yun_right_list(real_ci_lis, real_ci_right)
         ci_result += '\n' + show_ci(cut_list, my_cut_text, yun_info_list, yun_final_list)
         if correct_type == 23 and ci_num == '658':  # 水龙吟格二十四特殊处理
             ci_result += f'\n仄句\n{ci_content[-1]}\n'
-            last_yun_list = hanzi_to_yun(ci_content[-1], yun_shu, ci_lin=True)[0]
-            last_ping = last_ze = False
-            for _ in last_yun_list:
-                if _ > 0:
-                    last_ping = True
-                else:
-                    last_ze = True
-            if last_ping and last_ze:
+            last_pingze = hanzi_to_pingze(ci_content[-1], yun_shu)
+            if last_pingze == '0':
                 ci_result += '中\n'
-            elif last_ping:
+            elif last_pingze == '1':
                 ci_result += '错\n'
             else:
                 ci_result += '〇\n'

@@ -4,9 +4,8 @@ import time
 import math
 from collections import defaultdict
 
-import new_rhythm as nw  # 新韵模块
-from pingshui_rhythm import hanzi_rhythm, rhythm_name, rhythm_correspond  # 平水韵模块
-from common import hanzi_to_yun, result_check
+from pingshui_rhythm import rhythm_name, rhythm_correspond  # 平水韵模块
+from common import *
 from shi_first import get_first_type_main  # 判断首句格式
 
 lyu_ju_rule_dict = {
@@ -20,7 +19,7 @@ lyu_ju_rule_dict = {
     8: ['0102012', '0102022']  # 平起不押韵（含拗句），下一句 5 首句 6
 }  # 一定要将拗句放在后检验
 
-sh = ['〇', '错', '中', '入', '丨']  # 如果需要更改符号在这里改
+sh = ['〇', '错', '中']  # 如果需要更改符号在这里改
 
 
 def most_frequent_rhythm(nested_list: list[list[int]]) -> int:
@@ -125,10 +124,7 @@ def lyu_ju(sentence: str, rule: int, yun_shu: int, input_flag=0) -> tuple[list[b
     else:
         patterns = lyu_ju_rule_dict[rule]
 
-    if yun_shu == 1:
-        sentence_pattern = ''.join(hanzi_rhythm(char, only_ping_ze=True) for char in sentence)
-    else:
-        sentence_pattern = ''.join(nw.new_ping_ze(nw.get_new_yun(char)) for char in sentence)
+    sentence_pattern = ''.join(hanzi_to_pingze(char, yun_shu) for char in sentence)
 
     best_match = None
     best_match_score = float('inf')
@@ -178,12 +174,8 @@ def check_real_first(first: list | bool, second: int, first_sen: str,
             修正后的 sen_type
             修正后的 second
     """
-    if yun_shu == 1:
-        last1 = hanzi_rhythm(first_sen[-1], only_ping_ze=True)
-        last3 = hanzi_rhythm(first_sen[-3], only_ping_ze=True)
-    else:
-        last1 = nw.new_ping_ze(nw.get_new_yun(first_sen[-1]))
-        last3 = nw.new_ping_ze(nw.get_new_yun(first_sen[-3]))
+    last1 = hanzi_to_pingze(first_sen[-1], yun_shu)
+    last3 = hanzi_to_pingze(first_sen[-3], yun_shu)
     if last1 != '0':
         return sen_type, second
     change_dict = {1: 2, 3: 4, 4: 3, 2: 1, 5: 6, 6: 5, 7: 8, 8: 7}
@@ -283,25 +275,15 @@ def sentence_show(show_sentence: str, sen_ge_lyu: list[bool], yun_shu: int) -> s
     """
     sp_zi = []
     ge_lju_show = ''
-    if yun_shu == 1:
-        for char in show_sentence:
-            yunbu = hanzi_rhythm(char, only_ping_ze=True)
-            if yunbu == '0':
-                sp_zi.append('duo')
-            elif any(15 <= tone <= 19 for tone in hanzi_rhythm(char, ci_lin=True)):
-                sp_zi.append('ru')
-            else:
-                sp_zi.append('no')
-    else:
-        for char in show_sentence:
-            yunbu = nw.new_ping_ze(nw.get_new_yun(char))
-            sp_zi.append('duo') if yunbu == '0' else sp_zi.append('no')
+    for char in show_sentence:
+        ping_ze = hanzi_to_pingze(char, yun_shu)
+        sp_zi.append('duo') if ping_ze == '0' else sp_zi.append('no')
 
     for i, is_valid in enumerate(sen_ge_lyu):
         if is_valid:
-            ge_lju_show += sh[0] if sp_zi[i] == 'ru' else (sh[2] if sp_zi[i] == 'duo' else sh[0])
+            ge_lju_show += sh[2] if sp_zi[i] == 'duo' else sh[0]
         else:
-            ge_lju_show += sh[1] if sp_zi[i] == 'ru' else sh[1]  # 暂时弃用入声单独标记，可以随时启用
+            ge_lju_show += sh[1]
     return ge_lju_show
 
 
@@ -316,12 +298,8 @@ def special_two_pingze(hanzi1: str, hanzi2: str, yun_shu: int, poem_pingze: int)
     Returns:
         第二个判断标准
     """
-    if yun_shu == 1:
-        ping_ze1 = hanzi_rhythm(hanzi1, only_ping_ze=True)
-        ping_ze2 = hanzi_rhythm(hanzi2, only_ping_ze=True)
-    else:
-        ping_ze1 = nw.new_ping_ze(nw.get_new_yun(hanzi1))
-        ping_ze2 = nw.new_ping_ze(nw.get_new_yun(hanzi2))
+    ping_ze1 = hanzi_to_pingze(hanzi1, yun_shu)
+    ping_ze2 = hanzi_to_pingze(hanzi2, yun_shu)
     if ping_ze1 + ping_ze2 in ['12', '21']:
         return 0  # 不一致
     if '1' in ping_ze1 + ping_ze2 and poem_pingze == 1:
@@ -343,10 +321,7 @@ def is_all_duo_yin(yun_jiao_content: str, yun_shu: int) -> bool:
         是否全部为多音字
     """
     for i in yun_jiao_content:
-        if yun_shu == 1:
-            ping_ze = hanzi_rhythm(i, only_ping_ze=True)
-        else:
-            ping_ze = nw.new_ping_ze(nw.get_new_yun(i))
+        ping_ze = hanzi_to_pingze(i, yun_shu)
         if ping_ze != '0':
             return False
     return True
@@ -366,8 +341,8 @@ def part_shi(yun_shu: int, poem: str) -> tuple[str, str, int, list | bool, int]:
             第一个判断标准
             诗所押的韵的数字表示
     """
-    yun_jiao, f_rhythm, f_hanzi, s_hanzi = poetry_yun_jiao(poem, yun_shu)
-    rhythm_lists = hanzi_to_yun(yun_jiao, yun_shu)
+    yun_jiaos, f_rhythm, f_hanzi, s_hanzi = poetry_yun_jiao(poem, yun_shu)
+    rhythm_lists = [hanzi_to_yun(yun_jiao, yun_shu) for yun_jiao in yun_jiaos]
     this_rhythm = most_frequent_rhythm(rhythm_lists)
     if f_rhythm:
         f_rhythm_check = set(f_rhythm) & {this_rhythm}
@@ -376,7 +351,7 @@ def part_shi(yun_shu: int, poem: str) -> tuple[str, str, int, list | bool, int]:
         poem_pingze = 1 if this_rhythm < 31 else -1
     else:
         poem_pingze = 1 if this_rhythm > 0 else -1  # 1 全诗平 -1 仄 无法判断多音 0
-    if is_all_duo_yin(yun_jiao, yun_shu):
+    if is_all_duo_yin(yun_jiaos, yun_shu):
         poem_pingze = 0
     return f_hanzi, s_hanzi, poem_pingze, f_rhythm, this_rhythm
 

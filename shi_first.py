@@ -1,7 +1,6 @@
 """判断诗歌首句格式的模块，由于相对比较复杂，需要考虑多音字、拗救以及诗歌中可能的错误，单独设置。"""
 
-from pingshui_rhythm import hanzi_rhythm
-import new_rhythm as nw
+from common import hanzi_to_pingze
 
 
 def match_combinations(poem_str: str) -> list[str]:
@@ -33,14 +32,9 @@ def sen_to_poem_str(poem_sen: str, yun_shu: int) -> str:
     Returns:
         二四五字对应平仄代号的字符串
     """
-    if yun_shu == 1:
-        hanzi1 = hanzi_rhythm(poem_sen[1], only_ping_ze=True)
-        hanzi3 = hanzi_rhythm(poem_sen[3], only_ping_ze=True)
-        hanzi5 = hanzi_rhythm(poem_sen[-1], only_ping_ze=True)
-    else:
-        hanzi1 = nw.new_ping_ze(nw.get_new_yun(poem_sen[1]))
-        hanzi3 = nw.new_ping_ze(nw.get_new_yun(poem_sen[3]))
-        hanzi5 = nw.new_ping_ze(nw.get_new_yun(poem_sen[-1]))
+    hanzi1 = hanzi_to_pingze(poem_sen[1], yun_shu)
+    hanzi3 = hanzi_to_pingze(poem_sen[3], yun_shu)
+    hanzi5 = hanzi_to_pingze(poem_sen[-1], yun_shu)
     return hanzi1 + hanzi3 + hanzi5
 
 

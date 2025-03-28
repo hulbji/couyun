@@ -26,28 +26,37 @@ def show_all_rhythm(single_hanzi: str) -> str:
     return result
 
 
-def hanzi_to_yun(hanzis: str, yun_shu: int, ci_lin=False) -> list[list[int]]:
+def hanzi_to_yun(hanzi: str, yun_shu: int, ci_lin=False) -> list[int]:
     """
-    将一串汉字对应为韵书中韵部的嵌套列表。
+    将一个汉字对应为韵书中韵部的列表。
     Args:
-        hanzis: 一串汉字
+        hanzi: 一个汉字
         yun_shu: 使用韵书的代码
         ci_lin: 是否输出词林韵部
     Returns:
-        所有汉字韵部列表的列表
+        汉字的韵部列表
     """
-    rhythm_lists = []
-    for hanzi in hanzis:
-        if yun_shu == 1:
-            if ci_lin:
-                rhythm_lists.append(hanzi_rhythm(hanzi, ci_lin=True))
-            else:
-                rhythm_lists.append(hanzi_rhythm(hanzi))
-        elif yun_shu == 2:
-            rhythm_lists.append(nw.convert_yun(nw.get_new_yun(hanzi), nw.xin_yun))
-        else:
-            rhythm_lists.append(nw.convert_yun(nw.get_new_yun(hanzi), nw.tong_yun))
-    return rhythm_lists
+    if yun_shu == 1:
+        if ci_lin:
+            return hanzi_rhythm(hanzi, ci_lin=True)
+        return hanzi_rhythm(hanzi)
+    elif yun_shu == 2:
+        return nw.convert_yun(nw.get_new_yun(hanzi), nw.xin_yun)
+    return nw.convert_yun(nw.get_new_yun(hanzi), nw.tong_yun)
+
+
+def hanzi_to_pingze(hanzi: str, yun_shu: int) -> str:
+    """
+    给定汉字，返回对应韵书的平仄。多音字 0 平 1 仄 2
+    Args:
+        hanzi: 给定的汉字
+        yun_shu: 使用的韵书代号
+    Returns:
+        平仄代码
+    """
+    if yun_shu == 1:
+        return hanzi_rhythm(hanzi, only_ping_ze=True)
+    return nw.new_ping_ze(nw.get_new_yun(hanzi))
 
 
 def result_check(post_result: str, temp_result: str) -> str:
