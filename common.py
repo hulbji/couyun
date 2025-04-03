@@ -9,20 +9,26 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 cn_nums = {'一': 1, '二': 2, '两': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9, '十': 10}
 
 
-def show_all_rhythm(single_hanzi: str) -> str:
+def show_all_rhythm(single_hanzi: str) -> str | None:
     """
     给定一个汉字，返回其平水、词林、新韵、通韵韵部。
     Args:
         single_hanzi: 单个汉字
     Returns:
-        平水、词林、新韵、通韵韵部
+        平水、词林、新韵、通韵韵部，如果输入的汉字过于生僻不能识别，返回 None
     """
     result = ''
-    result += hanzi_rhythm(single_hanzi, showit=True)
-    result += '\n中华新韵'
-    result += nw.show_yun(single_hanzi, nw.xin_yun, nw.xin_hanzi) + '\n'
-    result += '\n中华通韵'
-    result += nw.show_yun(single_hanzi, nw.tong_yun, nw.tong_hanzi) + '\n'
+    no_message = '未能在韵书中查询到该汉字信息\n'
+    pingshui = hanzi_rhythm(single_hanzi, showit=True)
+    if pingshui == f'{single_hanzi}在：\n':
+        pingshui += no_message
+    xin = nw.show_yun(single_hanzi, nw.xin_yun, nw.xin_hanzi) + '\n'
+    if xin == '\n':
+        xin += no_message
+    tong = nw.show_yun(single_hanzi, nw.tong_yun, nw.tong_hanzi) + '\n'
+    if tong == '\n':
+        tong += no_message
+    result += pingshui + '\n中华新韵' + xin + '\n中华通韵' + tong
     return result
 
 
@@ -47,7 +53,7 @@ def hanzi_to_yun(hanzi: str, yun_shu: int, ci_lin=False) -> list[int]:
 
 def hanzi_to_pingze(hanzi: str, yun_shu: int) -> str:
     """
-    给定汉字，返回对应韵书的平仄。多音字 0 平 1 仄 2
+    给定汉字，返回对应韵书的平仄。多音字 0 平 1 仄 2 生僻字 3
     Args:
         hanzi: 给定的汉字
         yun_shu: 使用的韵书代号

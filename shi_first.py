@@ -1,5 +1,4 @@
 """判断诗歌首句格式的模块，由于相对比较复杂，需要考虑多音字、拗救以及诗歌中可能的错误，单独设置。"""
-
 from common import hanzi_to_pingze
 
 
@@ -94,11 +93,12 @@ def first_poem(matched_lists: list[list[str]], first_yayun: int,
     return first_poem(matched_lists, first_yayun, sen_num, poem_pingze, match_time)
 
 
-def seperate_poem(poem: str) -> tuple[list[str], int]:
+def seperate_poem(poem: str, set_len: int) -> tuple[list[str], int]:
     """
     将诗歌切分为数个句子。
     Args:
         poem: 诗歌的汉字内容
+        set_len: 排律使用，应对字数为 70 的倍数
     Returns:
         返回两个值：
             拆分的句子列表
@@ -106,21 +106,20 @@ def seperate_poem(poem: str) -> tuple[list[str], int]:
     """
     poem_str_list = []
     sen_num = 0
-    while len(poem) % 7 == 0:
-        poem_str_list.append(poem[2:7])
-        poem = poem[7:]
-        sen_num += 1
-        if len(poem) == 0:
-            return poem_str_list, sen_num
-    while len(poem) % 5 == 0:
-        poem_str_list.append(poem[0:5])
-        poem = poem[5:]
-        sen_num += 1
-        if len(poem) == 0:
-            return poem_str_list, sen_num
+
+    while len(poem) > 0:
+        if len(poem) % 7 == 0 and set_len != 5:
+            poem_str_list.append(poem[2:7])
+            poem = poem[7:]
+            sen_num += 1
+        else:
+            poem_str_list.append(poem[0:5])
+            poem = poem[5:]
+            sen_num += 1
+    return poem_str_list, sen_num
 
 
-def get_first_type_main(poem: str, yun_shu: int, first_yayun: int, poem_pingze: int) -> int:
+def get_first_type_main(poem: str, yun_shu: int, first_yayun: int, poem_pingze: int, set_len: int) -> int:
     """
     最终的判断诗歌首句格式的代码
     Args:
@@ -128,10 +127,11 @@ def get_first_type_main(poem: str, yun_shu: int, first_yayun: int, poem_pingze: 
         poem: 诗歌的全汉字内容
         first_yayun: 第二个判断标准
         poem_pingze: 诗歌平仄
+        set_len: 排律使用，应对字数为 70 的倍数
     Returns:
         句子匹配的对应规则代码
     """
-    poem_lists, sentence_num = seperate_poem(poem)
+    poem_lists, sentence_num = seperate_poem(poem, set_len)
     num_lists = []
     for sentence in poem_lists:
         check_poem_str = sen_to_poem_str(sentence, yun_shu)

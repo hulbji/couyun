@@ -3,9 +3,9 @@
 import math
 from num_to_cn import num_to_cn
 from pypinyin import pinyin, Style
-from pypinyin_dict.pinyin_data import kxhc1983
+from pypinyin_dict.pinyin_data import zdic
 
-kxhc1983.load()  # 使用现代汉语词典
+zdic.load()  # 使用汉典网的汉字拼音数据
 
 xin_yun = {1: ['a', 'ia', 'ua'], 2: ['o', 'e', 'uo'], 3: ['ie', 'ue', 've'], 4: ['ai', 'uai'],
            5: ['ei', 'uei', 'ui'], 6: ['ao', 'iao'], 7: ['ou', 'iu', 'iou'], 8: ['an', 'ian', 'uan', 'van'],
@@ -30,6 +30,8 @@ def get_new_yun(hanzi: str) -> list:
         该汉字所有读音的韵母和声调的列表
     """
     hanzi_pinyin = pinyin(hanzi, style=Style.FINALS_TONE3, heteronym=True)[0]
+    if '' in hanzi_pinyin:
+        return []
     yun_list = []
     for _ in range(len(hanzi_pinyin)):
         yun_part, tone = hanzi_pinyin[_][0: -1], hanzi_pinyin[_][-1]
@@ -95,6 +97,8 @@ def show_yun(hanzi: str | list, yun_rule: dict, yun_hanzi: list) -> str:
         hanzi_yun_list = convert_yun(get_new_yun(hanzi), yun_rule)
     else:
         hanzi_yun_list = hanzi
+    if not hanzi_yun_list:
+        return ''
     show_list = []
     for _ in hanzi_yun_list:
         yun_num = int(math.fabs(_))

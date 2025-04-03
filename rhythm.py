@@ -12,13 +12,15 @@ from ci_rhythm import real_ci
 
 ico_path = os.path.join(current_dir, 'picture', 'ei.ico')
 png_path = os.path.join(current_dir, 'picture', 'ei.png')
+hanzi_path = os.path.join(current_dir, 'all_hanzi19355.txt')
+with open(hanzi_path, 'r', encoding='utf-8') as file:
+    allowed_hanzi = set(file.read())
 
 
 def extract_chinese_and_remove_parentheses(text: str) -> str:
     """删除输入文本中的非汉字部分以及括号内的部分"""
     text_without_parentheses = re.sub(r'[(（].*?[)）]', '', text)
-    chinese_text = re.sub(r'[^\u4e00-\u9fff]', '', text_without_parentheses)
-    return chinese_text
+    return ''.join([char for char in text_without_parentheses if char in allowed_hanzi])
 
 
 def load_background_image(image_path):
@@ -51,10 +53,14 @@ class RhythmCheckerGUI:
             input_text (tk.Text): 输入文本框组件。
             output_text (tk.Text): 输出文本框组件。
             main_interface (ttk.Frame): 主界面框架。
-            cipai_var (tk.StringVar): 词牌输入的变量绑定。
+            cipai_var (tk.StringVar): 词牌。
+            cipai_form (tk.StringVar): 输入的词牌格式
             yunshu_var (tk.StringVar): 韵书选择的变量绑定。
             yun_shu_combobox (dict): 韵书选项的映射字典。
             scrollbar_x (ttk.Scrollbar): 水平滚动条组件。
+            default_font (tuple): 常规格式
+            bigger_font(tuple): 大号格式
+            my_purple: 选择的紫色色号
 
         Methods:
             create_main_interface(): 创建主界面布局。
@@ -69,6 +75,7 @@ class RhythmCheckerGUI:
             check_char(input_text, output_text): 对输入的汉字进行查询。
     """
     def __init__(self, roots):
+        self.cipai_form = None
         self.scrollbar_x = None
         self.root = roots
         self.root.iconbitmap(ico_path)
@@ -87,31 +94,33 @@ class RhythmCheckerGUI:
         self.yunshu_reverse_map = None
         self.yunshu_var = None
         self.yun_shu_combobox = {1: '平水韵', 2: '中华通韵', 3: "中华新韵"}
+        self.default_font = ("微软雅黑", 12)
+        self.bigger_font = ("微软雅黑", 16)
+        self.my_purple = "#c9a6eb"
         self.create_main_interface()
 
     def create_main_interface(self):
-        default_font = ("微软雅黑", 12)
         self.main_interface = ttk.Frame(self.root)
         self.main_interface.pack(pady=100)
-        title_label = ttk.Label(self.main_interface, text="凑韵诗词格律校验工具", font=("微软雅黑", 16))
+        title_label = ttk.Label(self.main_interface, text="凑韵诗词格律校验工具", font=self.bigger_font)
         title_label.pack(pady=10)
         button_frame = ttk.Frame(self.main_interface)
         button_frame.pack(pady=10)
-        poem_button = tk.Button(button_frame, text="诗校验", command=self.open_poem_interface, font=default_font,
-                                bg="#c9a6eb", width=20)
+        poem_button = tk.Button(button_frame, text="诗校验", command=self.open_poem_interface, font=self.default_font,
+                                bg=self.my_purple, width=20)
         poem_button.pack(side=tk.TOP, padx=5, pady=10)
-        ci_button = tk.Button(button_frame, text="词校验", command=self.open_ci_interface, font=default_font,
-                              bg="#c9a6eb", width=20)
+        ci_button = tk.Button(button_frame, text="词校验", command=self.open_ci_interface, font=self.default_font,
+                              bg=self.my_purple, width=20)
         ci_button.pack(side=tk.TOP, padx=5, pady=10)
         check_char_button = tk.Button(button_frame, text="查字", command=self.open_char_interface,
-                                      font=default_font, bg="#c9a6eb", width=20)
+                                      font=self.default_font, bg=self.my_purple, width=20)
         check_char_button.pack(side=tk.TOP, padx=5, pady=10)
 
     def create_generic_interface(self, title_text, hint_text, button_text, command_func, mode):
         self.main_interface.pack_forget()
         generic_interface = ttk.Frame(self.root)
         generic_interface.pack(pady=60 if mode == 's' else 20)
-        title_label = ttk.Label(generic_interface, text=title_text, font=("微软雅黑", 16))
+        title_label = ttk.Label(generic_interface, text=title_text, font=self.bigger_font)
         title_label.pack(pady=10)
         if mode != 's':
             if mode == 'c':
@@ -120,11 +129,11 @@ class RhythmCheckerGUI:
                 self.yun_shu_combobox[1] = '平水韵'
             yunshu_frame = ttk.Frame(generic_interface)
             yunshu_frame.pack(pady=5, anchor=tk.W)
-            yunshu_label = ttk.Label(yunshu_frame, text="选择韵书:", font=("微软雅黑", 12))
+            yunshu_label = ttk.Label(yunshu_frame, text="选择韵书:", font=self.default_font)
             yunshu_label.pack(side=tk.LEFT, padx=5)
             self.yunshu_var = tk.StringVar()
             self.yunshu_var.set(self.yun_shu_combobox[1])
-            yunshu_combobox = ttk.Combobox(yunshu_frame, textvariable=self.yunshu_var, font=("微软雅黑", 12), width=15,
+            yunshu_combobox = ttk.Combobox(yunshu_frame, textvariable=self.yunshu_var, font=self.default_font, width=15,
                                            state="readonly")
             yunshu_combobox['values'] = list(self.yun_shu_combobox.values())
             yunshu_combobox.pack(side=tk.LEFT, padx=5)
@@ -134,20 +143,27 @@ class RhythmCheckerGUI:
         if mode == 'c':
             cipai_frame = ttk.Frame(generic_interface)
             cipai_frame.pack(pady=5, anchor=tk.W)
-            cipai_label = ttk.Label(cipai_frame, text="输入词牌:", font=("微软雅黑", 12))
+            cipai_label = ttk.Label(cipai_frame, text="输入词牌:", font=self.default_font)
             cipai_label.pack(side=tk.LEFT, padx=5)
             self.cipai_var = tk.StringVar()
-            cipai_entry = ttk.Entry(cipai_frame, textvariable=self.cipai_var, font=("微软雅黑", 12), width=15)
+            cipai_entry = ttk.Entry(cipai_frame, textvariable=self.cipai_var, font=self.default_font, width=15)
             cipai_entry.pack(side=tk.LEFT, padx=5)
+            format_frame = ttk.Frame(generic_interface)
+            format_frame.pack(pady=5, anchor=tk.W)
+            format_label = ttk.Label(format_frame, text="格式:", font=self.default_font)
+            format_label.pack(side=tk.LEFT, padx=5)
+            self.cipai_form = tk.StringVar()
+            format_entry = ttk.Entry(format_frame, textvariable=self.cipai_form, font=self.default_font, width=10)
+            format_entry.pack(side=tk.LEFT, padx=5)
         frame = ttk.Frame(generic_interface)
         frame.pack(pady=10)
-        input_label = ttk.Label(frame, text=hint_text, font=("微软雅黑", 12))
+        input_label = ttk.Label(frame, text=hint_text, font=self.default_font)
         input_label.pack(side=tk.TOP, pady=10, anchor=tk.W)
-        input_text = tk.Text(frame, width=settings(mode)[0], height=1 if mode == 's' else 10, font=("微软雅黑", 12))
+        input_text = tk.Text(frame, width=settings(mode)[0], height=1 if mode == 's' else 10, font=self.default_font)
         input_text.pack(side=tk.TOP if mode == 's' else tk.LEFT, padx=5)
 
         # 创建输出文本框
-        output_text = tk.Text(frame, width=settings(mode)[1], height=10, font=("微软雅黑", 12), wrap=tk.NONE,
+        output_text = tk.Text(frame, width=settings(mode)[1], height=10, font=self.default_font, wrap=tk.NONE,
                               state=tk.DISABLED)
         output_text.pack(side=tk.TOP if mode == 's' else tk.LEFT, padx=5)
         if mode == 'c':
@@ -158,11 +174,11 @@ class RhythmCheckerGUI:
         button_frame = ttk.Frame(generic_interface)
         button_frame.pack(pady=10)
         analyze_button = tk.Button(button_frame, text=button_text,
-                                   command=lambda: command_func(input_text, output_text), font=("微软雅黑", 12),
-                                   bg="#c9a6eb", width=settings(mode)[2])
+                                   command=lambda: command_func(input_text, output_text), font=self.default_font,
+                                   bg=self.my_purple, width=settings(mode)[2])
         analyze_button.pack(side=tk.LEFT, padx=5)
-        back_button = tk.Button(button_frame, text="返回", command=self.return_to_main, font=("微软雅黑", 12),
-                                bg="#c9a6eb", width=settings(mode)[3])
+        back_button = tk.Button(button_frame, text="返回", command=self.return_to_main, font=self.default_font,
+                                bg=self.my_purple, width=settings(mode)[3])
         back_button.pack(side=tk.RIGHT, padx=5)
         output_text.pack_forget()
 
@@ -212,7 +228,8 @@ class RhythmCheckerGUI:
             return
         processed_text = extract_chinese_and_remove_parentheses(text)
         len_shi = len(processed_text)
-        if len_shi not in [20, 40, 28, 56]:
+        if len_shi % 10 != 0 and len_shi % 14 != 0 or len_shi < 20:
+            print(len_shi)
             messagebox.showwarning("要不检查下？", f"诗的字数不正确，可能有无法识别的生僻字，你输入了{len_shi}字")
             input_text.delete("1.0", tk.END)
             input_text.insert(tk.END, processed_text)
@@ -231,15 +248,19 @@ class RhythmCheckerGUI:
             messagebox.showwarning("找茬是吧", "请输入需要校验的词！")
             return
         cipai = self.cipai_var.get().strip()
+        form = self.cipai_form.get().strip()
         if not cipai:
             messagebox.showwarning("找茬是吧", "请输入词牌！")
             return
         processed_text = extract_chinese_and_remove_parentheses(text)
-        result = real_ci(self.current_yun_shu, cipai, processed_text)
+        len_ci = len(processed_text)
+        result = real_ci(self.current_yun_shu, cipai, processed_text, form)
         if result == 0:
-            messagebox.showwarning("要不检查下？", "不能找到你输入的词牌")
+            messagebox.showwarning("要不检查下？", "不能找到你输入的词牌！")
         elif result == 1:
-            messagebox.showwarning("要不检查下？", "内容无法匹配词牌格式")
+            messagebox.showwarning("要不检查下？", f"内容无法匹配词牌格式，请检查格式以及是否有无法识别的生僻字！\n你输入了{len_ci}字！")
+        elif result == 2:
+            messagebox.showwarning('找茬是吧？', "输入的格式不正确，请输入正确的格式数字！")
         else:
             self.scrollbar_x.place(relx=0.35, rely=0.94, relwidth=0.65, height=20)
             output_text.pack(side=tk.RIGHT, padx=5)
@@ -257,6 +278,9 @@ class RhythmCheckerGUI:
         if len(text) != 1:
             messagebox.showwarning("找茬是吧", "请输入单个汉字！")
             return
+        if not re.match(r'[\u4e00-\u9fff\u3400-\u4dbf]', text):
+            messagebox.showwarning("你在干嘛呢", "输入的内容非汉字或其不在基本区及拓展A区")
+            return
         result = show_all_rhythm(text)
         output_text.pack(side=tk.BOTTOM, padx=5)
         output_text.config(state=tk.NORMAL)
@@ -268,4 +292,4 @@ class RhythmCheckerGUI:
 if __name__ == "__main__":
     root = tk.Tk()
     app = RhythmCheckerGUI(root)
-    root.mainloop()  # 后续添加功能 1、对排律的检测 2、词牌自定义格式 3、僻字处理
+    root.mainloop()  # 后续添加功能 1、对排律的检测 2、词牌自定义格式(√) 3、僻字处理(√) 4、仄韵检测修复(√) 5、优化了拗句检测的条件

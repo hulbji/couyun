@@ -324,7 +324,7 @@ def find_type(text: str, all_types: list[list[str]], yun_shu: int) -> list[int] 
     type_num = count_list[0][1]
     correct_types = []
     for _ in count_list:
-        if _[1] == type_num:
+        if _[1] / type_num >= 0.85:  # 按符合85%以上匹配
             correct_types.append(_[0])
     return correct_types
 
@@ -349,13 +349,14 @@ def show_ci(ge_lyu_final: list, text_final: list, yun_final: list, your_lyu_fina
     return result.rstrip() + '\n'
 
 
-def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str) -> str | int:
+def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, give_type: str) -> str | int:
     """
     校验词牌的最终方法
     Args:
         yun_shu: 使用的韵书代码
         ci_pai_name: 输入的词牌名
         ci_content: 输入的词内容（已经除去了除汉字以外的内容）
+        give_type: 给定的词牌格式，如果没有，那么按照自动格式检验
     Returns:
         校验结果。如果输入的词牌没有对应，返回 0，如果词内容不能与词牌匹配，返回 1
     """
@@ -366,6 +367,17 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str) -> str | int:
     start_time = time.time()
     final_result = post_result = ''
     correct_types = find_type(ci_content, type_list, yun_shu)
+    # print(correct_types)  # 展示可能的格式，最可能的在先， 0开头，若换算实际格式 +1
+    incorrect_given_type = False
+    if give_type:
+        if give_type.isnumeric():
+            give_type = int(give_type) - 1
+            if give_type in correct_types:
+                correct_types = [give_type]
+            else:
+                incorrect_given_type = True
+        else:
+            return 2
     if not correct_types:
         return 1
     for correct_type in correct_types:
@@ -409,4 +421,6 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str) -> str | int:
         post_result = final_result
     end_time = time.time()
     final_result += f'检测完毕，耗时{end_time - start_time:.5f}s\n'
-    return final_result
+    if incorrect_given_type:
+        final_result = "给定格式与实际相差过大或没有此格式，将另行匹配。\n" + final_result
+    return final_result  # 检查一下匹配正确词牌的原理，可以适当放宽标准

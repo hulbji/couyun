@@ -6,17 +6,18 @@ from collections import defaultdict
 
 from pingshui_rhythm import rhythm_name, rhythm_correspond  # 平水韵模块
 from common import *
+from num_to_cn import num_to_cn
 from shi_first import get_first_type_main  # 判断首句格式
 
 lyu_ju_rule_dict = {
-    1: ['11221', '21121', '11121'],  # 平起押韵，下一句 2 首句 3
-    2: ['01122', '11212'],  # 平起不押韵，下一句 3 首句 4
-    3: ['02211'],  # 仄起押韵，下一句 4 首句 1
-    4: ['02012', '02022'],  # 仄起不押韵（含拗句），下一句 1 首句 2
-    5: ['0211221', '0221121', '0211121'],  # 仄起押韵，下一句 6 首句 7
-    6: ['0201122', '0211212'],  # 仄起不押韵，下一句 7 首句 8
-    7: ['0102211'],  # 平起押韵，下一句 8 首句 5
-    8: ['0102012', '0102022']  # 平起不押韵（含拗句），下一句 5 首句 6
+    1: ['11221', '21121', '11121'],  # 平起押韵
+    2: ['01122', '11212'],  # 平起不押韵
+    3: ['02211'],  # 仄起押韵
+    4: ['02012', '02022'],  # 仄起不押韵（含拗句）
+    5: ['0211221', '0221121', '0211121'],  # 仄起押韵
+    6: ['0201122', '0211212'],  # 仄起不押韵
+    7: ['0102211'],  # 平起押韵
+    8: ['0102012', '0102022']  # 平起不押韵（含拗句）
 }  # 一定要将拗句放在后检验
 
 sh = ['〇', '错', '中']  # 如果需要更改符号在这里改
@@ -80,14 +81,11 @@ def poetry_yun_jiao(poem: str, yun_shu: int) -> tuple[str, list | bool, str, str
             第二句末汉字
     """
     poem_length = len(poem)
-    if poem_length == 20:
-        indices = [10, 20]
-    elif poem_length == 28:
-        indices = [14, 28]
-    elif poem_length == 40:
-        indices = [10, 20, 30, 40]
-    else:
-        indices = [14, 28, 42, 56]
+    indices = []
+    if poem_length % 10 == 0:
+        indices = list(range(10, poem_length + 1, 10))
+    elif poem_length % 14 == 0:
+        indices = list(range(14, poem_length + 1, 14))
     extracted = [poem[hanzi_yun_jiao - 1] for hanzi_yun_jiao in indices]
     if poem_length % 5 == 0:
         first_hanzi = poem[4]
@@ -101,7 +99,8 @@ def poetry_yun_jiao(poem: str, yun_shu: int) -> tuple[str, list | bool, str, str
     return ''.join(extracted), first_yayun, first_hanzi, second_hanzi
 
 
-def lyu_ju(sentence: str, rule: int, yun_shu: int, input_flag=0) -> tuple[list[bool], int, str]:
+def lyu_ju(sentence: str, rule: int, yun_shu: int, poem_pingze: int,
+           input_flag: int = 0) -> tuple[list[bool], int, str, str]:
     """
     判断一个句子是不是律句，包括拗句。
     Args:
@@ -109,6 +108,7 @@ def lyu_ju(sentence: str, rule: int, yun_shu: int, input_flag=0) -> tuple[list[b
         rule: 句子匹配的对应规则代码
         yun_shu: 使用的韵书代码
         input_flag: 拗句标记代码
+        poem_pingze: 诗的平仄代码
     Returns:
         返回三个值：
             表示该字平仄正确与否的布尔列表
@@ -116,10 +116,15 @@ def lyu_ju(sentence: str, rule: int, yun_shu: int, input_flag=0) -> tuple[list[b
             展示的拗句提示词
     """
     hint_word = ''
-    if input_flag == 1:
-        hint_word += "“平平仄平仄”拗句，为本句自救。\n此时第一字必须平声。\n"  # 输出上一句的特殊情况
+    if poem_pingze == -1:
+        lyu_ju_rule_dict[1] = ['11221', '21121', '11121', '21221']  # 仄韵无孤平
+        lyu_ju_rule_dict[4] = ['02012']
+        lyu_ju_rule_dict[8] = ['0102012']  # 仄韵无“中仄中仄仄”拗句，因为没法对句救
+    else:
+        lyu_ju_rule_dict[1] = ['11221', '21121', '11121']
+        lyu_ju_rule_dict[4] = ['02012', '02022']
+        lyu_ju_rule_dict[8] = ['0102012', '0102022']
     if input_flag == 2:
-        hint_word += "本句可能为“中仄中仄仄”拗句。\n如需使用，对句第三字需改仄为平。为对句相救。\n"
         patterns = lyu_ju_rule_dict[rule][-2:]
     else:
         patterns = lyu_ju_rule_dict[rule]
@@ -152,11 +157,16 @@ def lyu_ju(sentence: str, rule: int, yun_shu: int, input_flag=0) -> tuple[list[b
     hanzi_rule = ''.join(change_to_hanzi_rule[char] for char in matched_rule)
     hint_word += f'\n{hanzi_rule}'
 
+    ao_word = ''
     if matched_rule in ['02022', '0102022']:  # 拗救需提示
-        return match_list, 2, hint_word
-    if matched_rule in ['0211212', '11212']:
-        return match_list, 1, hint_word
-    return match_list, 0, hint_word
+        input_flag = 2
+        ao_word += "\n本句可能为“中仄中仄仄”拗句。四拗对句须三救。"
+    elif matched_rule in ['0211212', '11212']:
+        input_flag = 1
+        ao_word += "\n“平平仄平仄”拗句，为本句自救。"
+    else:
+        input_flag = 0
+    return match_list, input_flag, hint_word, ao_word
 
 
 def check_real_first(first: list | bool, second: int, first_sen: str,
@@ -189,25 +199,34 @@ def check_real_first(first: list | bool, second: int, first_sen: str,
     return sen_type, second
 
 
-def which_sentence(first_sen_type: int, how_many: int, first_yayun: int) -> list[int]:
+def which_sentence(first_sen_type: int, how_many: int, first_yayun: int, poem_pingze: int) -> list[int]:
     """
     根据首句推测后续句的格式。
     Args:
         first_sen_type: 首句的句式格式代码
         how_many: 诗的句数
         first_yayun: 首句是否押韵，-1押仄韵 1押平韵 0不押韵
+        poem_pingze: 诗歌的平仄代码
     Returns:
         每个句子对应的规则代码的列表
     """
     sen_list = []
     turn_rule = {1: 2, 2: 3, 3: 4, 4: 1, 5: 6, 6: 7, 7: 8, 8: 5}
     first_rule = {1: 3, 2: 4, 3: 1, 4: 2, 5: 7, 6: 8, 7: 5, 8: 6}
+    ze_turn_rule = {2: 1, 3: 2, 4: 3, 1: 4, 6: 5, 7: 6, 8: 7, 5: 8}
+    ze_first_rule = {3: 1, 4: 2, 1: 3, 2: 4, 7: 5, 8: 6, 5: 7, 6: 8}
     for _ in range(how_many):
         sen_list.append(first_sen_type)
         if first_yayun and _ == 0:  # 若首句押韵
-            first_sen_type = first_rule[first_sen_type]
+            if poem_pingze == 1:
+                first_sen_type = first_rule[first_sen_type]
+            else:
+                first_sen_type = ze_first_rule[first_sen_type]
         else:
-            first_sen_type = turn_rule[first_sen_type]
+            if poem_pingze == 1:
+                first_sen_type = turn_rule[first_sen_type]
+            else:
+                first_sen_type = ze_turn_rule[first_sen_type]
     return sen_list
 
 
@@ -357,7 +376,7 @@ def part_shi(yun_shu: int, poem: str) -> tuple[str, str, int, list | bool, int]:
 
 
 def part_shi_2(yun_shu: int, poem: str, f_hanzi: str, s_hanzi: str,
-               poem_pingze: int, f_rhythm: list | bool, this_rhythm: int) -> str:
+               poem_pingze: int, f_rhythm: list | bool, this_rhythm: int, sen_len: int = None) -> str:
     """
     诗歌检验函数集成二。
     Args:
@@ -368,33 +387,42 @@ def part_shi_2(yun_shu: int, poem: str, f_hanzi: str, s_hanzi: str,
         poem_pingze: 诗歌平仄
         f_rhythm: 第一个判断标准
         this_rhythm: 诗所押的韵的数字表示
+        sen_len: 指定一句的长度，用于排律字数无法确定是五言句还是七言句时使用
     Returns:
         诗歌的检验结果（还需要校验）
     """
     s_rhythm = special_two_pingze(f_hanzi, s_hanzi, yun_shu, poem_pingze)
     shi_result = ''
-    sen_len = 5 if len(poem) % 5 == 0 else 7
-    first_sen = get_first_type_main(poem, yun_shu, s_rhythm, poem_pingze)
+    if not sen_len:
+        sen_len = 5 if len(poem) % 5 == 0 else 7
+    if len(poem) // sen_len == 4:
+        poem_type = '绝句'
+    elif len(poem) // sen_len == 8:
+        poem_type = '律诗'
+    else:
+        poem_type = '排律'
+    shi_result += f'{num_to_cn(sen_len)}言{poem_type}\n'
+    first_sen = get_first_type_main(poem, yun_shu, s_rhythm, poem_pingze, sen_len)
     first_sen, s_rhythm = check_real_first(f_rhythm, s_rhythm, poem[0: sen_len], yun_shu, first_sen)
-    yun_jiao_list = [2, 4] if len(poem) in [20, 28] else [2, 4, 6, 8]
+    max_yun_jiao = len(poem) // 5 if sen_len == 5 else len(poem) // 7
+    yun_jiao_list = list(range(2, max_yun_jiao + 1, 2))
     if s_rhythm:
         yun_jiao_list.append(1)
     if not first_sen:
         return '无法判断。'  # 如果没有识别，中止。
-    rule_list = which_sentence(first_sen, int(len(poem) / sen_len), s_rhythm)
+    rule_list = which_sentence(first_sen, int(len(poem) / sen_len), s_rhythm, poem_pingze)
 
     sen_mode = 0  # 一般律句，如果有拗句，对应值变化
     for i in range(len(rule_list)):
         a_sentence = poem[sen_len * i: sen_len * (i + 1)]
-        ge_lju, sen_mode, hint = lyu_ju(a_sentence, rule_list[i], yun_shu, sen_mode)
+        ge_lju, sen_mode, hint, ao = lyu_ju(a_sentence, rule_list[i], yun_shu, poem_pingze, sen_mode)
         shi_result += hint + '\n' + a_sentence + '\t'
+        yun_jiao_result = ''
         if i + 1 in yun_jiao_list:
-            if i == 0:
-                shi_result += yun_jiao_show(a_sentence[-1], this_rhythm, yun_shu, True)
-            else:
-                shi_result += yun_jiao_show(a_sentence[-1], this_rhythm, yun_shu, False)
+            is_first_sen = True if i == 0 else False
+            yun_jiao_result = yun_jiao_show(a_sentence[-1], this_rhythm, yun_shu, is_first_sen)
         ge_lju_show = sentence_show(a_sentence, ge_lju, yun_shu)
-        shi_result += '\n' + ge_lju_show + '\n'
+        shi_result += yun_jiao_result + '\n' + ge_lju_show + '\t' + ao + '\n'
     return shi_result
 
 
@@ -408,13 +436,26 @@ def real_shi(yun_shu: int, poem: str) -> str:
         最终的诗歌校验结果
     """
     start_time = time.time()
-    f_hanzi, s_hanzi, poem_pingze, f_rhythm, this_rhythm = part_shi(yun_shu, poem)
-    poem_pingze = [1, -1] if poem_pingze == 0 else [poem_pingze]
-    post_result = final_result = ''
-    for single_pingze in poem_pingze:
-        temp_result = part_shi_2(yun_shu, poem, f_hanzi, s_hanzi, single_pingze, f_rhythm, this_rhythm)
-        final_result = result_check(post_result, temp_result)
-        post_result = temp_result
+    if len(poem) % 70 == 0:
+        all_check_time = 2
+        d_check = [5, 7]
+    else:
+        all_check_time = 1
+        d_check = [None]
+    all_post_result = final_result = ''
+    for _ in range(all_check_time):
+        post_result = ''
+        f_hanzi, s_hanzi, poem_pingze, f_rhythm, this_rhythm = part_shi(yun_shu, poem)
+        poem_pingze = [1, -1] if poem_pingze == 0 else [poem_pingze]
+        for single_pingze in poem_pingze:
+            temp_result = part_shi_2(yun_shu, poem, f_hanzi, s_hanzi, single_pingze, f_rhythm, this_rhythm, d_check[_])
+            final_result = result_check(post_result, temp_result)
+            post_result = temp_result
+        if all_check_time == 1:
+            break
+        all_temp_result = final_result
+        final_result = result_check(all_post_result, all_temp_result)
+        all_post_result = all_temp_result
     end_time = time.time()
     final_result += f'检测完毕，耗时{end_time - start_time:.5f}s\n'
     return final_result.lstrip()
