@@ -15,7 +15,7 @@ def show_all_rhythm(single_hanzi: str) -> str | None:
     Args:
         single_hanzi: 单个汉字
     Returns:
-        平水、词林、新韵、通韵韵部，如果输入的汉字过于生僻不能识别，返回 None
+        平水、词林、新韵、通韵韵部，如果输入的汉字过于生僻不能识别，返回 None（不是我这有接近20000个汉字，正常写诗那用得到什么奇葩生僻字啊）
     """
     result = ''
     no_message = '未能在韵书中查询到该汉字信息\n'

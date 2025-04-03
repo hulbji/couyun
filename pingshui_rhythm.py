@@ -80,7 +80,7 @@ def hanzi_rhythm(search_str: str, showit=False, only_ping_ze=False, ci_lin=False
                 ping = True
             elif rh_list[2] < 0 and not ze:
                 ze = True
-        return '0' if ping and ze else ('1' if ping else '2')  # 0 中 1 平 2 仄 空字符串 生僻字
+        return '0' if ping and ze else ('1' if ping else '2')  # 0 中 1 平 2 仄 空字符串 生僻字（只做查字用）
     elif ci_lin:
         return list(set(rh_list[3] for rh_list in matching_lists))
     else:
