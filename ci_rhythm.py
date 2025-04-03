@@ -423,4 +423,4 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, give_type: str) -> 
     final_result += f'检测完毕，耗时{end_time - start_time:.5f}s\n'
     if incorrect_given_type:
         final_result = "给定格式与实际相差过大或没有此格式，将另行匹配。\n" + final_result
-    return final_result  # 检查一下匹配正确词牌的原理，可以适当放宽标准
+    return final_result

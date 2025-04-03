@@ -106,7 +106,6 @@ def seperate_poem(poem: str, set_len: int) -> tuple[list[str], int]:
     """
     poem_str_list = []
     sen_num = 0
-
     while len(poem) > 0:
         if len(poem) % 7 == 0 and set_len != 5:
             poem_str_list.append(poem[2:7])

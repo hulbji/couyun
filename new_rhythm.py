@@ -5,7 +5,7 @@ from num_to_cn import num_to_cn
 from pypinyin import pinyin, Style
 from pypinyin_dict.pinyin_data import zdic
 
-zdic.load()  # 使用汉典网的汉字拼音数据
+zdic.load()  # 使用汉典网的拼音数据
 
 xin_yun = {1: ['a', 'ia', 'ua'], 2: ['o', 'e', 'uo'], 3: ['ie', 'ue', 've'], 4: ['ai', 'uai'],
            5: ['ei', 'uei', 'ui'], 6: ['ao', 'iao'], 7: ['ou', 'iu', 'iou'], 8: ['an', 'ian', 'uan', 'van'],

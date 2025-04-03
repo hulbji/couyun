@@ -292,4 +292,4 @@ class RhythmCheckerGUI:
 if __name__ == "__main__":
     root = tk.Tk()
     app = RhythmCheckerGUI(root)
-    root.mainloop()  # 后续添加功能 1、对排律的检测 2、词牌自定义格式(√) 3、僻字处理(√) 4、仄韵检测修复(√) 5、优化了拗句检测的条件
+    root.mainloop()
