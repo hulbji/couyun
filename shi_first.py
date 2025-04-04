@@ -25,6 +25,7 @@ def match_combinations(poem_str: str) -> list[str]:
 
 def sen_to_poem_str(poem_sen: str, yun_shu: int) -> str:
     """
+    给定一句诗的内容，返回二四五字对应平仄代号的字符串
     Args:
         poem_sen: 诗歌某一句的内容
         yun_shu: 使用的韵书代码
@@ -37,8 +38,29 @@ def sen_to_poem_str(poem_sen: str, yun_shu: int) -> str:
     return hanzi1 + hanzi3 + hanzi5
 
 
+def get_current_pattern(sen: int, ping_ze: str) -> list[int]:
+    """
+    如果首句押韵，给定当前的句数，返回应该的当句格式代号列表。比如如果此时是第一句，且全诗押平声韵，那么句式格式一定是1或3
+    Args:
+        sen: 当前的诗句数
+        ping_ze: 诗歌的平仄
+    Returns:
+        二四五字对应平仄代号的字符串
+    """
+    ping_initial = [[1, 3], [3, 1], [4, 2], [1, 3]]
+    ping_cycle = [[2, 4], [3, 1], [4, 2], [1, 3]]
+    ze_initial = [[2, 4], [4, 2], [1, 3], [2, 4]]
+    ze_cycle = [[3, 1], [4, 2], [1, 3], [2, 4]]
+
+    if ping_ze == "ping":
+        current = ping_initial[sen] if sen <= 4 else ping_cycle[sen % 4]
+    else:
+        current = ze_initial[sen] if sen <= 4 else ze_cycle[sen % 4]
+    return current
+
+
 def first_poem(matched_lists: list[list[str]], first_yayun: int,
-               sen_num: int, poem_pingze: int, match_time=1) -> int:
+               sen_num: int, poem_pingze: int, match_time=0) -> int:
     """
     递归计算每一个句子，直到其匹配到特定的格式，得到首句的格式。
     Args:
@@ -50,26 +72,24 @@ def first_poem(matched_lists: list[list[str]], first_yayun: int,
     Returns:
         句子匹配的规则代码（五言，七言需要在此基础上 +4）
     """
-    matched_list = matched_lists[match_time - 1]
-    ping = {1: [1, 3], 2: [3, 1], 3: [4, 2], 4: [1, 3], 5: [2, 4], 6: [3, 1], 7: [4, 2], 8: [1, 3]}
-    ze = {1: [2, 4], 2: [4, 2], 3: [1, 3], 4: [2, 4], 5: [3, 1], 6: [4, 2], 7: [1, 3], 8: [2, 4]}
+    matched_list = matched_lists[match_time]
     rule = {'111': 0, '112': 2, '121': 1, '122': 2, "211": 3, '212': 4, '221': 0, '222': 4}
     changed_set = set([rule[i] for i in matched_list])
     if first_yayun == 1:
-        intersection = changed_set.intersection(set(ping[match_time]))
+        intersection = changed_set.intersection(set(get_current_pattern(match_time, 'ping')))
         if len(intersection) == 1:
             current = next(iter(intersection))
-            place = ping[match_time].index(current)
-            return ping[1][place]
+            place = get_current_pattern(match_time, 'ping').index(current)
+            return get_current_pattern(0, 'ping')[place]
     elif first_yayun == -1:
-        intersection = changed_set.intersection(set(ze[match_time]))
+        intersection = changed_set.intersection(set(get_current_pattern(match_time, 'ze')))
         if len(intersection) == 1:
             current = next(iter(intersection))
-            place = ze[match_time].index(current)
-            return ze[1][place]
+            place = get_current_pattern(match_time, 'ze').index(current)
+            return get_current_pattern(0, 'ze')[place]
     else:
         if len(changed_set) == 1:
-            result = next(iter(changed_set)) + 1 - match_time
+            result = next(iter(changed_set)) - match_time
             while result <= 0:
                 result += 4
             return result
@@ -126,7 +146,7 @@ def get_first_type_main(poem: str, yun_shu: int, first_yayun: int, poem_pingze: 
         poem: 诗歌的全汉字内容
         first_yayun: 第二个判断标准
         poem_pingze: 诗歌平仄
-        set_len: 排律使用，应对字数为 70 的倍数
+        set_len: 一句的字数，应为5或7
     Returns:
         句子匹配的对应规则代码
     """
@@ -137,4 +157,4 @@ def get_first_type_main(poem: str, yun_shu: int, first_yayun: int, poem_pingze: 
         poem_list = match_combinations(check_poem_str)
         num_lists.append(poem_list)
     matched_method = first_poem(num_lists, first_yayun, sentence_num, poem_pingze)
-    return matched_method if len(poem) % 5 == 0 else matched_method + 4
+    return matched_method if set_len == 5 else matched_method + 4

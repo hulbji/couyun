@@ -67,12 +67,13 @@ def first_hard(first_hanzi: str, second_hanzi: str, yun_shu: int) -> list | bool
     return False
 
 
-def poetry_yun_jiao(poem: str, yun_shu: int) -> tuple[str, list | bool, str, str]:
+def poetry_yun_jiao(poem: str, yun_shu: int, set_num: int = None) -> tuple[str, list | bool, str, str]:
     """
     提取一首诗中所有的韵字。
     Args:
         poem: 诗的全部汉字内容
         yun_shu: 使用的韵书代码
+        set_num: 对于70字倍数的排律，需要指定其一句的字数。
     Returns:
         返回四个值：
             韵字字符串
@@ -82,12 +83,12 @@ def poetry_yun_jiao(poem: str, yun_shu: int) -> tuple[str, list | bool, str, str
     """
     poem_length = len(poem)
     indices = []
-    if poem_length % 10 == 0:
+    if poem_length % 10 == 0 and set_num != 7:
         indices = list(range(10, poem_length + 1, 10))
     elif poem_length % 14 == 0:
         indices = list(range(14, poem_length + 1, 14))
     extracted = [poem[hanzi_yun_jiao - 1] for hanzi_yun_jiao in indices]
-    if poem_length % 5 == 0:
+    if poem_length % 5 == 0 and set_num != 7:
         first_hanzi = poem[4]
         second_hanzi = poem[9]
     else:
@@ -346,12 +347,13 @@ def is_all_duo_yin(yun_jiao_content: str, yun_shu: int) -> bool:
     return True
 
 
-def part_shi(yun_shu: int, poem: str) -> tuple[str, str, int, list | bool, int]:
+def part_shi(yun_shu: int, poem: str, set_num: int = None) -> tuple[str, str, int, list | bool, int]:
     """
     诗歌检验函数集成一
     Args:
         yun_shu: 使用的韵书代码
         poem: 诗歌的全汉字内容
+        set_num: 对于70字倍数的排律，需要指定其一句的字数。
     Returns:
         返回五个结果：
             首句末汉字
@@ -360,7 +362,7 @@ def part_shi(yun_shu: int, poem: str) -> tuple[str, str, int, list | bool, int]:
             第一个判断标准
             诗所押的韵的数字表示
     """
-    yun_jiaos, f_rhythm, f_hanzi, s_hanzi = poetry_yun_jiao(poem, yun_shu)
+    yun_jiaos, f_rhythm, f_hanzi, s_hanzi = poetry_yun_jiao(poem, yun_shu, set_num)
     rhythm_lists = [hanzi_to_yun(yun_jiao, yun_shu) for yun_jiao in yun_jiaos]
     this_rhythm = most_frequent_rhythm(rhythm_lists)
     if f_rhythm:
@@ -436,7 +438,7 @@ def real_shi(yun_shu: int, poem: str) -> str:
         最终的诗歌校验结果
     """
     start_time = time.time()
-    if len(poem) % 70 == 0:
+    if len(poem) % 70 == 0 and len(poem) >= 70:
         all_check_time = 2
         d_check = [5, 7]
     else:
@@ -445,7 +447,7 @@ def real_shi(yun_shu: int, poem: str) -> str:
     all_post_result = final_result = ''
     for _ in range(all_check_time):
         post_result = ''
-        f_hanzi, s_hanzi, poem_pingze, f_rhythm, this_rhythm = part_shi(yun_shu, poem)
+        f_hanzi, s_hanzi, poem_pingze, f_rhythm, this_rhythm = part_shi(yun_shu, poem, d_check[_])
         poem_pingze = [1, -1] if poem_pingze == 0 else [poem_pingze]
         for single_pingze in poem_pingze:
             temp_result = part_shi_2(yun_shu, poem, f_hanzi, s_hanzi, single_pingze, f_rhythm, this_rhythm, d_check[_])

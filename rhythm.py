@@ -229,7 +229,6 @@ class RhythmCheckerGUI:
         processed_text = extract_chinese_and_remove_parentheses(text)
         len_shi = len(processed_text)
         if len_shi % 10 != 0 and len_shi % 14 != 0 or len_shi < 20:
-            print(len_shi)
             messagebox.showwarning("要不检查下？", f"诗的字数不正确，可能有无法识别的生僻字，你输入了{len_shi}字")
             input_text.delete("1.0", tk.END)
             input_text.insert(tk.END, processed_text)
@@ -292,4 +291,4 @@ class RhythmCheckerGUI:
 if __name__ == "__main__":
     root = tk.Tk()
     app = RhythmCheckerGUI(root)
-    root.mainloop()
+    root.mainloop()  # 后续支持对繁体字的识别
