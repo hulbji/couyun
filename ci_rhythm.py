@@ -195,7 +195,7 @@ def find_ci_part(ci_info: str) -> list[int]:
                 current_list.append(segment[index - 1])
         result.append(current_list)
 
-    if "前后段" in ci_info:
+    if "前后段" in ci_info:  # 双调重复
         first_segment = result[0]
         result = result + [first_segment]
     elif "后两段" in ci_info:
@@ -204,9 +204,15 @@ def find_ci_part(ci_info: str) -> list[int]:
     elif "前两段" in ci_info:
         first_segment = result[0]
         result = [first_segment] + result
-    elif "每段" in ci_info:
+    elif "每段" in ci_info:  # 三段重复
         first_segment = result[0]
         result += [first_segment, first_segment]
+    elif "第一、第二段" in ci_info:
+        first_segment = result[0]
+        result = [first_segment] + result
+    elif "第三段、第四段" in ci_info:  # 四段重复，只有莺啼序会出现这些情况
+        third_segment = result[2]
+        result.append(third_segment)
 
     sum_list = []
     for segment in result:
@@ -369,17 +375,19 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, give_type: str) -> 
     correct_types = find_type(ci_content, type_list, yun_shu)
     # print(correct_types)  # 展示可能的格式，最可能的在先， 0开头，若换算实际格式 +1
     incorrect_given_type = False
+    if not correct_types:
+        return 1
     if give_type:
+        print(give_type)
         if give_type.isnumeric():
             give_type = int(give_type) - 1
+            print(give_type, correct_types)
             if give_type in correct_types:
                 correct_types = [give_type]
             else:
                 incorrect_given_type = True
         else:
             return 2
-    if not correct_types:
-        return 1
     for correct_type in correct_types:
         ci_result = ''
         ci_result += f'你的格式为 格{num_to_cn(correct_type + 1)}' + '\n'
@@ -419,8 +427,8 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, give_type: str) -> 
                 ci_result += '〇\n'
         final_result = result_check(post_result, ci_result)
         post_result = final_result
-    end_time = time.time()
-    final_result += f'检测完毕，耗时{end_time - start_time:.5f}s\n'
     if incorrect_given_type:
         final_result = "给定格式与实际相差过大或没有此格式，将另行匹配。\n" + final_result
+    end_time = time.time()
+    final_result += f'检测完毕，耗时{end_time - start_time:.5f}s\n'
     return final_result

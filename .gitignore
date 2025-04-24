@@ -1,4 +1,7 @@
 .idea/
 **/__pycache__/
 other/
+pingshui_data/
 couyun.spec
+all_hanzi19355.txt
+all_hanzi22202.txt

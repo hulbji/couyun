@@ -32,7 +32,7 @@ def show_all_rhythm(single_hanzi: str) -> str | None:
     return result
 
 
-def hanzi_to_yun(hanzi: str, yun_shu: int, ci_lin=False) -> list[int]:
+def hanzi_to_yun(hanzi: str, yun_shu: int, ci_lin: bool = False) -> list[int]:
     """
     将一个汉字对应为韵书中韵部的列表。
     Args:

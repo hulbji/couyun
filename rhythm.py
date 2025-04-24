@@ -1,10 +1,11 @@
-"""凑韵诗词格律检测工具主体tk模块，使用方法请参照README文件。"""
+"""凑韵诗词格律检测工具主体tk模块，支持简体/繁体切换，使用方法请参照README文件。"""
 
 import re
 import os
 import tkinter as tk
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
+from opencc import OpenCC
 
 from common import show_all_rhythm, current_dir
 from shi_rhythm import real_shi
@@ -12,7 +13,7 @@ from ci_rhythm import real_ci
 
 ico_path = os.path.join(current_dir, 'picture', 'ei.ico')
 png_path = os.path.join(current_dir, 'picture', 'ei.png')
-hanzi_path = os.path.join(current_dir, 'all_hanzi19355.txt')
+hanzi_path = os.path.join(current_dir, 'all_hanzi36133.txt')
 with open(hanzi_path, 'r', encoding='utf-8') as file:
     allowed_hanzi = set(file.read())
 
@@ -23,10 +24,39 @@ def extract_chinese_and_remove_parentheses(text: str) -> str:
     return ''.join([char for char in text_without_parentheses if char in allowed_hanzi])
 
 
+def convert_to_traditional(text, is_traditional):
+    """如果在繁体界面下转换，需要将除了诗歌以外的内容转换为繁体。"""
+    if not is_traditional:
+        return text
+    cc = OpenCC('s2t')
+    lines = text.split('\n')
+    converted_lines = []
+    for line in lines:
+        if '\t' in line and "你的格式" not in line:
+            parts = line.split('\t', 1)
+            word_part = parts[0]
+            non_word_part = parts[1] if len(parts) > 1 else ''
+            converted_non_word = cc.convert(non_word_part)
+            converted_line = f"{word_part}\t{converted_non_word}"
+        elif ' ' in line and "你的格式" not in line:
+            parts = line.split(' ', 1)
+            word_part = parts[0]
+            non_word_part = parts[1] if len(parts) > 1 else ''
+            converted_non_word = cc.convert(non_word_part)
+            converted_line = f"{word_part} {converted_non_word}"
+        else:
+            converted_line = cc.convert(line)
+        converted_lines.append(converted_line)
+    converted_text = '\n'.join(converted_lines)
+    # 在这里处理会被错误转换的繁体字
+    converted_text = converted_text.replace('鹹韻', "咸韻")
+    return converted_text
+
+
 def load_background_image(image_path):
     """加载并调整背景图片大小"""
     image = Image.open(image_path)
-    image = image.resize((800, 531), Image.Resampling.LANCZOS)
+    image = image.resize((800, 600), Image.Resampling.LANCZOS)
     return ImageTk.PhotoImage(image)
 
 
@@ -40,255 +70,308 @@ def settings(mode):
 
 
 class RhythmCheckerGUI:
-    """
-        诗词格律检测工具的图形用户界面。
-        基于Tkinter，允许用户进行诗、词的格律校验以及单个汉字的查询。
-        提供了直观的输入输出界面，并支持不同的韵书选择。
-
-        Attributes:
-            root (tk.Tk): Tkinter主窗口对象。
-            background_image (ImageTk.PhotoImage): 背景图片。
-            background_label (tk.Label): 用于显示背景图片的标签。
-            current_yun_shu (int): 当前选择的韵书编号。
-            input_text (tk.Text): 输入文本框组件。
-            output_text (tk.Text): 输出文本框组件。
-            main_interface (ttk.Frame): 主界面框架。
-            cipai_var (tk.StringVar): 词牌。
-            cipai_form (tk.StringVar): 输入的词牌格式
-            yunshu_var (tk.StringVar): 韵书选择的变量绑定。
-            yun_shu_combobox (dict): 韵书选项的映射字典。
-            scrollbar_x (ttk.Scrollbar): 水平滚动条组件。
-            default_font (tuple): 常规格式
-            bigger_font(tuple): 大号格式
-            my_purple: 选择的紫色色号
-
-        Methods:
-            create_main_interface(): 创建主界面布局。
-            create_generic_interface(title_text, hint_text, button_text, command_func, mode): 创建通用的校验界面。
-            on_yunshu_change(): 处理韵书选择变化的回调函数。
-            open_poem_interface(): 打开诗校验界面。
-            open_ci_interface(): 打开词校验界面。
-            open_char_interface(): 打开查字界面。
-            return_to_main(): 返回主界面。
-            check_poem(input_text, output_text): 对输入的诗进行格律校验。
-            check_ci(input_text, output_text): 对输入的词进行格律校验。
-            check_char(input_text, output_text): 对输入的汉字进行查询。
-    """
     def __init__(self, roots):
+        self.yunshu_var = None
+        self.opencc_s2t = OpenCC('s2t')
+        self.opencc_t2s = OpenCC('t2s')
+        self.is_traditional = False
+        self.widgets_to_translate = []
+        self.comboboxes = []
+
+        self.yun_shu_map = {1: '平水韵', 2: '中华通韵', 3: '中华新韵'}
+        self.initial_reverse_map = {v: k for k, v in self.yun_shu_map.items()}
+
+        self.current_yun_shu = 1
+
         self.cipai_form = None
         self.scrollbar_x = None
         self.root = roots
         self.root.iconbitmap(ico_path)
         self.root.resizable(width=False, height=False)
         self.root.title("凑韵")
-        self.root.geometry("800x531")
+        self.root.geometry("800x600")
+
         self.background_image = load_background_image(png_path)
-        # noinspection PyTypeChecker
+        self.bg_images = ["ei.png", "ei2.png", "ei3.png"]
+        self.bg_index = 0
         self.background_label = tk.Label(self.root, image=self.background_image)
         self.background_label.place(relwidth=1, relheight=1)
-        self.current_yun_shu = None
+        self.cover_button = tk.Button(self.root, text="更换封面", command=self.switch_background)
+        self.cover_button.place(relx=0.0, rely=0.99, anchor='sw')
+
+        self.toggle_button = tk.Button(self.root, text="繁體", command=self.toggle_language)
+        self.toggle_button.place(relx=0.99, rely=0.99, anchor='se')
+
         self.input_text = None
         self.output_text = None
         self.main_interface = None
         self.cipai_var = None
-        self.yunshu_reverse_map = None
-        self.yunshu_var = None
-        self.yun_shu_combobox = {1: '平水韵', 2: '中华通韵', 3: "中华新韵"}
+        self.yunshu_reverse_map = {'词林正韵': 1, "平水韵": 1, "中华新韵": 2, "中华通韵": 3,
+                                   '詞林正韻': 1, "平水韻": 1, "中華新韻": 2, "中華通韻": 3}
+
         self.default_font = ("微软雅黑", 12)
         self.bigger_font = ("微软雅黑", 16)
         self.my_purple = "#c9a6eb"
+
         self.create_main_interface()
+
+    def register(self, widget):
+        """注册需要翻译的控件"""
+        self.widgets_to_translate.append(widget)
+
+    def toggle_language(self):
+        """在简体和繁体之间切换"""
+        for widget in self.widgets_to_translate:
+            orig = widget.cget('text')
+            new = self.opencc_s2t.convert(orig) if not self.is_traditional else self.opencc_t2s.convert(orig)
+            widget.config(text=new)
+        for cb in self.comboboxes:
+            if not self.is_traditional:
+                trad_map = {k: self.opencc_s2t.convert(v) for k, v in self.yun_shu_map.items()}
+                cb['values'] = [trad_map[k] for k in sorted(trad_map)]
+                cb.set(trad_map[self.current_yun_shu])
+            else:
+                cb['values'] = [self.yun_shu_map[k] for k in sorted(self.yun_shu_map)]
+                cb.set(self.yun_shu_map[self.current_yun_shu])
+        # 切换按钮、标题文本
+        btn_text = '简体' if not self.is_traditional else '繁體'
+        self.toggle_button.config(text=btn_text)
+        change_text = '切換封面' if not self.is_traditional else '切换封面'
+        self.cover_button.config(text=change_text)
+        title_text = '凑韵' if self.is_traditional else '湊韻'
+        self.root.title(title_text)
+        self.is_traditional = not self.is_traditional
+
+    def switch_background(self):
+        self.bg_index = (self.bg_index + 1) % len(self.bg_images)
+        image_path = os.path.join(current_dir, "picture", self.bg_images[self.bg_index])
+        self.background_image = load_background_image(image_path)
+        self.background_label.config(image=self.background_image)
 
     def create_main_interface(self):
         self.main_interface = ttk.Frame(self.root)
         self.main_interface.pack(pady=100)
+
         title_label = ttk.Label(self.main_interface, text="凑韵诗词格律校验工具", font=self.bigger_font)
         title_label.pack(pady=10)
-        button_frame = ttk.Frame(self.main_interface)
-        button_frame.pack(pady=10)
-        poem_button = tk.Button(button_frame, text="诗校验", command=self.open_poem_interface, font=self.default_font,
-                                bg=self.my_purple, width=20)
+        self.register(title_label)
+
+        frame = ttk.Frame(self.main_interface)
+        frame.pack(pady=10)
+
+        poem_button = tk.Button(frame, text="诗校验", command=self.open_poem_interface,
+                                font=self.default_font, bg=self.my_purple, width=20)
         poem_button.pack(side=tk.TOP, padx=5, pady=10)
-        ci_button = tk.Button(button_frame, text="词校验", command=self.open_ci_interface, font=self.default_font,
-                              bg=self.my_purple, width=20)
+        self.register(poem_button)
+
+        ci_button = tk.Button(frame, text="词校验", command=self.open_ci_interface,
+                              font=self.default_font, bg=self.my_purple, width=20)
         ci_button.pack(side=tk.TOP, padx=5, pady=10)
-        check_char_button = tk.Button(button_frame, text="查字", command=self.open_char_interface,
-                                      font=self.default_font, bg=self.my_purple, width=20)
-        check_char_button.pack(side=tk.TOP, padx=5, pady=10)
+        self.register(ci_button)
+
+        char_button = tk.Button(frame, text="查字", command=self.open_char_interface,
+                                font=self.default_font, bg=self.my_purple, width=20)
+        char_button.pack(side=tk.TOP, padx=5, pady=10)
+        self.register(char_button)
 
     def create_generic_interface(self, title_text, hint_text, button_text, command_func, mode):
+        # 记录当前需要翻译控件数
+        old_widgets = len(self.widgets_to_translate)
+        old_comboboxes = len(self.comboboxes)
+
         self.main_interface.pack_forget()
-        generic_interface = ttk.Frame(self.root)
-        generic_interface.pack(pady=60 if mode == 's' else 20)
-        title_label = ttk.Label(generic_interface, text=title_text, font=self.bigger_font)
+        generic = ttk.Frame(self.root)
+        generic.pack(pady=60 if mode == 's' else 20)
+
+        title_label = ttk.Label(generic, text=title_text, font=self.bigger_font)
         title_label.pack(pady=10)
+        self.register(title_label)
+
         if mode != 's':
             if mode == 'c':
-                self.yun_shu_combobox[1] = '词林正韵'
+                self.yun_shu_map[1] = '词林正韵'
             else:
-                self.yun_shu_combobox[1] = '平水韵'
-            yunshu_frame = ttk.Frame(generic_interface)
-            yunshu_frame.pack(pady=5, anchor=tk.W)
-            yunshu_label = ttk.Label(yunshu_frame, text="选择韵书:", font=self.default_font)
-            yunshu_label.pack(side=tk.LEFT, padx=5)
-            self.yunshu_var = tk.StringVar()
-            self.yunshu_var.set(self.yun_shu_combobox[1])
-            yunshu_combobox = ttk.Combobox(yunshu_frame, textvariable=self.yunshu_var, font=self.default_font, width=15,
-                                           state="readonly")
-            yunshu_combobox['values'] = list(self.yun_shu_combobox.values())
-            yunshu_combobox.pack(side=tk.LEFT, padx=5)
-            self.yunshu_reverse_map = {value: key for key, value in self.yun_shu_combobox.items()}
-            self.yunshu_var.trace("w", lambda name, index, the_mode: self.on_yunshu_change())
-            self.current_yun_shu = 1
-        if mode == 'c':
-            cipai_frame = ttk.Frame(generic_interface)
-            cipai_frame.pack(pady=5, anchor=tk.W)
-            cipai_label = ttk.Label(cipai_frame, text="输入词牌:", font=self.default_font)
-            cipai_label.pack(side=tk.LEFT, padx=5)
-            self.cipai_var = tk.StringVar()
-            cipai_entry = ttk.Entry(cipai_frame, textvariable=self.cipai_var, font=self.default_font, width=15)
-            cipai_entry.pack(side=tk.LEFT, padx=5)
-            format_frame = ttk.Frame(generic_interface)
-            format_frame.pack(pady=5, anchor=tk.W)
-            format_label = ttk.Label(format_frame, text="格式:", font=self.default_font)
-            format_label.pack(side=tk.LEFT, padx=5)
-            self.cipai_form = tk.StringVar()
-            format_entry = ttk.Entry(format_frame, textvariable=self.cipai_form, font=self.default_font, width=10)
-            format_entry.pack(side=tk.LEFT, padx=5)
-        frame = ttk.Frame(generic_interface)
-        frame.pack(pady=10)
-        input_label = ttk.Label(frame, text=hint_text, font=self.default_font)
-        input_label.pack(side=tk.TOP, pady=10, anchor=tk.W)
-        input_text = tk.Text(frame, width=settings(mode)[0], height=1 if mode == 's' else 10, font=self.default_font)
-        input_text.pack(side=tk.TOP if mode == 's' else tk.LEFT, padx=5)
+                self.yun_shu_map[1] = '平水韵'
 
-        # 创建输出文本框
-        output_text = tk.Text(frame, width=settings(mode)[1], height=10, font=self.default_font, wrap=tk.NONE,
-                              state=tk.DISABLED)
-        output_text.pack(side=tk.TOP if mode == 's' else tk.LEFT, padx=5)
+            fb = ttk.Frame(generic)
+            fb.pack(pady=5, anchor=tk.W)
+            fl = ttk.Label(fb, text="选择韵书:", font=self.default_font)
+            fl.pack(side=tk.LEFT, padx=5)
+            self.register(fl)
+
+            self.yunshu_var = tk.StringVar()
+            self.yunshu_var.set(self.yun_shu_map[self.current_yun_shu])
+            cb = ttk.Combobox(fb, textvariable=self.yunshu_var,
+                              font=self.default_font, width=15, state="readonly")
+            cb['values'] = [self.yun_shu_map[k] for k in sorted(self.yun_shu_map)]
+            cb.pack(side=tk.LEFT, padx=5)
+            self.comboboxes.append(cb)
+            self.yunshu_var.trace("w", lambda *args: self.on_yunshu_change())
+
         if mode == 'c':
-            self.scrollbar_x = ttk.Scrollbar(frame, orient=tk.HORIZONTAL, command=output_text.xview)
-            output_text.configure(xscrollcommand=self.scrollbar_x.set)
+            cf = ttk.Frame(generic)
+            cf.pack(pady=5, anchor=tk.W)
+            cl = ttk.Label(cf, text="输入词牌:", font=self.default_font)
+            cl.pack(side=tk.LEFT, padx=5)
+            self.register(cl)
+            self.cipai_var = tk.StringVar()
+            ttk.Entry(cf, textvariable=self.cipai_var,
+                      font=self.default_font, width=15).pack(side=tk.LEFT, padx=5)
+
+            ff = ttk.Frame(generic)
+            ff.pack(pady=5, anchor=tk.W)
+            fl2 = ttk.Label(ff, text="格式:", font=self.default_font)
+            fl2.pack(side=tk.LEFT, padx=5)
+            self.register(fl2)
+            self.cipai_form = tk.StringVar()
+            ttk.Entry(ff, textvariable=self.cipai_form,
+                      font=self.default_font, width=10).pack(side=tk.LEFT, padx=5)
+
+        mf = ttk.Frame(generic)
+        mf.pack(pady=10)
+        il = ttk.Label(mf, text=hint_text, font=self.default_font)
+        il.pack(side=tk.TOP, pady=10, anchor=tk.W)
+        self.register(il)
+
+        it = tk.Text(mf, width=settings(mode)[0], height=1 if mode == 's' else 10,
+                     font=self.default_font)
+        it.pack(side=tk.TOP if mode == 's' else tk.LEFT, padx=5)
+
+        ot = tk.Text(mf, width=settings(mode)[1], height=10,
+                     font=self.default_font, wrap=tk.NONE, state=tk.DISABLED)
+        ot.pack(side=tk.TOP if mode == 's' else tk.LEFT, padx=5)
+        if mode == 'c':
+            self.scrollbar_x = ttk.Scrollbar(mf, orient=tk.HORIZONTAL, command=ot.xview)
+            ot.configure(xscrollcommand=self.scrollbar_x.set)
             self.scrollbar_x.pack(side=tk.BOTTOM, fill=tk.X)
             self.scrollbar_x.place(relx=0, rely=1, relwidth=1, height=0)
-        button_frame = ttk.Frame(generic_interface)
-        button_frame.pack(pady=10)
-        analyze_button = tk.Button(button_frame, text=button_text,
-                                   command=lambda: command_func(input_text, output_text), font=self.default_font,
-                                   bg=self.my_purple, width=settings(mode)[2])
-        analyze_button.pack(side=tk.LEFT, padx=5)
-        back_button = tk.Button(button_frame, text="返回", command=self.return_to_main, font=self.default_font,
-                                bg=self.my_purple, width=settings(mode)[3])
-        back_button.pack(side=tk.RIGHT, padx=5)
-        output_text.pack_forget()
 
-        return input_text, output_text
+        bf = ttk.Frame(generic)
+        bf.pack(pady=10)
+        btn = tk.Button(bf, text=button_text,
+                        command=lambda: command_func(it, ot),
+                        font=self.default_font, bg=self.my_purple,
+                        width=settings(mode)[2])
+        btn.pack(side=tk.LEFT, padx=5)
+        self.register(btn)
+        back = tk.Button(bf, text="返回", command=self.return_to_main,
+                         font=self.default_font, bg=self.my_purple,
+                         width=settings(mode)[3])
+        back.pack(side=tk.RIGHT, padx=5)
+        self.register(back)
+
+        ot.pack_forget()
+
+        # 若已是繁体模式，立即翻译新控件
+        if self.is_traditional:
+            # 翻译新注册的标签/按钮
+            for w in self.widgets_to_translate[old_widgets:]:
+                w.config(text=self.opencc_s2t.convert(w.cget('text')))
+            # 翻译新 Combobox
+            for cb_new in self.comboboxes[old_comboboxes:]:
+                trad_map = {k: self.opencc_s2t.convert(v) for k, v in self.yun_shu_map.items()}
+                cb_new['values'] = [trad_map[k] for k in sorted(trad_map)]
+                cb_new.set(trad_map[self.current_yun_shu])
+
+        return it, ot
 
     def on_yunshu_change(self):
-        selected_yunshu = self.yunshu_var.get()
-        self.current_yun_shu = self.yunshu_reverse_map[selected_yunshu]
+        self.current_yun_shu = self.yunshu_reverse_map[self.yunshu_var.get()]
 
     def open_poem_interface(self):
         self.input_text, self.output_text = self.create_generic_interface(
-            title_text="诗校验",
-            hint_text='请输入需要分析的律诗或绝句：',
-            button_text="开始分析",
-            command_func=self.check_poem,
-            mode='p'
+            title_text="诗校验", hint_text='请输入需要分析的律诗或绝句：',
+            button_text="开始分析", command_func=self.check_poem, mode='p'
         )
 
     def open_ci_interface(self):
         self.input_text, self.output_text = self.create_generic_interface(
-            title_text="词校验",
-            hint_text='请输入需要分析的词：',
-            button_text="开始分析",
-            command_func=self.check_ci,
-            mode='c'
+            title_text="词校验", hint_text='请输入需要分析的词：',
+            button_text="开始分析", command_func=self.check_ci, mode='c'
         )
 
     def open_char_interface(self):
         self.input_text, self.output_text = self.create_generic_interface(
-            title_text="查字",
-            hint_text='请输入需要查询的汉字：',
-            button_text="开始查询",
-            command_func=self.check_char,
-            mode='s'
+            title_text="查字", hint_text='请输入需要查询的汉字：',
+            button_text="开始查询", command_func=self.check_char, mode='s'
         )
 
     def return_to_main(self):
-        for widget in self.root.winfo_children():
-            if widget != self.main_interface:
-                widget.pack_forget()
+        for w in self.root.winfo_children():
+            if w not in (self.main_interface, self.toggle_button):
+                w.pack_forget()
         self.main_interface.pack(pady=100)
 
-    def check_poem(self, input_text, output_text):
-        text = input_text.get("1.0", tk.END).strip()
+    def check_poem(self, it, ot):
+        text = it.get("1.0", tk.END).strip()
         if not text:
-            messagebox.showwarning("找茬是吧", "请输入需要校验的诗！")
+            title, msg = "找茬是吧？", "请输入需要校验的诗！"
+            if self.is_traditional:
+                title = self.opencc_s2t.convert(title)
+                msg = self.opencc_s2t.convert(msg)
+            messagebox.showwarning(title, msg)
             return
-        processed_text = extract_chinese_and_remove_parentheses(text)
-        len_shi = len(processed_text)
-        if len_shi % 10 != 0 and len_shi % 14 != 0 or len_shi < 20:
-            messagebox.showwarning("要不检查下？", f"诗的字数不正确，可能有无法识别的生僻字，你输入了{len_shi}字")
-            input_text.delete("1.0", tk.END)
-            input_text.insert(tk.END, processed_text)
+        processed = extract_chinese_and_remove_parentheses(text)
+        length = len(processed)
+        if (length % 10 != 0 and length % 14 != 0) or length < 20:
+            messagebox.showwarning("要不检查下？", f"诗的字数不正确，你输入了{length}字")
+            it.delete("1.0", tk.END)
+            it.insert(tk.END, processed)
             return
-        else:
-            result = real_shi(self.current_yun_shu, processed_text)
-            output_text.pack(side=tk.RIGHT, padx=5)
-            output_text.config(state=tk.NORMAL)
-            output_text.delete("1.0", tk.END)
-            output_text.insert(tk.END, result)
-            output_text.config(state=tk.DISABLED)
+        res = real_shi(self.current_yun_shu, processed)
+        res = convert_to_traditional(res, self.is_traditional)
+        ot.pack(side=tk.RIGHT, padx=5)
+        ot.config(state=tk.NORMAL)
+        ot.delete("1.0", tk.END)
+        ot.insert(tk.END, res)
+        ot.config(state=tk.DISABLED)
 
-    def check_ci(self, input_text, output_text):
-        text = input_text.get("1.0", tk.END).strip()
+    def check_ci(self, it, ot):
+        text = it.get("1.0", tk.END).strip()
         if not text:
-            messagebox.showwarning("找茬是吧", "请输入需要校验的词！")
+            messagebox.showwarning("找茬是吧？", "请输入需要校验的词！")
             return
-        cipai = self.cipai_var.get().strip()
-        form = self.cipai_form.get().strip()
-        if not cipai:
-            messagebox.showwarning("找茬是吧", "请输入词牌！")
+        cipai_to_s = OpenCC('t2s')
+        cp, fm = cipai_to_s.convert(self.cipai_var.get().strip()), self.cipai_form.get().strip()
+        if not cp:
+            messagebox.showwarning("找茬是吧？", "请输入词牌！")
             return
-        processed_text = extract_chinese_and_remove_parentheses(text)
-        len_ci = len(processed_text)
-        result = real_ci(self.current_yun_shu, cipai, processed_text, form)
-        if result == 0:
-            messagebox.showwarning("要不检查下？", "不能找到你输入的词牌！")
-        elif result == 1:
-            messagebox.showwarning("要不检查下？", f"内容无法匹配词牌格式，请检查格式以及是否有无法识别的生僻字！\n你输入了{len_ci}字！")
-        elif result == 2:
-            messagebox.showwarning('找茬是吧？', "输入的格式不正确，请输入正确的格式数字！")
-        else:
-            self.scrollbar_x.place(relx=0.35, rely=0.94, relwidth=0.65, height=20)
-            output_text.pack(side=tk.RIGHT, padx=5)
-            output_text.config(state=tk.NORMAL)
-            output_text.delete("1.0", tk.END)
-            output_text.insert(tk.END, result)
-            output_text.config(state=tk.DISABLED)
+        proc = extract_chinese_and_remove_parentheses(text)
+        length = len(proc)
+        res = real_ci(self.current_yun_shu, cp, proc, fm)
+        msgs = {0: "不能找到你输入的词牌！", 1: f"格式不匹配，可能有不能识别的生僻字，你输入了{length}字！", 2: "格式数字错误！"}
+        if res in msgs:
+            messagebox.showwarning("要不检查下？", msgs[res])
+            return
+        res = convert_to_traditional(res, self.is_traditional)
+        self.scrollbar_x.place(relx=0.35, rely=0.94, relwidth=0.65, height=20)
+        ot.pack(side=tk.RIGHT, padx=5)
+        ot.config(state=tk.NORMAL)
+        ot.delete("1.0", tk.END)
+        ot.insert(tk.END, res)
+        ot.config(state=tk.DISABLED)
 
-    @staticmethod
-    def check_char(input_text, output_text):
-        text = input_text.get("1.0", tk.END).strip()
+    def check_char(self, it, ot):
+        text = it.get("1.0", tk.END).strip()
         if not text:
-            messagebox.showwarning("找茬是吧", "请输入需要查询的汉字！")
+            messagebox.showwarning("找茬是吧？", "请输入需要查询的汉字！")
             return
         if len(text) != 1:
-            messagebox.showwarning("找茬是吧", "请输入单个汉字！")
+            messagebox.showwarning("找茬是吧？", "请输入单个汉字！")
             return
-        if not re.match(r'[\u4e00-\u9fff\u3400-\u4dbf]', text):
-            messagebox.showwarning("你在干嘛呢", "输入的内容非汉字或其不在基本区及拓展A区")
+        if not re.match(r'[\u4e00-\u9fff\u3400-\u4dbf\u3007]', text):
+            messagebox.showwarning("你在干嘛呢？", "非汉字或超出区段（基本区及拓展A区）")
             return
-        result = show_all_rhythm(text)
-        output_text.pack(side=tk.BOTTOM, padx=5)
-        output_text.config(state=tk.NORMAL)
-        output_text.delete("1.0", tk.END)
-        output_text.insert(tk.END, result)
-        output_text.config(state=tk.DISABLED)
+        res = show_all_rhythm(text)
+        res = convert_to_traditional(res, self.is_traditional)
+        ot.pack(side=tk.BOTTOM, padx=5)
+        ot.config(state=tk.NORMAL)
+        ot.delete("1.0", tk.END)
+        ot.insert(tk.END, res)
+        ot.config(state=tk.DISABLED)
 
 
 if __name__ == "__main__":
     root = tk.Tk()
     app = RhythmCheckerGUI(root)
-    root.mainloop()  # 后续支持对繁体字的识别
+    root.mainloop()
