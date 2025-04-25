@@ -24,7 +24,7 @@ def extract_chinese_and_remove_parentheses(text: str) -> str:
     return ''.join([char for char in text_without_parentheses if char in allowed_hanzi])
 
 
-def convert_to_traditional(text, is_traditional):
+def convert_to_traditional(text, is_traditional, mode):
     """如果在繁体界面下转换，需要将除了诗歌以外的内容转换为繁体。"""
     if not is_traditional:
         return text
@@ -44,12 +44,15 @@ def convert_to_traditional(text, is_traditional):
             non_word_part = parts[1] if len(parts) > 1 else ''
             converted_non_word = cc.convert(non_word_part)
             converted_line = f"{word_part} {converted_non_word}"
+        elif '在：' in line and mode == 's':
+            converted_line = line
         else:
             converted_line = cc.convert(line)
         converted_lines.append(converted_line)
     converted_text = '\n'.join(converted_lines)
     # 在这里处理会被错误转换的繁体字
     converted_text = converted_text.replace('鹹韻', "咸韻")
+    converted_text = converted_text.replace('十五鹹', "十五咸")
     return converted_text
 
 
@@ -319,7 +322,7 @@ class RhythmCheckerGUI:
             it.insert(tk.END, processed)
             return
         res = real_shi(self.current_yun_shu, processed)
-        res = convert_to_traditional(res, self.is_traditional)
+        res = convert_to_traditional(res, self.is_traditional, 'p')
         ot.pack(side=tk.RIGHT, padx=5)
         ot.config(state=tk.NORMAL)
         ot.delete("1.0", tk.END)
@@ -343,7 +346,7 @@ class RhythmCheckerGUI:
         if res in msgs:
             messagebox.showwarning("要不检查下？", msgs[res])
             return
-        res = convert_to_traditional(res, self.is_traditional)
+        res = convert_to_traditional(res, self.is_traditional, 'c')
         self.scrollbar_x.place(relx=0.35, rely=0.94, relwidth=0.65, height=20)
         ot.pack(side=tk.RIGHT, padx=5)
         ot.config(state=tk.NORMAL)
@@ -363,7 +366,7 @@ class RhythmCheckerGUI:
             messagebox.showwarning("你在干嘛呢？", "非汉字或超出区段（基本区及拓展A区）")
             return
         res = show_all_rhythm(text)
-        res = convert_to_traditional(res, self.is_traditional)
+        res = convert_to_traditional(res, self.is_traditional, 's')
         ot.pack(side=tk.BOTTOM, padx=5)
         ot.config(state=tk.NORMAL)
         ot.delete("1.0", tk.END)

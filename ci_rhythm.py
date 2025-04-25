@@ -378,10 +378,8 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, give_type: str) -> 
     if not correct_types:
         return 1
     if give_type:
-        print(give_type)
         if give_type.isnumeric():
             give_type = int(give_type) - 1
-            print(give_type, correct_types)
             if give_type in correct_types:
                 correct_types = [give_type]
             else:
