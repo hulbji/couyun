@@ -72,6 +72,7 @@ def settings(mode):
     return 15, 30, 7, 5
 
 
+# noinspection PyTypeChecker
 class RhythmCheckerGUI:
     def __init__(self, roots):
         self.yunshu_var = None
@@ -100,7 +101,7 @@ class RhythmCheckerGUI:
         self.background_label = tk.Label(self.root, image=self.background_image)
         self.background_label.place(relwidth=1, relheight=1)
         self.cover_button = tk.Button(self.root, text="更换封面", command=self.switch_background)
-        self.cover_button.place(relx=0.0, rely=0.99, anchor='sw')
+        self.cover_button.place(relx=0.01, rely=0.99, anchor='sw')
 
         self.toggle_button = tk.Button(self.root, text="繁體", command=self.toggle_language)
         self.toggle_button.place(relx=0.99, rely=0.99, anchor='se')
@@ -362,8 +363,8 @@ class RhythmCheckerGUI:
         if len(text) != 1:
             messagebox.showwarning("找茬是吧？", "请输入单个汉字！")
             return
-        if not re.match(r'[\u4e00-\u9fff\u3400-\u4dbf\u3007]', text):
-            messagebox.showwarning("你在干嘛呢？", "非汉字或超出区段（基本区及拓展A区）")
+        if not re.match(r'[\u4e00-\u9fff\u3400-\u4dbf\u3007\U00020000-\U0002A6DF]', text):
+            messagebox.showwarning("你在干嘛呢？", "非汉字或超出区段（基本区及拓展A、B区）")
             return
         res = show_all_rhythm(text)
         res = convert_to_traditional(res, self.is_traditional, 's')
