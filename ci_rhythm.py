@@ -4,16 +4,19 @@ import time
 
 from ci_cut import *
 from ci_show import *
+from ci_confirm import *
 from common import *
+from cipai_word_counts import ci_and_num
 
 
-def search_ci(input_name: str) -> str | None:
+def search_ci(input_name: str, reverse_search=False) -> str | None:
     """
-    从词牌名称，在词牌索引中读取编号。
+    从词牌名称，在词牌索引中读取编号。或者通过编号读取词牌名。
     Args:
-        input_name: 词牌实际名称
+        input_name: 词牌实际名称或编号
+        reverse_search: 是否反向搜索，通过编号读取词牌名。
     Returns:
-        词牌的编号值（字符串），如果没有，返回None
+        词牌的编号值（字符串）或编号值对应的词牌名，如果没有，返回None
     """
     file_path = os.path.join(current_dir, 'ci_list', 'ci_index.txt')
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -22,10 +25,16 @@ def search_ci(input_name: str) -> str | None:
             line = line.strip()
             number, ci_name = line.split()
             ci_dict[ci_name] = number
-    ci_number = ci_dict.get(input_name)
-    if ci_number is not None:
-        return ci_number
-    return None
+    if reverse_search:
+        for key, value in ci_dict.items():
+            if value == input_name:
+                return key
+        return None
+    else:
+        ci_number = ci_dict.get(input_name)
+        if ci_number is not None:
+            return ci_number
+        return None
 
 
 def ci_type_extraction(ci_number: str) -> list[list[str]]:
@@ -355,22 +364,37 @@ def show_ci(ge_lyu_final: list, text_final: list, yun_final: list, your_lyu_fina
     return result.rstrip() + '\n'
 
 
-def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, give_type: str) -> str | int:
+def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, ci_comma: str, give_type: str) -> str | int:
     """
     校验词牌的最终方法
     Args:
         yun_shu: 使用的韵书代码
         ci_pai_name: 输入的词牌名
         ci_content: 输入的词内容（已经除去了除汉字以外的内容）
+        ci_comma: 保留标点符号的输入内容
         give_type: 给定的词牌格式，如果没有，那么按照自动格式检验
     Returns:
         校验结果。如果输入的词牌没有对应，返回 0，如果词内容不能与词牌匹配，返回 1
     """
-    ci_num = search_ci(ci_pai_name)
-    if ci_num is None:
-        return 0
-    type_list = ci_type_extraction(ci_num)
     start_time = time.time()
+    if ci_pai_name:  # 如果输入了词牌名称
+        ci_num = search_ci(ci_pai_name)
+        if ci_num is None:
+            return 0
+        type_list = ci_type_extraction(ci_num)
+        name_show = ''
+    else:
+        ci_num_list = ci_and_num[len(ci_content)]
+        ci_num = type_list = None
+        for single_ci_type in ci_num_list:
+            type_list = ci_type_extraction(single_ci_type)
+            this_type = cipai_confirm(ci_content, ci_comma, type_list)
+            if this_type:
+                ci_num = single_ci_type
+                break
+        name_show = search_ci(ci_num, reverse_search=True)
+        if not ci_num or not type_list:
+            return 3
     final_result = post_result = ''
     correct_types = find_type(ci_content, type_list, yun_shu)
     # print(correct_types)  # 展示可能的格式，最可能的在先， 0开头，若换算实际格式 +1
@@ -429,4 +453,6 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, give_type: str) -> 
         final_result = "给定格式与实际相差过大或没有此格式，将另行匹配。\n" + final_result
     end_time = time.time()
     final_result += f'检测完毕，耗时{end_time - start_time:.5f}s\n'
+    if name_show:
+        final_result = name_show + '\n' + final_result
     return final_result
