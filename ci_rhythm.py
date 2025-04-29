@@ -381,78 +381,84 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, ci_comma: str, give
         ci_num = search_ci(ci_pai_name)
         if ci_num is None:
             return 0
-        type_list = ci_type_extraction(ci_num)
-        name_show = ''
+        ci_nums = [ci_num]
     else:
         ci_num_list = ci_and_num[len(ci_content)]
-        ci_num = type_list = None
+        ci_nums = None
+        rate_dict = {}
         for single_ci_type in ci_num_list:
-            type_list = ci_type_extraction(single_ci_type)
-            this_type = cipai_confirm(ci_content, ci_comma, type_list)
-            if this_type:
-                ci_num = single_ci_type
-                break
-        name_show = search_ci(ci_num, reverse_search=True)
-        if not ci_num or not type_list:
+            this_type = ci_type_extraction(single_ci_type)
+            current_rate = cipai_confirm(ci_content, ci_comma, this_type)
+            rate_dict[single_ci_type] = current_rate
+            max_rate = max(rate_dict.values())
+            ci_nums = [key for key, value in rate_dict.items() if value == max_rate]
+        if not ci_nums:
             return 3
-    final_result = post_result = ''
-    correct_types = find_type(ci_content, type_list, yun_shu)
-    # print(correct_types)  # 展示可能的格式，最可能的在先， 0开头，若换算实际格式 +1
-    incorrect_given_type = False
-    if not correct_types:
-        return 1
-    if give_type:
-        if give_type.isnumeric():
-            give_type = int(give_type) - 1
-            if give_type in correct_types:
-                correct_types = [give_type]
+    real_final = real_post = name_show = ''
+    for ci_num in ci_nums:
+        type_list = ci_type_extraction(ci_num)
+        final_result = post_result = ''
+        correct_types = find_type(ci_content, type_list, yun_shu)
+        # print(correct_types)  # 展示可能的格式，最可能的在先， 0开头，若换算实际格式 +1
+        incorrect_given_type = False
+        if not correct_types:
+            return 1
+        if give_type:
+            if give_type.isnumeric():
+                give_type = int(give_type) - 1
+                if give_type in correct_types:
+                    correct_types = [give_type]
+                else:
+                    incorrect_given_type = True
             else:
-                incorrect_given_type = True
-        else:
-            return 2
-    for correct_type in correct_types:
-        ci_result = ''
-        ci_result += f'你的格式为 格{num_to_cn(correct_type + 1)}' + '\n'
-        ci, rhythm, rule = type_list[correct_type]
-        num_rule = find_ci_part(rule)
-        wds, pos, remain, yun_jiao_pos = extract_rhyme_words(ci, rhythm, num_rule)
-        cipai_text = type_list[correct_type][0]
-        ci_form_str = type_list[correct_type][1]
-        yun_jiao_class = yun_jiao_classify(pos, wds)
-        yun_list = [ci_content[i] for i in yun_jiao_pos]
-        real_ci_lis = split_cipai_text(cipai_text, yun_jiao_pos)
-        cut_list = split_yun_str_by_ci(real_ci_lis, ci_form_str, wds, ci_num)  # 分割后词格律信息
-        my_cut_text = replace_user_ci_text(ci_content, real_ci_lis)  # 分割后词内容
-        yun_num_list = []
-        for yun_jiao in yun_list:
-            yun_num_list.append(hanzi_to_yun(yun_jiao, yun_shu, ci_lin=True))
+                return 2
+        for correct_type in correct_types:
+            ci_result = ''
+            ci_result += f'你的格式为 格{num_to_cn(correct_type + 1)}' + '\n'
+            ci, rhythm, rule = type_list[correct_type]
+            num_rule = find_ci_part(rule)
+            wds, pos, remain, yun_jiao_pos = extract_rhyme_words(ci, rhythm, num_rule)
+            cipai_text = type_list[correct_type][0]
+            ci_form_str = type_list[correct_type][1]
+            yun_jiao_class = yun_jiao_classify(pos, wds)
+            yun_list = [ci_content[i] for i in yun_jiao_pos]
+            real_ci_lis = split_cipai_text(cipai_text, yun_jiao_pos)
+            cut_list = split_yun_str_by_ci(real_ci_lis, ci_form_str, wds, ci_num)  # 分割后词格律信息
+            my_cut_text = replace_user_ci_text(ci_content, real_ci_lis)  # 分割后词内容
+            yun_num_list = []
+            for yun_jiao in yun_list:
+                yun_num_list.append(hanzi_to_yun(yun_jiao, yun_shu, ci_lin=True))
 
-        yun_df = yun_data_process(yun_jiao_pos, yun_list, yun_jiao_class, yun_num_list)
-        yun_info_list = []
-        for df_row in yun_df.itertuples():
-            yun_hanzi = ci_yun_list_to_hanzi_yun(df_row.yun_num, yun_shu)
-            yun_group = f'第{num_to_cn(df_row.group)}组韵'
-            is_yayun = f'{"" if df_row.is_yayun else "不"}押韵'
-            yun_info = yun_hanzi + ' ' + yun_group + ' ' + is_yayun
-            yun_info_list.append(yun_info)  # 分割后词韵信息
-        real_ci_right = ping_ze_right(ci_content, remain, yun_shu)
-        yun_final_list = yun_right_list(real_ci_lis, real_ci_right)
-        ci_result += '\n' + show_ci(cut_list, my_cut_text, yun_info_list, yun_final_list)
-        if correct_type == 23 and ci_num == '658':  # 水龙吟格二十四特殊处理
-            ci_result += f'\n仄句\n{ci_content[-1]}\n'
-            last_pingze = hanzi_to_pingze(ci_content[-1], yun_shu)
-            if last_pingze == '0':
-                ci_result += '中\n'
-            elif last_pingze == '1':
-                ci_result += '错\n'
-            else:
-                ci_result += '〇\n'
-        final_result = result_check(post_result, ci_result)
-        post_result = final_result
-    if incorrect_given_type:
-        final_result = "给定格式与实际相差过大或没有此格式，将另行匹配。\n" + final_result
+            yun_df = yun_data_process(yun_jiao_pos, yun_list, yun_jiao_class, yun_num_list)
+            yun_info_list = []
+            for df_row in yun_df.itertuples():
+                yun_hanzi = ci_yun_list_to_hanzi_yun(df_row.yun_num, yun_shu)
+                yun_group = f'第{num_to_cn(df_row.group)}组韵'
+                is_yayun = f'{"" if df_row.is_yayun else "不"}押韵'
+                yun_info = yun_hanzi + ' ' + yun_group + ' ' + is_yayun
+                yun_info_list.append(yun_info)  # 分割后词韵信息
+            real_ci_right = ping_ze_right(ci_content, remain, yun_shu)
+            yun_final_list = yun_right_list(real_ci_lis, real_ci_right)
+            ci_result += '\n' + show_ci(cut_list, my_cut_text, yun_info_list, yun_final_list)
+            if correct_type == 23 and ci_num == '658':  # 水龙吟格二十四特殊处理
+                ci_result += f'\n仄句\n{ci_content[-1]}\n'
+                last_pingze = hanzi_to_pingze(ci_content[-1], yun_shu)
+                if last_pingze == '0':
+                    ci_result += '中\n'
+                elif last_pingze == '1':
+                    ci_result += '错\n'
+                else:
+                    ci_result += '〇\n'
+            final_result = result_check(post_result, ci_result)
+            post_result = final_result
+        if incorrect_given_type:
+            final_result = "给定格式与实际相差过大或没有此格式，将另行匹配。\n" + final_result
+        if not ci_pai_name:
+            name_show = search_ci(ci_num, reverse_search=True)
+            final_result = name_show + '\n' + final_result
+        current_result = final_result
+        real_final = result_check(real_post, current_result)
+        real_post = real_final
     end_time = time.time()
-    final_result += f'检测完毕，耗时{end_time - start_time:.5f}s\n'
-    if name_show:
-        final_result = name_show + '\n' + final_result
-    return final_result
+    real_final += f'检测完毕，耗时{end_time - start_time:.5f}s\n'
+    return real_final
