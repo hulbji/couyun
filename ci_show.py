@@ -1,74 +1,96 @@
 """韵脚的所有信息整合为数据框"""
 
-import pandas as pd
 import new_rhythm as nw
 from collections import Counter
 from num_to_cn import num_to_cn
+from typing import List, Dict
 
 
-def yun_data_process(yun_jiao_pos: list[int], yun_list: list[str], yun_jiao_class: dict,
-                     yun_num_list: list[list[int]]) -> pd.DataFrame:
-    """
-    根据韵脚位置、韵脚列表、韵脚分类、每个字的韵数字代码列表组成的列表
-    构造包含韵位置、韵脚汉字、每个字的韵数字代码列表、是否为叶韵、韵组别、是否正确押韵的数据框
-    Args:
-        yun_jiao_pos: 韵脚位置
-        yun_list: 韵脚列表
-        yun_jiao_class: 韵脚分类
-        yun_num_list: 每个字的韵数字代码列表组成的列表
-    """
-    df = pd.DataFrame({
-        "pos": yun_jiao_pos,
-        "hanzi": yun_list,
-        "yun_num": yun_num_list  # 直接添加列表
-    })
-    xie_yun_map = {}
-    group_map = {}
-    for group, positions in yun_jiao_class.items():
-        for p in positions:
-            absolute_p = abs(p)
-            xie_yun_map[absolute_p] = p < 0
-            group_map[absolute_p] = group
+class YunData:
+    def __init__(self, pos: int, hanzi: str, yun_num: List[int]):
+        self.pos = pos
+        self.hanzi = hanzi
+        self.yun_num = yun_num
+        self.xie_yun = False
+        self.group = None
+        self.is_yayun = False
 
-    df["xie_yun"] = df["pos"].map(lambda x: xie_yun_map.get(x, False))
-    df["group"] = df["pos"].map(lambda y: group_map.get(y, None))
 
-    group_min_pos = df.groupby("group")["pos"].min().reset_index()
-    group_min_pos_sorted = group_min_pos.sort_values(by="pos", ascending=True)
-    group_min_pos_sorted["new_group"] = range(1, len(group_min_pos_sorted) + 1)
-    df = df.merge(group_min_pos_sorted[["group", "new_group"]], on="group", how="left")
-    df["group"] = df["new_group"]
-    df.drop(columns=["new_group"], inplace=True)
+class YunDataProcessor:
+    def __init__(self, yun_jiao_pos: List[int], yun_list: List[str], yun_jiao_class: Dict, yun_num_list: List[List[int]]):
+        self.yun_data = [
+            YunData(pos, hanzi, yun_num)
+            for pos, hanzi, yun_num in zip(yun_jiao_pos, yun_list, yun_num_list)
+        ]
+        self.yun_jiao_class = yun_jiao_class
+        self.xie_yun_map = {}
+        self.group_map = {}
+        self.group_most_common = {}
 
-    df["is_yayun"] = False
-    group_most_common = {}
-    for group_name, group_data in df.groupby("group"):
-        elements = []
-        for index, row in group_data.iterrows():
-            yun_num = row['yun_num']
-            xie_yun = row['xie_yun']
-            if xie_yun:
-                processed = [-num for num in yun_num]
+        for group, positions in yun_jiao_class.items():
+            for p in positions:
+                absolute_p = abs(p)
+                self.xie_yun_map[absolute_p] = p < 0
+                self.group_map[absolute_p] = group
+
+    def process(self):
+        for yun in self.yun_data:
+            yun.xie_yun = self.xie_yun_map.get(yun.pos, False)
+            yun.group = self.group_map.get(yun.pos, None)
+
+        group_min_pos = {}
+        for yun in self.yun_data:
+            if yun.group is not None:
+                group_min_pos[yun.group] = min(
+                    group_min_pos.get(yun.group, yun.pos), yun.pos)
+
+        sorted_groups = sorted(group_min_pos.items(), key=lambda x: x[1])
+        new_group_map = {group: idx + 1 for idx, (group, _) in enumerate(sorted_groups)}
+
+        for yun in self.yun_data:
+            if yun.group is not None:
+                yun.group = new_group_map[yun.group]
+
+        for group_name in set(yun.group for yun in self.yun_data):
+            elements = []
+            for yun in self.yun_data:
+                if yun.group == group_name:
+                    yun_num = yun.yun_num
+                    if yun.xie_yun:
+                        yun_num = [-num for num in yun_num]
+                    elements.extend(yun_num)
+            if elements:
+                counter = Counter(elements)
+                most_common_element = counter.most_common(1)[0][0]
+                self.group_most_common[group_name] = most_common_element
             else:
-                processed = yun_num
-            elements.extend(processed)
-        if elements:
-            counter = Counter(elements)
-            most_common_element = counter.most_common(1)[0][0]
-            group_most_common[group_name] = most_common_element
-        else:
-            group_most_common[group_name] = None
+                self.group_most_common[group_name] = None
 
-    for index, row in df.iterrows():
-        group = row['group']
-        most_common = group_most_common.get(group)
-        if most_common is not None:
-            yun_num = row['yun_num']
-            xie_yun = row['xie_yun']
-            processed = [-num for num in yun_num] if xie_yun else yun_num
-            if most_common in processed:
-                df.at[index, "is_yayun"] = True
-    return df
+        for yun in self.yun_data:
+            most_common = self.group_most_common.get(yun.group)
+            if most_common is not None:
+                yun_num = yun.yun_num
+                if yun.xie_yun:
+                    yun_num = [-num for num in yun_num]
+                if most_common in yun_num:
+                    yun.is_yayun = True
+
+        result = []
+        for yun in self.yun_data:
+            result.append({
+                'pos': yun.pos,
+                'hanzi': yun.hanzi,
+                'yun_num': yun.yun_num,
+                'xie_yun': yun.xie_yun,
+                'group': yun.group,
+                'is_yayun': yun.is_yayun,
+            })
+        return result
+
+
+def yun_data_process(yun_jiao_pos: List[int], yun_list: List[str], yun_jiao_class: Dict, yun_num_list: List[List[int]]):
+    processor = YunDataProcessor(yun_jiao_pos, yun_list, yun_jiao_class, yun_num_list)
+    return processor.process()
 
 
 def ci_yun_list_to_hanzi_yun(yun_list: list[int], yun_shu: int):

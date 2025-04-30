@@ -394,7 +394,7 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, ci_comma: str, give
             ci_nums = [key for key, value in rate_dict.items() if value == max_rate]
         if not ci_nums:
             return 3
-    real_final = real_post = name_show = ''
+    real_final = real_post = ''
     for ci_num in ci_nums:
         type_list = ci_type_extraction(ci_num)
         final_result = post_result = ''
@@ -429,12 +429,12 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, ci_comma: str, give
             for yun_jiao in yun_list:
                 yun_num_list.append(hanzi_to_yun(yun_jiao, yun_shu, ci_lin=True))
 
-            yun_df = yun_data_process(yun_jiao_pos, yun_list, yun_jiao_class, yun_num_list)
+            yun_show_list = yun_data_process(yun_jiao_pos, yun_list, yun_jiao_class, yun_num_list)
             yun_info_list = []
-            for df_row in yun_df.itertuples():
-                yun_hanzi = ci_yun_list_to_hanzi_yun(df_row.yun_num, yun_shu)
-                yun_group = f'第{num_to_cn(df_row.group)}组韵'
-                is_yayun = f'{"" if df_row.is_yayun else "不"}押韵'
+            for single_show_dict in yun_show_list:
+                yun_hanzi = ci_yun_list_to_hanzi_yun(single_show_dict['yun_num'], yun_shu)
+                yun_group = f"第{num_to_cn(single_show_dict['group'])}组韵"
+                is_yayun = f"{'' if single_show_dict['is_yayun'] else '不'}押韵"
                 yun_info = yun_hanzi + ' ' + yun_group + ' ' + is_yayun
                 yun_info_list.append(yun_info)  # 分割后词韵信息
             real_ci_right = ping_ze_right(ci_content, remain, yun_shu)

@@ -17,7 +17,7 @@ def load_font(font_path):
     ctypes.windll.gdi32.AddFontResourceW(font_path)
 
 
-load_font(os.path.abspath("./font/LXGWWenKaiMono-Regular.ttf"))
+load_font(os.path.join(current_dir, 'font', "LXGWWenKaiMono-Regular.ttf"))
 ico_path = os.path.join(current_dir, 'picture', 'ei.ico')
 jpg_path = os.path.join(current_dir, 'picture', 'ei.jpg')
 hanzi_path = os.path.join(current_dir, 'all_hanzi36133.txt')
