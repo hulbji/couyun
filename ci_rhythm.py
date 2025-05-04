@@ -91,7 +91,10 @@ def process_rhyme_data(rhyme_words: list, rhyme_position: list) -> tuple[list, l
     chars_to_remove = "竹枝女儿举棹年少句读\u3000"
     processed_rhyme_words = []
     processed_rhyme_position = []
-    for word, position in zip(rhyme_words, rhyme_position):
+    for i, (word, position) in enumerate(zip(rhyme_words, rhyme_position)):
+        # 如果当前词是“叠”，检查前一个词是否是“句”，此时为“叠句”而非“叠韵”
+        if word == '叠' and rhyme_words[i - 1] == '句':
+            continue
         processed_word = ''.join(char for char in word if char not in chars_to_remove)
         if processed_word:
             processed_rhyme_words.append(processed_word)
@@ -383,12 +386,17 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, ci_comma: str, give
             return 0
         ci_nums = [ci_num]
     else:
-        ci_num_list = ci_and_num[len(ci_content)]
+        if len(ci_content) in ci_and_num.keys():
+            ci_num_list = ci_and_num[len(ci_content)]
+        else:
+            return 3
         ci_nums = None
         rate_dict = {}
         for single_ci_type in ci_num_list:
             this_type = ci_type_extraction(single_ci_type)
             current_rate = cipai_confirm(ci_content, ci_comma, this_type)
+            if not current_rate:
+                continue
             rate_dict[single_ci_type] = current_rate
             max_rate = max(rate_dict.values())
             ci_nums = [key for key, value in rate_dict.items() if value == max_rate]

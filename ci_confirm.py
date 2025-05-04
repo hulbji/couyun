@@ -14,7 +14,7 @@ def find_punctuation_positions(text: str) -> list[int]:
     return position
 
 
-def cipai_confirm(ci_input: str, ci_comma: str, cipai_forms: list[list]) -> float:
+def cipai_confirm(ci_input: str, ci_comma: str, cipai_forms: list[list]) -> float | None:
     for single_form in cipai_forms:
         single_sample_ci = single_form[0]
         if len(ci_input) != len(single_sample_ci.replace('\u3000', '')):
@@ -25,4 +25,4 @@ def cipai_confirm(ci_input: str, ci_comma: str, cipai_forms: list[list]) -> floa
         right_rate = right / len(set(input_form) | set(cipai_form))
         if right_rate > 0.7:
             return right_rate
-    return 0
+    return None

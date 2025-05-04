@@ -3,7 +3,7 @@
 import re
 import os
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, font
 import ctypes
 from PIL import Image, ImageTk
 from opencc import OpenCC
@@ -14,10 +14,19 @@ from ci_rhythm import real_ci
 
 
 def load_font(font_path):
-    ctypes.windll.gdi32.AddFontResourceW(font_path)
+    ctypes.windll.gdi32.AddFontResourceW(font_path, 0x10, 0)
 
 
-load_font(os.path.join(current_dir, 'font', "LXGWWenKaiMono-Regular.ttf"))
+def unload_font(font_path):
+    ctypes.windll.gdi32.RemoveFontResourceW(font_path, 0x10, 0)
+
+
+def on_close():
+    font_path = os.path.join(current_dir, 'font', "LXGWWenKaiMono-Regular.ttf")
+    unload_font(font_path)
+    root.destroy()
+
+
 ico_path = os.path.join(current_dir, 'picture', 'ei.ico')
 jpg_path = os.path.join(current_dir, 'picture', 'ei.jpg')
 hanzi_path = os.path.join(current_dir, 'all_hanzi36133.txt')
@@ -101,9 +110,9 @@ class RhythmCheckerGUI:
         self.initial_reverse_map = {v: k for k, v in self.yun_shu_map.items()}
         self.current_yun_shu = 1
 
-        self.small_font = ("霞鹜文楷等宽", 12)
-        self.default_font = ("霞鹜文楷等宽", 14)
-        self.bigger_font = ("霞鹜文楷等宽", 16)
+        self.small_font = font.Font(family="霞鹜文楷等宽", size=12)
+        self.default_font = font.Font(family="霞鹜文楷等宽", size=14)
+        self.bigger_font = font.Font(family="霞鹜文楷等宽", size=16)
         self.my_purple = "#c9a6eb"
 
         self.cipai_form = None
@@ -395,7 +404,9 @@ class RhythmCheckerGUI:
 
 if __name__ == "__main__":
     root = tk.Tk()
+    load_font(os.path.join(current_dir, 'font', "LXGWWenKaiMono-Regular.ttf"))
     root.tk.call('tk', 'scaling', 2)
     ttk.Style().theme_use('vista')
+    root.protocol("WM_DELETE_WINDOW", on_close)
     app = RhythmCheckerGUI(root)
     root.mainloop()
