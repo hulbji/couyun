@@ -9,7 +9,7 @@ zdic.load()  # 使用汉典网的拼音数据
 
 xin_yun = {1: ['a', 'ia', 'ua'], 2: ['o', 'e', 'uo'], 3: ['ie', 'ue', 've'], 4: ['ai', 'uai'],
            5: ['ei', 'uei', 'ui'], 6: ['ao', 'iao'], 7: ['ou', 'iu', 'iou'], 8: ['an', 'ian', 'uan', 'van'],
-           9: ['en', 'in', 'un', 'vn'], 10: ['ang', 'iang', 'uang'], 11: ['ueng', 'eng', 'ing', 'ong', 'iong'],
+           9: ['en', 'in', 'un', 'vn', 'uen'], 10: ['ang', 'iang', 'uang'], 11: ['ueng', 'eng', 'ing', 'ong', 'iong'],
            12: ['i', 'er', 'v'], 13: ['-i'], 14: ['u']}
 tong_yun = {1: ['a', 'ia', 'ua'], 2: ['o', 'uo'], 3: ['e', 'ie', 'ue', 've'], 4: ['i', '-i'], 5: ['u'], 6: ['v'],
             7: ['ai', 'uai'], 8: ['ei', 'ui', 'uei'], 9: ['ao', 'iao'], 10: ['ou', 'iu', 'iou'],
