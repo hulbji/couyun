@@ -20,10 +20,10 @@ lyu_ju_rule_dict = {
     8: ['0102012', '0102022']  # 平起不押韵（含拗句）
 }  # 一定要将拗句放在后检验
 
-sh = ['〇', '错', '中']  # 如果需要更改符号在这里改
+sh = ['〇', 'Ｘ', '◎', '？']  # 如果需要更改符号在这里改
 
 
-def most_frequent_rhythm(nested_list: list[list[int]]) -> int:
+def most_frequent_rhythm(nested_list: list[list[int]]) -> int | None:
     """
     统计以数字表示的韵字韵部列表中各个元素的出现频率，并找出出现次数最多的元素。
     Args:
@@ -34,7 +34,10 @@ def most_frequent_rhythm(nested_list: list[list[int]]) -> int:
     freq = defaultdict(int)
     for sublist in nested_list:
         for num in sublist:
-            freq[num] += 1
+            if num != 107:
+                freq[num] += 1
+    if not freq.values():
+        return None
     max_count = max(freq.values())
     most_num = [num for num, count in freq.items() if count == max_count]
     return most_num[0]
@@ -280,6 +283,8 @@ def yun_jiao_show(zi: str, poem_rhythm_num: int, yun_shu: int, is_first_sentence
             yun_jiao_content += f'{"韵、".join(zi_list)}韵 ' + '用邻韵 押韵 '
     else:
         yun_jiao_content += f'{"韵、".join(zi_list)}韵 ' + f'{"" if if_ya_yun else "不"}押韵 '
+    if '？' in yun_jiao_content:
+        yun_jiao_content = '不知韵部'  # 生僻字处理模块
     return yun_jiao_content
 
 
@@ -297,13 +302,13 @@ def sentence_show(show_sentence: str, sen_ge_lyu: list[bool], yun_shu: int) -> s
     ge_lju_show = ''
     for char in show_sentence:
         ping_ze = hanzi_to_pingze(char, yun_shu)
-        sp_zi.append('duo') if ping_ze == '0' else sp_zi.append('no')
+        sp_zi.append('duo') if ping_ze == '0' else sp_zi.append('no') if ping_ze != '3' else sp_zi.append('pi')
 
     for i, is_valid in enumerate(sen_ge_lyu):
         if is_valid:
             ge_lju_show += sh[2] if sp_zi[i] == 'duo' else sh[0]
         else:
-            ge_lju_show += sh[1]
+            ge_lju_show += sh[1] if sp_zi[i] != 'pi' else sh[3]
     return ge_lju_show
 
 
@@ -319,7 +324,11 @@ def special_two_pingze(hanzi1: str, hanzi2: str, yun_shu: int, poem_pingze: int)
         第二个判断标准
     """
     ping_ze1 = hanzi_to_pingze(hanzi1, yun_shu)
+    if ping_ze1 == '3':
+        ping_ze1 = '0'
     ping_ze2 = hanzi_to_pingze(hanzi2, yun_shu)
+    if ping_ze2 == '3':
+        ping_ze2 = '0'
     if ping_ze1 + ping_ze2 in ['12', '21']:
         return 0  # 不一致
     if '1' in ping_ze1 + ping_ze2 and poem_pingze == 1:
@@ -347,7 +356,8 @@ def is_all_duo_yin(yun_jiao_content: str, yun_shu: int) -> bool:
     return True
 
 
-def part_shi(yun_shu: int, poem: str, set_num: int = None) -> tuple[str, str, int, list | bool, int]:
+def part_shi(yun_shu: int, poem: str, set_num: int = None) \
+        -> tuple[str, str, int, list | bool, int] | tuple[None, None, None, None, None]:
     """
     诗歌检验函数集成一
     Args:
@@ -365,6 +375,8 @@ def part_shi(yun_shu: int, poem: str, set_num: int = None) -> tuple[str, str, in
     yun_jiaos, f_rhythm, f_hanzi, s_hanzi = poetry_yun_jiao(poem, yun_shu, set_num)
     rhythm_lists = [hanzi_to_yun(yun_jiao, yun_shu) for yun_jiao in yun_jiaos]
     this_rhythm = most_frequent_rhythm(rhythm_lists)
+    if not this_rhythm:
+        return None, None, None, None, None
     if f_rhythm:
         f_rhythm_check = set(f_rhythm) & {this_rhythm}
         f_rhythm = next(iter(f_rhythm_check)) if f_rhythm_check else f_rhythm[0]
@@ -410,8 +422,6 @@ def part_shi_2(yun_shu: int, poem: str, f_hanzi: str, s_hanzi: str,
     yun_jiao_list = list(range(2, max_yun_jiao + 1, 2))
     if s_rhythm:
         yun_jiao_list.append(1)
-    if not first_sen:
-        return '无法判断。'  # 如果没有识别，中止。
     rule_list = which_sentence(first_sen, int(len(poem) / sen_len), s_rhythm, poem_pingze)
 
     sen_mode = 0  # 一般律句，如果有拗句，对应值变化
@@ -428,7 +438,7 @@ def part_shi_2(yun_shu: int, poem: str, f_hanzi: str, s_hanzi: str,
     return shi_result
 
 
-def real_shi(yun_shu: int, poem: str) -> str:
+def real_shi(yun_shu: int, poem: str) -> str | None:
     """
     最终在tk上运行的主模块。
     Args:
@@ -448,6 +458,8 @@ def real_shi(yun_shu: int, poem: str) -> str:
     for _ in range(all_check_time):
         post_result = ''
         f_hanzi, s_hanzi, poem_pingze, f_rhythm, this_rhythm = part_shi(yun_shu, poem, d_check[_])
+        if not f_hanzi:
+            return None
         poem_pingze = [1, -1] if poem_pingze == 0 else [poem_pingze]
         for single_pingze in poem_pingze:
             temp_result = part_shi_2(yun_shu, poem, f_hanzi, s_hanzi, single_pingze, f_rhythm, this_rhythm, d_check[_])

@@ -80,7 +80,9 @@ def new_ping_ze(yun_list: list) -> str:
             ping = True
         else:
             ze = True
-    return '0' if ping and ze else ('1' if ping else '2')
+    if not ping and not ze:
+        return '3'
+    return '0' if ping and ze else '1' if ping else '2'
 
 
 def show_yun(hanzi: str | list, yun_rule: dict, yun_hanzi: list) -> str:

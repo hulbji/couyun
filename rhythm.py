@@ -29,7 +29,7 @@ def on_close():
 
 ico_path = os.path.join(current_dir, 'picture', 'ei.ico')
 jpg_path = os.path.join(current_dir, 'picture', 'ei.jpg')
-hanzi_path = os.path.join(current_dir, 'all_hanzi36133.txt')
+hanzi_path = os.path.join(current_dir, 'all_hanzi.txt')
 with open(hanzi_path, 'r', encoding='utf-8') as file:
     allowed_hanzi = set(file.read())
 if os.name == 'nt':
@@ -350,6 +350,13 @@ class RhythmCheckerGUI:
             it.insert(tk.END, processed)
             return
         res = real_shi(self.current_yun_shu, processed)
+        if not res:
+            title, msg = "怎么回事？", "你输入的每一个韵脚都不在韵书里面诶，我没法分析的！"
+            if self.is_traditional:
+                title = self.opencc_s2t.convert(title)
+                msg = self.opencc_s2t.convert(msg)
+            messagebox.showwarning(title, msg)
+            return
         res = convert_to_traditional(res, self.is_traditional, 'p')
         self.scrollbar.place(relx=0.98, rely=0.14, relwidth=0.02, height=340)
         ot.pack(side=tk.RIGHT, padx=5)

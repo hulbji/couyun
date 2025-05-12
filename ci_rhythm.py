@@ -163,6 +163,8 @@ def ping_ze_right(text: str, cipai: str, yun_shu: int) -> list[str | bool]:
         ping_ze = hanzi_to_pingze(text[hanzi_num], yun_shu)
         if ping_ze == '0':
             result.append('duo')
+        elif ping_ze == '3':
+            result.append('pi')
         elif ping_ze == '1':
             result.append(True) if cipai[hanzi_num] in '平中' else result.append(False)
         else:
@@ -444,6 +446,8 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, ci_comma: str, give
                 yun_group = f"第{num_to_cn(single_show_dict['group'])}组韵"
                 is_yayun = f"{'' if single_show_dict['is_yayun'] else '不'}押韵"
                 yun_info = yun_hanzi + ' ' + yun_group + ' ' + is_yayun
+                if '零' in yun_info:
+                    yun_info = '不知韵部'
                 yun_info_list.append(yun_info)  # 分割后词韵信息
             real_ci_right = ping_ze_right(ci_content, remain, yun_shu)
             yun_final_list = yun_right_list(real_ci_lis, real_ci_right)
@@ -452,9 +456,11 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, ci_comma: str, give
                 ci_result += f'\n仄句\n{ci_content[-1]}\n'
                 last_pingze = hanzi_to_pingze(ci_content[-1], yun_shu)
                 if last_pingze == '0':
-                    ci_result += '中\n'
+                    ci_result += '◎\n'
                 elif last_pingze == '1':
-                    ci_result += '错\n'
+                    ci_result += 'Ｘ\n'
+                elif last_pingze == '3':
+                    ci_result += '？\n'
                 else:
                     ci_result += '〇\n'
             final_result = result_check(post_result, ci_result)

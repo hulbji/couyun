@@ -7,7 +7,7 @@ rhythm_name = [
     '东冬江支微鱼虞齐佳灰真文元寒删先萧肴豪歌麻阳庚青蒸尤侵覃盐咸',
     '董肿讲纸尾语麌荠蟹贿轸吻阮旱潸铣筱巧皓哿马养梗迥有寝感俭豏',
     '送宋绛寘未御遇霁泰卦队震问愿翰谏霰啸效号个祃漾敬径宥沁勘艳陷',
-    '屋沃觉质物月曷黠屑药陌锡职缉合叶洽'
+    '屋沃觉质物月曷黠屑药陌锡职缉合叶洽？'
 ]
 
 rhythm_correspond = {1: 1, 2: 1, 3: 2, 4: 3, 5: 3, 6: 4, 7: 4, 8: 3, 9: [5, 10], 10: [3, 5],
@@ -32,7 +32,7 @@ def traverse_lists_and_find(search_hanzi: str) -> list[list]:
     return matching_list
 
 
-def matching_list_to_rhythm_name(matching_list: list[list]) -> list[str]:
+def matching_list_to_rhythm_name(matching_list: list[list]) -> list[str] | None:
     """
     将韵表列表转换为韵律名称。
     Args:
@@ -45,6 +45,8 @@ def matching_list_to_rhythm_name(matching_list: list[list]) -> list[str]:
         rh1 = abs(int(single_list[1])) - 1
         rh2 = abs(int(single_list[2])) - 1
         rh3_re = '平' if rh1 == 0 else ('仄' if rh1 in [1, 2] else '入声')
+        if rh2 == -1:
+            return None
         if rh3_re == '平' and rh2 + 1 > 15:
             pingshui_rh = f'平水韵{num_to_cn((rh2 + 1) - 15)}{rhythm_name[rh1][int(abs(single_list[2])) - 1]}'
         else:
@@ -70,6 +72,8 @@ def hanzi_rhythm(search_str: str, showit=False, only_ping_ze=False, ci_lin=False
         result = ''
         real_rhythm = matching_list_to_rhythm_name(matching_lists)
         result += f'{search_str}在：' + '\n'
+        if not real_rhythm:
+            return result + '未能在韵书中查询到该汉字信息\n'
         for rhythms in real_rhythm:
             result += rhythms + '\n'
         return result
@@ -80,6 +84,8 @@ def hanzi_rhythm(search_str: str, showit=False, only_ping_ze=False, ci_lin=False
                 ping = True
             elif rh_list[2] < 0 and not ze:
                 ze = True
+        if not ping and not ze:
+            return '3'
         return '0' if ping and ze else ('1' if ping else '2')  # 0 中 1 平 2 仄 空字符串 生僻字（只做查字用）
     elif ci_lin:
         return list(set(rh_list[3] for rh_list in matching_lists))
