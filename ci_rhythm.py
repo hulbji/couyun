@@ -458,7 +458,7 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, ci_comma: str, give
                 if last_pingze == '0':
                     ci_result += '◎\n'
                 elif last_pingze == '1':
-                    ci_result += 'Ｘ\n'
+                    ci_result += '●\n'
                 elif last_pingze == '3':
                     ci_result += '？\n'
                 else:

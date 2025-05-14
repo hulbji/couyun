@@ -20,7 +20,7 @@ lyu_ju_rule_dict = {
     8: ['0102012', '0102022']  # 平起不押韵（含拗句）
 }  # 一定要将拗句放在后检验
 
-sh = ['〇', 'Ｘ', '◎', '？']  # 如果需要更改符号在这里改
+sh = ['〇', '●', '◎', '？']  # 如果需要更改符号在这里改
 
 
 def most_frequent_rhythm(nested_list: list[list[int]]) -> int | None:
