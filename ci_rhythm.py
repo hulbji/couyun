@@ -401,7 +401,7 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, ci_comma: str, give
                 continue
             rate_dict[single_ci_type] = current_rate
             max_rate = max(rate_dict.values())
-            ci_nums = [key for key, value in rate_dict.items() if value == max_rate]
+            ci_nums = [key for key, value in rate_dict.items() if value >= max_rate * 0.9]
         if not ci_nums:
             return 3
     real_final = real_post = ''
