@@ -94,6 +94,8 @@ def first_poem(matched_lists: list[list[str]], first_yayun: int,
                 result += 4
             return result
     if sen_num == match_time + 1:
+        if not matched_list:
+            return 1 if poem_pingze == 1 else 2
         co_rule = rule[matched_list[0]]
         if co_rule == 0:
             if matched_list[0] == '111' and poem_pingze > 0:

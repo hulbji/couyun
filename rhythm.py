@@ -35,7 +35,7 @@ with open(hanzi_path, 'r', encoding='utf-8') as file:
 if os.name == 'nt':
     try:
         ctypes.windll.shcore.SetProcessDpiAwareness(2)
-    except Exception:
+    except (OSError, AttributeError, ctypes.ArgumentError):
         ctypes.windll.user32.SetProcessDPIAware()
 
 
@@ -128,7 +128,7 @@ class RhythmCheckerGUI:
         self.bg_index = 0
         self.background_label = tk.Label(self.root, image=self.background_image)
         self.background_label.place(relwidth=1, relheight=1)
-        self.cover_button = tk.Button(self.root, text="更换封面", command=self.switch_background, font=self.small_font)
+        self.cover_button = tk.Button(self.root, text="切换封面", command=self.switch_background, font=self.small_font)
         self.cover_button.place(relx=0.01, rely=0.99, anchor='sw')
 
         self.toggle_button = tk.Button(self.root, text="繁體", command=self.toggle_language, font=self.small_font)

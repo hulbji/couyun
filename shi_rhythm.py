@@ -283,7 +283,7 @@ def yun_jiao_show(zi: str, poem_rhythm_num: int, yun_shu: int, is_first_sentence
             yun_jiao_content += f'{"韵、".join(zi_list)}韵 ' + '用邻韵 押韵 '
     else:
         yun_jiao_content += f'{"韵、".join(zi_list)}韵 ' + f'{"" if if_ya_yun else "不"}押韵 '
-    if '？' in yun_jiao_content:
+    if '？' in yun_jiao_content or yun_jiao_content == '韵 不押韵 ':
         yun_jiao_content = '不知韵部'  # 生僻字处理模块
     return yun_jiao_content
 
@@ -306,7 +306,7 @@ def sentence_show(show_sentence: str, sen_ge_lyu: list[bool], yun_shu: int) -> s
 
     for i, is_valid in enumerate(sen_ge_lyu):
         if is_valid:
-            ge_lju_show += sh[2] if sp_zi[i] == 'duo' else sh[0]
+            ge_lju_show += sh[2] if sp_zi[i] == 'duo' else sh[0] if sp_zi[i] != 'pi' else sh[3]
         else:
             ge_lju_show += sh[1] if sp_zi[i] != 'pi' else sh[3]
     return ge_lju_show

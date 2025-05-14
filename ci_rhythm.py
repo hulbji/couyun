@@ -446,7 +446,7 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, ci_comma: str, give
                 yun_group = f"第{num_to_cn(single_show_dict['group'])}组韵"
                 is_yayun = f"{'' if single_show_dict['is_yayun'] else '不'}押韵"
                 yun_info = yun_hanzi + ' ' + yun_group + ' ' + is_yayun
-                if '零' in yun_info:
+                if '零' in yun_info or len(yun_info) == 9:
                     yun_info = '不知韵部'
                 yun_info_list.append(yun_info)  # 分割后词韵信息
             real_ci_right = ping_ze_right(ci_content, remain, yun_shu)
