@@ -112,7 +112,7 @@ def count_poem_para(string: str) -> tuple[int, int, int]:
     lines = string.split('\n')
     for line in lines:
         if '〇' in line:
-            total_count += line.count('〇') + line.count('中')
+            total_count += line.count('〇') + line.count('◎')
         if '不押韵' in line:
             total_count -= 1
         if '押韵' in line:

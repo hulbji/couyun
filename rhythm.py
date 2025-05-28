@@ -7,6 +7,7 @@ from tkinter import ttk, messagebox, font
 import ctypes
 from PIL import Image, ImageTk
 from opencc import OpenCC
+import json
 
 from common import show_all_rhythm, current_dir
 from shi_rhythm import real_shi
@@ -21,15 +22,20 @@ def unload_font(font_path):
     ctypes.windll.gdi32.RemoveFontResourceW(font_path, 0x10, 0)
 
 
-def on_close():
-    font_path = os.path.join(current_dir, 'font', "LXGWWenKaiMono-Regular.ttf")
-    unload_font(font_path)
-    root.destroy()
+def load_state(state_path):
+    with open(state_path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+
+def save_state(state_path, state):
+    with open(state_path, 'w', encoding='utf-8') as f:
+        json.dump(state, f, ensure_ascii=False, indent=4)
 
 
 ico_path = os.path.join(current_dir, 'picture', 'ei.ico')
-jpg_path = os.path.join(current_dir, 'picture', 'ei.jpg')
-hanzi_path = os.path.join(current_dir, 'all_hanzi.txt')
+jpg_fold = os.path.join(current_dir, 'picture')
+hanzi_path = os.path.join(current_dir, 'other', 'all_hanzi.txt')
+state_file = os.path.join(current_dir, 'other', 'state.json')
 with open(hanzi_path, 'r', encoding='utf-8') as file:
     allowed_hanzi = set(file.read())
 if os.name == 'nt':
@@ -37,6 +43,7 @@ if os.name == 'nt':
         ctypes.windll.shcore.SetProcessDpiAwareness(2)
     except (OSError, AttributeError, ctypes.ArgumentError):
         ctypes.windll.user32.SetProcessDPIAware()
+current_state = load_state(state_file)
 
 
 def extract_chinese(text: str, comma_remain=False) -> str:
@@ -96,19 +103,25 @@ def settings(mode):
     return 15, 47, 8, 5
 
 
+def on_close(state):
+    font_path = os.path.join(current_dir, 'font', "LXGWWenKaiMono-Regular.ttf")
+    unload_font(font_path)
+    save_state(state_file, state)
+    root.destroy()
+
+
 # noinspection PyTypeChecker
 class RhythmCheckerGUI:
     def __init__(self, roots):
         self.yunshu_var = None
         self.opencc_s2t = OpenCC('s2t')
         self.opencc_t2s = OpenCC('t2s')
-        self.is_traditional = False
+        self.is_traditional = current_state['is_traditional']
         self.widgets_to_translate = []
         self.comboboxes = []
 
         self.yun_shu_map = {1: '平水韵', 2: '中华通韵', 3: '中华新韵'}
-        self.initial_reverse_map = {v: k for k, v in self.yun_shu_map.items()}
-        self.current_yun_shu = 1
+        self.current_yun_shu = current_state['yun_shu']
 
         self.small_font = font.Font(family="霞鹜文楷等宽", size=12)
         self.default_font = font.Font(family="霞鹜文楷等宽", size=14)
@@ -120,18 +133,20 @@ class RhythmCheckerGUI:
         self.root = roots
         self.root.iconbitmap(ico_path)
         self.root.resizable(width=False, height=False)
-        self.root.title("凑韵")
+        self.root.title("湊韻" if self.is_traditional else "凑韵")
         self.root.geometry("1200x900")
 
-        self.background_image = load_background_image(jpg_path)
         self.bg_images = ["ei.jpg", "ei_2.jpg", "ei_3.jpg"]
-        self.bg_index = 0
+        self.bg_index = current_state['bg_index']
+        self.background_image = load_background_image(os.path.join(jpg_fold, self.bg_images[self.bg_index]))
         self.background_label = tk.Label(self.root, image=self.background_image)
         self.background_label.place(relwidth=1, relheight=1)
-        self.cover_button = tk.Button(self.root, text="切换封面", command=self.switch_background, font=self.small_font)
+        self.cover_button = tk.Button(self.root, text='切換封面' if self.is_traditional else "切换封面",
+                                      command=self.switch_background, font=self.small_font)
         self.cover_button.place(relx=0.01, rely=0.99, anchor='sw')
 
-        self.toggle_button = tk.Button(self.root, text="繁體", command=self.toggle_language, font=self.small_font)
+        self.toggle_button = tk.Button(self.root, text='简体' if self.is_traditional else "繁體",
+                                       command=self.toggle_language, font=self.small_font)
         self.toggle_button.place(relx=0.99, rely=0.99, anchor='se')
 
         self.input_text = None
@@ -151,7 +166,7 @@ class RhythmCheckerGUI:
         """在简体和繁体之间切换"""
         for widget in self.widgets_to_translate:
             orig = widget.cget('text')
-            new = self.opencc_s2t.convert(orig) if not self.is_traditional else self.opencc_t2s.convert(orig)
+            new = self.opencc_t2s.convert(orig) if self.is_traditional else self.opencc_s2t.convert(orig)
             widget.config(text=new)
         for cb in self.comboboxes:
             if not self.is_traditional:
@@ -161,17 +176,18 @@ class RhythmCheckerGUI:
             else:
                 cb['values'] = [self.yun_shu_map[k] for k in sorted(self.yun_shu_map)]
                 cb.set(self.yun_shu_map[self.current_yun_shu])
-        # 切换按钮、标题文本
-        btn_text = '简体' if not self.is_traditional else '繁體'
+        btn_text = '繁體' if self.is_traditional else '简体'
         self.toggle_button.config(text=btn_text)
-        change_text = '切換封面' if not self.is_traditional else '切换封面'
+        change_text = '切换封面' if self.is_traditional else '切換封面'
         self.cover_button.config(text=change_text)
         title_text = '凑韵' if self.is_traditional else '湊韻'
         self.root.title(title_text)
         self.is_traditional = not self.is_traditional
+        current_state['is_traditional'] = self.is_traditional
 
     def switch_background(self):
         self.bg_index = (self.bg_index + 1) % len(self.bg_images)
+        current_state['bg_index'] = self.bg_index
         image_path = os.path.join(current_dir, "picture", self.bg_images[self.bg_index])
         self.background_image = load_background_image(image_path)
         self.background_label.config(image=self.background_image)
@@ -180,20 +196,21 @@ class RhythmCheckerGUI:
         self.main_interface = ttk.Frame(self.root)
         self.main_interface.pack(pady=200)
 
-        title_label = ttk.Label(self.main_interface, text="凑韵诗词格律校验工具", font=self.bigger_font)
+        label = '湊韻詩詞格律校驗工具' if self.is_traditional else "凑韵诗词格律校验工具"
+        title_label = ttk.Label(self.main_interface, text=label, font=self.bigger_font)
         title_label.pack(pady=10)
         self.register(title_label)
 
         frame = ttk.Frame(self.main_interface)
         frame.pack(pady=10)
 
-        poem_button = tk.Button(frame, text="诗校验", command=self.open_poem_interface,
-                                font=self.default_font, bg=self.my_purple, width=20)
+        poem_button = tk.Button(frame, text="詩校驗" if self.is_traditional else "诗校验",
+                                command=self.open_poem_interface, font=self.default_font, bg=self.my_purple, width=20)
         poem_button.pack(side=tk.TOP, padx=5, pady=10)
         self.register(poem_button)
 
-        ci_button = tk.Button(frame, text="词校验", command=self.open_ci_interface,
-                              font=self.default_font, bg=self.my_purple, width=20)
+        ci_button = tk.Button(frame, text="詞校驗" if self.is_traditional else "词校验",
+                              command=self.open_ci_interface, font=self.default_font, bg=self.my_purple, width=20)
         ci_button.pack(side=tk.TOP, padx=5, pady=10)
         self.register(ci_button)
 
@@ -203,7 +220,6 @@ class RhythmCheckerGUI:
         self.register(char_button)
 
     def create_generic_interface(self, title_text, hint_text, button_text, command_func, mode):
-        # 记录当前需要翻译控件数
         old_widgets = len(self.widgets_to_translate)
         old_comboboxes = len(self.comboboxes)
 
@@ -308,6 +324,7 @@ class RhythmCheckerGUI:
 
     def on_yunshu_change(self):
         self.current_yun_shu = self.yunshu_reverse_map[self.yunshu_var.get()]
+        current_state['yun_shu'] = self.current_yun_shu
 
     def open_poem_interface(self):
         self.input_text, self.output_text = self.create_generic_interface(
@@ -397,7 +414,7 @@ class RhythmCheckerGUI:
         if len(text) != 1:
             messagebox.showwarning("找茬是吧？", "请输入单个汉字！")
             return
-        if not re.match(r'[\u4e00-\u9fff\u3400-\u4dbf\u3007\U00020000-\U0002A6DF]', text):
+        if not re.match(r'[\u4e00-\u9fff\u3400-\u4dbf\u3007\u2642\U00020000-\U0002A6DF]', text):
             messagebox.showwarning("你在干嘛呢？", "非汉字或超出区段（基本区及拓展A、B区）")
             return
         res = show_all_rhythm(text)
@@ -414,6 +431,6 @@ if __name__ == "__main__":
     load_font(os.path.join(current_dir, 'font', "LXGWWenKaiMono-Regular.ttf"))
     root.tk.call('tk', 'scaling', 2)
     ttk.Style().theme_use('vista')
-    root.protocol("WM_DELETE_WINDOW", on_close)
+    root.protocol("WM_DELETE_WINDOW", lambda: on_close(current_state))
     app = RhythmCheckerGUI(root)
     root.mainloop()

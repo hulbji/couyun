@@ -92,8 +92,7 @@ def process_rhyme_data(rhyme_words: list, rhyme_position: list) -> tuple[list, l
     processed_rhyme_words = []
     processed_rhyme_position = []
     for i, (word, position) in enumerate(zip(rhyme_words, rhyme_position)):
-        # 如果当前词是“叠”，检查前一个词是否是“句”，此时为“叠句”而非“叠韵”
-        if word == '叠' and rhyme_words[i - 1] == '句':
+        if word == '叠' and rhyme_words[i - 1] == '句':  # 如果当前词是“叠”，检查前一个词是否是“句”，此时为“叠句”而非“叠韵”
             continue
         processed_word = ''.join(char for char in word if char not in chars_to_remove)
         if processed_word:
