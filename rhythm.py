@@ -2,6 +2,7 @@
 
 import re
 import os
+import time
 import tkinter as tk
 from tkinter import ttk, messagebox, font
 import ctypes
@@ -34,27 +35,28 @@ def save_state(state_path, state):
 
 ico_path = os.path.join(current_dir, 'picture', 'ei.ico')
 jpg_fold = os.path.join(current_dir, 'picture')
-hanzi_path = os.path.join(current_dir, 'other', 'all_hanzi.txt')
-state_file = os.path.join(current_dir, 'other', 'state.json')
-with open(hanzi_path, 'r', encoding='utf-8') as file:
-    allowed_hanzi = set(file.read())
+state_file = os.path.join(current_dir, 'state', 'state.json')
+current_state = load_state(state_file)
+size_tuple = current_state['tk_value']['size']
+size_string = 'x'.join(map(str, size_tuple))
 if os.name == 'nt':
     try:
         ctypes.windll.shcore.SetProcessDpiAwareness(2)
     except (OSError, AttributeError, ctypes.ArgumentError):
         ctypes.windll.user32.SetProcessDPIAware()
-current_state = load_state(state_file)
 
 
 def extract_chinese(text: str, comma_remain=False) -> str:
     """删除输入文本中的非汉字部分以及括号内的部分"""
     text = re.sub(r'[(（].*?[)）]', '', text)
-    if not comma_remain:
-        text = ''.join([char for char in text if char in allowed_hanzi]).replace('\n', '')
+    hanzi_range = r'\u4e00-\u9fff\u3400-\u4dbf\u3007\u2642\U00020000-\U0002A6DF'
+    if comma_remain:
+        punctuation = r',\.\?!:，。？！、：'
+        pattern = re.compile(f'[{hanzi_range}{punctuation}]')
     else:
-        comma_set = {',', '.', '?', '!', ':', "，", "。", "？", "！", "、", "："}
-        text = ''.join([char for char in text if char in allowed_hanzi | comma_set]).replace('\n', '')
-    return text
+        pattern = re.compile(f'[{hanzi_range}]')
+    filtered_text = ''.join(pattern.findall(text)).replace('\n', '')
+    return filtered_text
 
 
 def convert_to_traditional(text, is_traditional, mode):
@@ -62,55 +64,47 @@ def convert_to_traditional(text, is_traditional, mode):
     if not is_traditional:
         return text
     cc = OpenCC('s2t')
-    lines = text.split('\n')
     converted_lines = []
-    for line in lines:
-        if '\t' in line and "你的格式" not in line:
-            parts = line.split('\t', 1)
-            word_part = parts[0]
-            non_word_part = parts[1] if len(parts) > 1 else ''
+    for line in text.split('\n'):
+        if "你的格式" in line:
+            converted_line = cc.convert(line)
+        elif '\t' in line or ' ' in line:
+            sep = '\t' if '\t' in line else ' '
+            word_part, non_word_part = line.split(sep, 1)
             converted_non_word = cc.convert(non_word_part)
-            converted_line = f"{word_part}\t{converted_non_word}"
-        elif ' ' in line and "你的格式" not in line:
-            parts = line.split(' ', 1)
-            word_part = parts[0]
-            non_word_part = parts[1] if len(parts) > 1 else ''
-            converted_non_word = cc.convert(non_word_part)
-            converted_line = f"{word_part} {converted_non_word}"
+            converted_line = f"{word_part}{sep}{converted_non_word}"
         elif '在：' in line and mode == 's':
             converted_line = line
         else:
             converted_line = cc.convert(line)
         converted_lines.append(converted_line)
     converted_text = '\n'.join(converted_lines)
-    # 在这里处理会被错误转换的繁体字
-    converted_text = converted_text.replace('鹹韻', "咸韻")
-    converted_text = converted_text.replace('十五鹹', "十五咸")
-    return converted_text
+    return converted_text.replace('鹹韻', "咸韻").replace('十五鹹', "十五咸")
 
 
 def load_background_image(image_path):
     """加载并调整背景图片大小"""
     image = Image.open(image_path)
-    image = image.resize((1200, 900), Image.Resampling.LANCZOS)
+    image = image.resize(size_tuple, Image.Resampling.LANCZOS)
     return ImageTk.PhotoImage(image)
 
 
 def settings(mode):
     """根据模式调整窗口大小"""
     if mode in ['p', 'c']:
-        return 34, 66, 8, 5
-    return 15, 47, 8, 5
+        return current_state['tk_value']['frame_width'][0]
+    return current_state['tk_value']['frame_width'][1]
 
 
 def on_close(state):
+    """关闭窗口时的行为，卸载字体。将新状态写入json文件。"""
     font_path = os.path.join(current_dir, 'font', "LXGWWenKaiMono-Regular.ttf")
     unload_font(font_path)
     save_state(state_file, state)
     root.destroy()
 
 
-# noinspection PyTypeChecker
+# noinspection PyTypeChecker,DuplicatedCode
 class RhythmCheckerGUI:
     def __init__(self, roots):
         self.yunshu_var = None
@@ -120,7 +114,7 @@ class RhythmCheckerGUI:
         self.widgets_to_translate = []
         self.comboboxes = []
 
-        self.yun_shu_map = {1: '平水韵', 2: '中华通韵', 3: '中华新韵'}
+        self.yun_shu_map = {1: '平水韵', 2: '中华新韵', 3: '中华通韵'}
         self.current_yun_shu = current_state['yun_shu']
 
         self.small_font = font.Font(family="霞鹜文楷等宽", size=12)
@@ -134,7 +128,7 @@ class RhythmCheckerGUI:
         self.root.iconbitmap(ico_path)
         self.root.resizable(width=False, height=False)
         self.root.title("湊韻" if self.is_traditional else "凑韵")
-        self.root.geometry("1200x900")
+        self.root.geometry(size_string)
 
         self.bg_images = ["ei.jpg", "ei_2.jpg", "ei_3.jpg"]
         self.bg_index = current_state['bg_index']
@@ -194,7 +188,7 @@ class RhythmCheckerGUI:
 
     def create_main_interface(self):
         self.main_interface = ttk.Frame(self.root)
-        self.main_interface.pack(pady=200)
+        self.main_interface.pack(pady=current_state['tk_value']['main_pady'])
 
         label = '湊韻詩詞格律校驗工具' if self.is_traditional else "凑韵诗词格律校验工具"
         title_label = ttk.Label(self.main_interface, text=label, font=self.bigger_font)
@@ -225,7 +219,8 @@ class RhythmCheckerGUI:
 
         self.main_interface.pack_forget()
         generic = ttk.Frame(self.root)
-        generic.pack(pady=150 if mode == 's' else 50 if mode == 'c' else 100)
+        pady_len = current_state['tk_value']['generic_pady']
+        generic.pack(pady=pady_len[2] if mode == 's' else pady_len[1] if mode == 'c' else pady_len[0])
 
         title_label = ttk.Label(generic, text=title_text, font=self.bigger_font)
         title_label.pack(pady=10)
@@ -352,6 +347,7 @@ class RhythmCheckerGUI:
 
     def check_poem(self, it, ot):
         text = it.get("1.0", tk.END).strip()
+        start_time = time.time()
         if not text:
             title, msg = "找茬是吧？", "请输入需要校验的诗！"
             if self.is_traditional:
@@ -362,7 +358,7 @@ class RhythmCheckerGUI:
         processed = extract_chinese(text)
         length = len(processed)
         if (length % 10 != 0 and length % 14 != 0) or length < 20:
-            messagebox.showwarning("要不检查下？", f"诗的字数不正确，你输入了{length}字")
+            messagebox.showwarning("要不检查下？", f"诗的字数不正确，可能有不能识别的生僻字，你输入了{length}字")
             it.delete("1.0", tk.END)
             it.insert(tk.END, processed)
             return
@@ -374,8 +370,12 @@ class RhythmCheckerGUI:
                 msg = self.opencc_s2t.convert(msg)
             messagebox.showwarning(title, msg)
             return
+        end_time = time.time()
+        time_result = f'检测完毕，耗时{end_time - start_time:.5f}s\n'
+        res += time_result
         res = convert_to_traditional(res, self.is_traditional, 'p')
-        self.scrollbar.place(relx=0.98, rely=0.14, relwidth=0.02, height=340)
+        bar = current_state['tk_value']['shi_bar']
+        self.scrollbar.place(relx=bar[0], rely=bar[1], relwidth=bar[2], height=bar[3])
         ot.pack(side=tk.RIGHT, padx=5)
         ot.config(state=tk.NORMAL)
         ot.delete("1.0", tk.END)
@@ -384,6 +384,7 @@ class RhythmCheckerGUI:
 
     def check_ci(self, it, ot):
         text = it.get("1.0", tk.END).strip()
+        start_time = time.time()
         if not text:
             messagebox.showwarning("找茬是吧？", "请输入需要校验的词！")
             return
@@ -398,8 +399,12 @@ class RhythmCheckerGUI:
         if res in msgs:
             messagebox.showwarning("要不检查下？", msgs[res])
             return
+        end_time = time.time()
+        time_result = f'检测完毕，耗时{end_time - start_time:.5f}s\n'
+        res += time_result
         res = convert_to_traditional(res, self.is_traditional, 'c')
-        self.scrollbar.place(relx=0.41, rely=0.96, relwidth=0.59, height=20)
+        bar = current_state['tk_value']['ci_bar']
+        self.scrollbar.place(relx=bar[0], rely=bar[1], relwidth=bar[2], height=bar[3])
         ot.pack(side=tk.RIGHT, padx=5)
         ot.config(state=tk.NORMAL)
         ot.delete("1.0", tk.END)

@@ -3,11 +3,10 @@
 import new_rhythm as nw
 from collections import Counter
 from num_to_cn import num_to_cn
-from typing import List, Dict
 
 
 class YunData:
-    def __init__(self, pos: int, hanzi: str, yun_num: List[int]):
+    def __init__(self, pos: int, hanzi: str, yun_num: list[int]):
         self.pos = pos
         self.hanzi = hanzi
         self.yun_num = yun_num
@@ -17,7 +16,7 @@ class YunData:
 
 
 class YunDataProcessor:
-    def __init__(self, yun_jiao_pos: List[int], yun_list: List[str], yun_jiao_class: Dict, yun_num_list: List[List[int]]):
+    def __init__(self, yun_jiao_pos: list[int], yun_list: list[str], yun_jiao_class: dict, yun_num_list: list[list[int]]):
         self.yun_data = [
             YunData(pos, hanzi, yun_num)
             for pos, hanzi, yun_num in zip(yun_jiao_pos, yun_list, yun_num_list)
@@ -88,7 +87,7 @@ class YunDataProcessor:
         return result
 
 
-def yun_data_process(yun_jiao_pos: List[int], yun_list: List[str], yun_jiao_class: Dict, yun_num_list: List[List[int]]):
+def yun_data_process(yun_jiao_pos: list[int], yun_list: list[str], yun_jiao_class: dict, yun_num_list: list[list[int]]):
     processor = YunDataProcessor(yun_jiao_pos, yun_list, yun_jiao_class, yun_num_list)
     return processor.process()
 
@@ -132,7 +131,7 @@ def yun_right_list(ci_seperate_lis: list[str], ci_content_right: list[bool | str
     ptr = 0
 
     for poem in ci_seperate_lis:
-        non_space_chars = [c for c in poem if c != '\u3000']
+        non_space_chars = poem.replace('\u3000', '')
         non_space_count = len(non_space_chars)
         sub_right = ci_content_right[ptr:ptr + non_space_count]
         converted = []

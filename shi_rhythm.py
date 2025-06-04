@@ -1,6 +1,5 @@
 """诗歌校验模块内容，可以校验五言或七言的绝句或律诗或排律，可以校验孤雁入群的特殊格式。支持拗救。支持三韵。"""
 
-import time
 import math
 from collections import defaultdict
 
@@ -447,7 +446,6 @@ def real_shi(yun_shu: int, poem: str) -> str | None:
     Returns:
         最终的诗歌校验结果
     """
-    start_time = time.time()
     if len(poem) % 70 == 0 and len(poem) >= 70:
         all_check_time = 2
         d_check = [5, 7]
@@ -470,6 +468,4 @@ def real_shi(yun_shu: int, poem: str) -> str | None:
         all_temp_result = final_result
         final_result = result_check(all_post_result, all_temp_result)
         all_post_result = all_temp_result
-    end_time = time.time()
-    final_result += f'检测完毕，耗时{end_time - start_time:.5f}s\n'
     return final_result.lstrip()
