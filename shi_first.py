@@ -53,9 +53,9 @@ def get_current_pattern(sen: int, ping_ze: str) -> list[int]:
     ze_cycle = [[3, 1], [4, 2], [1, 3], [2, 4]]
 
     if ping_ze == "ping":
-        current = ping_initial[sen] if sen <= 4 else ping_cycle[sen % 4]
+        current = ping_initial[sen] if sen <= 3 else ping_cycle[sen % 4]
     else:
-        current = ze_initial[sen] if sen <= 4 else ze_cycle[sen % 4]
+        current = ze_initial[sen] if sen <= 3 else ze_cycle[sen % 4]
     return current
 
 

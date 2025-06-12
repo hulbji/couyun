@@ -1,22 +1,5 @@
 [
     {
-        "rhyme_amount_by_para": [
-            4
-        ],
-        "rhyme_hanzi": [
-            "韵",
-            "韵",
-            "韵",
-            "韵"
-        ],
-        "rhyme_pos_by_para": [
-            [
-                2,
-                5,
-                15,
-                29
-            ]
-        ],
         "ge_lyu_str": "平平平平仄平仄仄仄平仄平平平仄平平平平仄平平仄仄平仄仄平平平",
         "rhyme_pos": [
             2,
@@ -46,21 +29,6 @@
         ]
     },
     {
-        "rhyme_amount_by_para": [
-            3
-        ],
-        "rhyme_hanzi": [
-            "韵",
-            "韵",
-            "韵"
-        ],
-        "rhyme_pos_by_para": [
-            [
-                5,
-                15,
-                29
-            ]
-        ],
         "ge_lyu_str": "平仄仄仄平平平平平仄仄平仄仄平平平平平仄平平仄平仄平平平仄平",
         "rhyme_pos": [
             5,
@@ -86,23 +54,6 @@
         ]
     },
     {
-        "rhyme_amount_by_para": [
-            4
-        ],
-        "rhyme_hanzi": [
-            "韵",
-            "韵",
-            "韵",
-            "韵"
-        ],
-        "rhyme_pos_by_para": [
-            [
-                2,
-                5,
-                15,
-                29
-            ]
-        ],
         "ge_lyu_str": "平平仄平平仄仄平仄仄平平仄平平仄平仄平平仄仄平仄平平仄平平仄",
         "rhyme_pos": [
             2,

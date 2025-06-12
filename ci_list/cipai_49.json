@@ -1,20 +1,5 @@
 [
     {
-        "rhyme_amount_by_para": [
-            3
-        ],
-        "rhyme_hanzi": [
-            "韵",
-            "韵",
-            "韵"
-        ],
-        "rhyme_pos_by_para": [
-            [
-                10,
-                24,
-                29
-            ]
-        ],
         "ge_lyu_str": "平中仄平中仄中仄仄平平中仄中平平仄仄中平平仄仄平平平仄仄平平",
         "rhyme_pos": [
             10,

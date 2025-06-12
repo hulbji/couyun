@@ -158,15 +158,15 @@ def lyu_ju(sentence: str, rule: int, yun_shu: int, poem_pingze: int,
     matched_rule, match_list = best_match
     change_to_hanzi_rule = {'0': '中', '1': '平', '2': '仄'}
     hanzi_rule = ''.join(change_to_hanzi_rule[char] for char in matched_rule)
-    hint_word += f'\n{hanzi_rule}'
+    hint_word += f'{hanzi_rule}'
 
     ao_word = ''
     if matched_rule in ['02022', '0102022']:  # 拗救需提示
         input_flag = 2
-        ao_word += "\n本句可能为“中仄中仄仄”拗句。四拗对句须三救。"
+        ao_word += "“中仄中仄仄”拗句。为对句相救。"
     elif matched_rule in ['0211212', '11212']:
         input_flag = 1
-        ao_word += "\n“平平仄平仄”拗句，为本句自救。"
+        ao_word += "“平平仄平仄”拗句，为本句自救。"
     else:
         input_flag = 0
     return match_list, input_flag, hint_word, ao_word
@@ -277,11 +277,11 @@ def yun_jiao_show(zi: str, poem_rhythm_num: int, yun_shu: int, is_first_sentence
         first_ci = set(first_ci)
         ci_both = all_ci & first_ci
         if not ci_both:
-            yun_jiao_content += f'{"韵、".join(zi_list)}韵 ' + '不押韵 '
+            yun_jiao_content += f'{"、".join(zi_list)}韵 ' + '不押韵 '
         else:
-            yun_jiao_content += f'{"韵、".join(zi_list)}韵 ' + '用邻韵 押韵 '
+            yun_jiao_content += f'{"、".join(zi_list)}韵 ' + '用邻韵 押韵 '
     else:
-        yun_jiao_content += f'{"韵、".join(zi_list)}韵 ' + f'{"" if if_ya_yun else "不"}押韵 '
+        yun_jiao_content += f'{"、".join(zi_list)}韵 ' + f'{"" if if_ya_yun else "不"}押韵 '
     if '？' in yun_jiao_content or yun_jiao_content == '韵 不押韵 ':
         yun_jiao_content = '不知韵部'  # 生僻字处理模块
     return yun_jiao_content
@@ -355,6 +355,20 @@ def is_all_duo_yin(yun_jiao_content: str, yun_shu: int) -> bool:
     return True
 
 
+def check_sentence_lengths(text):
+    """
+    将文本按照标点符号分割，计算所有片段的长度如果所有片段长度一致，返回该长度；否则返回 None
+    Args:
+        text: 输入的文本字符串
+    Returns:
+        所有片段长度一致时返回该长度，否则返回 None
+    """
+    punctuation_pattern = r'[.!?;:,，。？！；：、]'
+    segments = re.split(punctuation_pattern, text)
+    non_empty_segments = [segment.strip() for segment in segments if segment.strip()]
+    return len(non_empty_segments[0])
+
+
 def part_shi(yun_shu: int, poem: str, set_num: int = None) \
         -> tuple[str, str, int, list | bool, int] | tuple[None, None, None, None, None]:
     """
@@ -424,40 +438,55 @@ def part_shi_2(yun_shu: int, poem: str, f_hanzi: str, s_hanzi: str,
     rule_list = which_sentence(first_sen, int(len(poem) / sen_len), s_rhythm, poem_pingze)
 
     sen_mode = 0  # 一般律句，如果有拗句，对应值变化
+    temp_hint = temp_sen = temp_ge_lyu = temp_ao = ''
     for i in range(len(rule_list)):
         a_sentence = poem[sen_len * i: sen_len * (i + 1)]
         ge_lju, sen_mode, hint, ao = lyu_ju(a_sentence, rule_list[i], yun_shu, poem_pingze, sen_mode)
-        shi_result += hint + '\n' + a_sentence + '\t'
-        yun_jiao_result = ''
+        temp_hint += hint + '\u3000'
+        temp_sen += a_sentence + '\u3000'
+        temp_ao += '\n' + f'本联{"上" if i % 2 == 0 else "下"}句' + ao if ao else ''
+        temp_ge_lyu += sentence_show(a_sentence, ge_lju, yun_shu) + '\u3000'
         if i + 1 in yun_jiao_list:
             is_first_sen = True if i == 0 else False
             yun_jiao_result = yun_jiao_show(a_sentence[-1], this_rhythm, yun_shu, is_first_sen)
-        ge_lju_show = sentence_show(a_sentence, ge_lju, yun_shu)
-        shi_result += yun_jiao_result + '\n' + ge_lju_show + '\t' + ao + '\n'
+            if "不押韵" in yun_jiao_result:
+                temp_ge_lyu = temp_ge_lyu[:-2] + '■'
+            if "不" not in yun_jiao_result:
+                temp_ge_lyu = temp_ge_lyu[:-2] + '□'
+            shi_result += '\n' + temp_hint + '\n' + temp_sen + yun_jiao_result + '\n' + temp_ge_lyu + temp_ao + '\n'
+            temp_hint = temp_sen = temp_ge_lyu = temp_ao = ''
     return shi_result
 
 
-def real_shi(yun_shu: int, poem: str) -> str | None:
+def real_shi(yun_shu: int, poem: str, poem_comma) -> str | int:
     """
     最终在tk上运行的主模块。
     Args:
         yun_shu: 使用的韵书代码
         poem: 诗歌的全汉字内容
+        poem_comma: 诗歌的带标点内容
     Returns:
         最终的诗歌校验结果
     """
-    if len(poem) % 70 == 0 and len(poem) >= 70:
-        all_check_time = 2
-        d_check = [5, 7]
-    else:
+    if poem_comma != poem:
+        sen_len = check_sentence_lengths(poem_comma)
+        if sen_len not in [5, 7]:
+            return 1
+        d_check = [sen_len]
         all_check_time = 1
-        d_check = [None]
+    else:
+        if len(poem) % 70 == 0 and len(poem) >= 70:
+            all_check_time = 2
+            d_check = [5, 7]
+        else:
+            all_check_time = 1
+            d_check = [None]
     all_post_result = final_result = ''
     for _ in range(all_check_time):
         post_result = ''
         f_hanzi, s_hanzi, poem_pingze, f_rhythm, this_rhythm = part_shi(yun_shu, poem, d_check[_])
         if not f_hanzi:
-            return None
+            return 2
         poem_pingze = [1, -1] if poem_pingze == 0 else [poem_pingze]
         for single_pingze in poem_pingze:
             temp_result = part_shi_2(yun_shu, poem, f_hanzi, s_hanzi, single_pingze, f_rhythm, this_rhythm, d_check[_])

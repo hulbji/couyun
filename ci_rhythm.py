@@ -9,6 +9,7 @@ import json
 idx_file = os.path.join(current_dir, 'ci_list', 'ci_index.json')
 with open(idx_file, encoding='utf-8') as f:
     idx = json.load(f)
+show_mark = ['◎', '●', '〇', '？']
 
 
 def search_ci(input_name: str, reverse_search=False) -> str | None:
@@ -68,38 +69,6 @@ def ping_ze_right(text: str, cipai: str, yun_shu: int) -> list[str | bool]:
     return result
 
 
-def find_type(text: str, all_types: list[dict], yun_shu: int) -> list[int] | None:
-    """
-    根据输入的文字以及词牌的全部格式格式，通过平仄确定可能的格式。
-    Args:
-        text: 输入词汉字内容
-        all_types: 词牌所有格式的列表，列表中的列表包含每一个格式的例词内容，格律和词牌描述
-        yun_shu: 使用韵书的代码
-    Returns:
-        所有可能格式的编号的列表
-    """
-    count_list = []
-    for single_type in range(len(all_types)):
-        remain_words = all_types[single_type]['ge_lyu_str']
-        if len(remain_words) != len(text):
-            continue
-        right_list = ping_ze_right(text, remain_words, yun_shu)
-        count = 0
-        for _ in right_list:
-            if _:
-                count += 1
-        count_list.append([single_type, count])
-    if not count_list:
-        return None
-    count_list = sorted(count_list, key=lambda x: x[1], reverse=True)
-    type_num = count_list[0][1]
-    correct_types = []
-    for _ in count_list:
-        if _[1] / type_num >= 0.85:  # 按符合85%以上匹配
-            correct_types.append(_[0])
-    return correct_types
-
-
 def replace_user_ci_text(user_ci_text: str, ci_cut_list: list[str]) -> list[str]:
     """
     根据输入的词内容与分割好的例词列表分割词内容。
@@ -144,7 +113,10 @@ def show_ci(ge_lyu_final: list, text_final: list, yun_final: list, your_lyu_fina
         result += ge_lyu_final[_] + '\n'
         result += text_final[_] + ' '
         result += yun_final[_] + '\n'
-        result += your_lyu_final[_] + '\n\n'
+        if "不押韵" in yun_final[_]:
+            result += your_lyu_final[_][:-1] + '■' + '\n\n'
+        if "不" not in yun_final[_]:
+            result += your_lyu_final[_][:-1] + '□' + '\n\n'
     return result.rstrip() + '\n'
 
 
@@ -160,21 +132,20 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, ci_comma: str, give
     Returns:
         校验结果。如果输入的词牌没有对应，返回 0，如果词内容不能与词牌匹配，返回 1
     """
+    rate_dict = {}
+    all_type_dict = {}
     if ci_pai_name:  # 如果输入了词牌名称
         ci_num = search_ci(ci_pai_name)
-        all_type_dict = {}
         if ci_num is None:
             return 0
         ci_nums = [ci_num]
         all_type_dict[ci_num] = ci_type_extraction(ci_num)
+        rate_dict[ci_num] = cipai_confirm(ci_content, ci_comma, all_type_dict[ci_num])
     else:
         if len(ci_content) in ci_and_num.keys():
             ci_num_list = ci_and_num[len(ci_content)]
         else:
             return 3
-        ci_nums = None
-        rate_dict = {}
-        all_type_dict = {}
         for single_ci_type in ci_num_list:
             this_type = ci_type_extraction(single_ci_type)
             current_rate = cipai_confirm(ci_content, ci_comma, this_type)
@@ -182,15 +153,14 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, ci_comma: str, give
                 continue
             all_type_dict[single_ci_type] = this_type
             rate_dict[single_ci_type] = current_rate
-            max_rate = max(rate_dict.values())
-            ci_nums = [key for key, value in rate_dict.items() if value >= max_rate * 0.9]
+        ci_nums = rate_dict.keys()
         if not ci_nums:
             return 3
     real_final = real_post = ''
     for ci_num in ci_nums:
         type_list = all_type_dict[ci_num]
         final_result = post_result = ''
-        correct_types = find_type(ci_content, type_list, yun_shu)
+        correct_types = rate_dict[ci_num]
         incorrect_given_type = False
         if not correct_types:
             return 1
@@ -234,14 +204,7 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, ci_comma: str, give
             if correct_type == 23 and ci_num == '658':  # 水龙吟格二十四特殊处理
                 ci_result += f'\n仄句\n{ci_content[-1]}\n'
                 last_pingze = hanzi_to_pingze(ci_content[-1], yun_shu)
-                if last_pingze == '0':
-                    ci_result += '◎\n'
-                elif last_pingze == '1':
-                    ci_result += '●\n'
-                elif last_pingze == '3':
-                    ci_result += '？\n'
-                else:
-                    ci_result += '〇\n'
+                ci_result += f'{show_mark[int(last_pingze)]}\n'
             final_result = result_check(post_result, ci_result)
             post_result = final_result
         if incorrect_given_type:

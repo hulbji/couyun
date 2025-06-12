@@ -356,15 +356,17 @@ class RhythmCheckerGUI:
             messagebox.showwarning(title, msg)
             return
         processed = extract_chinese(text)
+        processed_comma = extract_chinese(text, comma_remain=True)
         length = len(processed)
         if (length % 10 != 0 and length % 14 != 0) or length < 20:
             messagebox.showwarning("要不检查下？", f"诗的字数不正确，可能有不能识别的生僻字，你输入了{length}字")
             it.delete("1.0", tk.END)
             it.insert(tk.END, processed)
             return
-        res = real_shi(self.current_yun_shu, processed)
-        if not res:
-            title, msg = "怎么回事？", "你输入的每一个韵脚都不在韵书里面诶，我没法分析的！"
+        res = real_shi(self.current_yun_shu, processed, processed_comma)
+        msgs = {1: '一句的长短不符合律诗的标准！请检查标点及字数。', 2: '你输入的每一个韵脚都不在韵书里面诶，我没法分析的！'}
+        if res in msgs:
+            title, msg = "怎么回事？", msgs[res]
             if self.is_traditional:
                 title = self.opencc_s2t.convert(title)
                 msg = self.opencc_s2t.convert(msg)
