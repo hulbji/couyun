@@ -116,7 +116,10 @@ def show_ci(ge_lyu_final: list, text_final: list, yun_final: list, your_lyu_fina
         if "不押韵" in yun_final[_]:
             result += your_lyu_final[_][:-1] + '■' + '\n\n'
         if "不" not in yun_final[_]:
-            result += your_lyu_final[_][:-1] + '□' + '\n\n'
+            if your_lyu_final[_][-1] == '●':
+                result += your_lyu_final[_][:-1] + '■' + '\n\n'
+            else:
+                result += your_lyu_final[_][:-1] + '□' + '\n\n'
     return result.rstrip() + '\n'
 
 

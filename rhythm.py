@@ -12,7 +12,7 @@ import json
 
 from common import show_all_rhythm, current_dir
 from shi_rhythm import real_shi
-from ci_rhythm import real_ci
+from ci_rhythm import real_ci, search_ci, ci_type_extraction
 
 
 def load_font(font_path):
@@ -273,11 +273,11 @@ class RhythmCheckerGUI:
         self.register(il)
 
         it = tk.Text(mf, width=settings(mode)[0], height=1 if mode == 's' else 10,
-                     font=self.default_font)
+                     font=self.small_font)
         it.pack(side=tk.TOP if mode == 's' else tk.LEFT, padx=5)
 
         ot = tk.Text(mf, width=settings(mode)[1], height=10,
-                     font=self.default_font, wrap=tk.NONE, state=tk.DISABLED)
+                     font=self.small_font, wrap=tk.NONE, state=tk.DISABLED)
         ot.pack(side=tk.TOP if mode == 's' else tk.LEFT, padx=5)
         if mode == 'c':
             self.scrollbar = ttk.Scrollbar(mf, orient=tk.HORIZONTAL, command=ot.xview)
@@ -298,6 +298,13 @@ class RhythmCheckerGUI:
                         width=settings(mode)[2])
         btn.pack(side=tk.LEFT, padx=5)
         self.register(btn)
+        if mode == 'c':
+            sam = tk.Button(bf, text='载入例词',
+                            command=self.get_ci_sample,
+                            font=self.default_font, bg=self.my_purple,
+                            width=settings(mode)[2])
+            sam.pack(side=tk.LEFT, padx=5)
+            self.register(sam)
         back = tk.Button(bf, text="返回", command=self.return_to_main,
                          font=self.default_font, bg=self.my_purple,
                          width=settings(mode)[3])
@@ -316,6 +323,29 @@ class RhythmCheckerGUI:
                 cb_new.set(trad_map[self.current_yun_shu])
 
         return it, ot
+
+    def get_ci_sample(self):
+        ci_pai_name = self.cipai_var.get()
+        ci_form = self.cipai_form.get()
+        if not ci_pai_name:
+            messagebox.showwarning("找茬是吧？", "请输入词牌名！")
+            return
+        if not ci_form.isnumeric():
+            messagebox.showwarning("找茬是吧？", "请输入正确的格式！")
+            return
+        ci_num = search_ci(ci_pai_name)
+        if ci_num is None:
+            messagebox.showwarning("找茬是吧？", "无法找到对应的词牌，请检查输入内容！")
+            return
+        all_types = ci_type_extraction(ci_num)
+        all_length = len(all_types)
+        if int(ci_form) > all_length:
+            messagebox.showwarning("找茬是吧？", "不存在此格式！")
+            return
+        sample_ci_list = all_types[int(ci_form) - 1]['ci_sep']
+        sample_ci = '。'.join(sample_ci_list).replace('\u3000', '，').replace('，，', '，') + '。'
+        self.input_text.delete("1.0", tk.END)
+        self.input_text.insert(tk.END, sample_ci)
 
     def on_yunshu_change(self):
         self.current_yun_shu = self.yunshu_reverse_map[self.yunshu_var.get()]
