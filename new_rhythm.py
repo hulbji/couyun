@@ -30,7 +30,7 @@ def get_new_yun(hanzi: str) -> list:
         该汉字所有读音的韵母和声调的列表
     """
     hanzi_pinyin = pinyin(hanzi, style=Style.FINALS_TONE3, heteronym=True)[0]
-    if '' in hanzi_pinyin:
+    if hanzi in hanzi_pinyin or '' in hanzi_pinyin:
         return []
     yun_list = []
     for _ in range(len(hanzi_pinyin)):

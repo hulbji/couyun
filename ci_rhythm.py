@@ -1,7 +1,6 @@
 """词校验模块内容，支持三韵。"""
 
 from ci_show import *
-from ci_confirm import *
 from common import *
 from cipai_word_counts import ci_and_num
 import json
@@ -120,7 +119,50 @@ def show_ci(ge_lyu_final: list, text_final: list, yun_final: list, your_lyu_fina
                 result += your_lyu_final[_][:-1] + '■' + '\n\n'
             else:
                 result += your_lyu_final[_][:-1] + '□' + '\n\n'
+        if "不知韵部" in yun_final[_]:
+            result += your_lyu_final[_] + '\n'
     return result.rstrip() + '\n'
+
+
+def find_punctuation_positions(text: str) -> list[int]:
+    comma_syms = {',', '.', '?', '!', ':', "，", "。", "？", "！", "、", "：", '\u3000'}
+    position = []
+    correct = 1
+    is_comma = False
+    for index, ch in enumerate(text):
+        if ch in comma_syms:
+            if not is_comma:
+                position.append(index - correct)
+            correct += 1
+            is_comma = True
+        else:
+            is_comma = False
+    return position
+
+
+def cipai_confirm(ci_input: str, ci_comma: str, sg_cipai_forms: list[dict]) -> list:
+    right_list = []
+    zi_conunt = len(ci_input)
+    form_count = 0
+    for single_form in sg_cipai_forms:
+        single_sample_ci = '\u3000'.join(single_form['ci_sep'])
+        if zi_conunt != len(single_form['ge_lyu_str']):
+            form_count += 1
+            continue
+        cipai_form = find_punctuation_positions(single_sample_ci)
+        input_form = find_punctuation_positions(ci_comma)
+        right = len(set(input_form).intersection(cipai_form))
+        right_rate = right / len(set(input_form) | set(cipai_form))
+        if zi_conunt <= 14:
+            set_rate = 0
+        elif zi_conunt >= 100:
+            set_rate = 0.7
+        else:
+            set_rate = 0.7 * (zi_conunt - 14) / (100 - 14)
+        if right_rate > set_rate:
+            right_list.append(form_count)
+        form_count += 1
+    return right_list
 
 
 def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, ci_comma: str, give_type: str) -> str | int:
@@ -156,6 +198,7 @@ def real_ci(yun_shu: int, ci_pai_name: str, ci_content: str, ci_comma: str, give
                 continue
             all_type_dict[single_ci_type] = this_type
             rate_dict[single_ci_type] = current_rate
+        # print(rate_dict)
         ci_nums = rate_dict.keys()
         if not ci_nums:
             return 3

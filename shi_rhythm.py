@@ -22,11 +22,12 @@ lyu_ju_rule_dict = {
 sh = ['〇', '●', '◎', '？']  # 如果需要更改符号在这里改
 
 
-def most_frequent_rhythm(nested_list: list[list[int]]) -> int | None:
+def most_frequent_rhythm(nested_list: list[list[int]], lis=False) -> int | list | None:
     """
     统计以数字表示的韵字韵部列表中各个元素的出现频率，并找出出现次数最多的元素。
     Args:
         nested_list: 韵部列表
+        lis: 是否返回为列表
     Returns:
         诗所押的韵的数字表示（如果可能出现多个，即全为多音字，那么返回第一个）
     """
@@ -39,32 +40,34 @@ def most_frequent_rhythm(nested_list: list[list[int]]) -> int | None:
         return None
     max_count = max(freq.values())
     most_num = [num for num, count in freq.items() if count == max_count]
+    if lis:
+        return most_num
     return most_num[0]
 
 
-def first_hard(first_hanzi: str, second_hanzi: str, yun_shu: int) -> list | bool:
+def first_hard(first_hanzi: str, other_hanzis: str, yun_shu: int) -> list | bool:
     """
     分析首句是否为韵字。
     Args:
         first_hanzi: 第一句末汉字
-        second_hanzi: 第二句末汉字
+        other_hanzis: 其余所有韵脚汉字
         yun_shu: 使用的韵书代码
     Returns:
         返回共同韵部的列表，如果没有共同韵部，返回 False。
     """
     if yun_shu == 1:
         first_list = hanzi_rhythm(first_hanzi)  # 平水
-        second_list = hanzi_rhythm(second_hanzi)
+        other_list = [hanzi_rhythm(other_hanzi) for other_hanzi in other_hanzis]
     else:  # 新韵通韵
         yun_shu = nw.xin_yun if yun_shu == 2 else nw.tong_yun
         first_list = nw.convert_yun(nw.get_new_yun(first_hanzi), yun_shu)
-        second_list = nw.convert_yun(nw.get_new_yun(second_hanzi), yun_shu)
-    duplicates = set(first_list) & set(second_list)
+        other_list = [nw.convert_yun(nw.get_new_yun(other_hanzi), yun_shu) for other_hanzi in other_hanzis]
+    duplicates = set(first_list) & set(most_frequent_rhythm(other_list, lis=True))
     if yun_shu == 1 and not duplicates:  # 使用平水韵时首句检测词林，首句可能押邻韵
         first_ci = hanzi_rhythm(first_hanzi, ci_lin=True)
-        second_ci = hanzi_rhythm(second_hanzi, ci_lin=True)
+        second_ci = hanzi_rhythm(other_hanzis[0], ci_lin=True)
         duplicates = set(first_ci) & set(second_ci)
-    if duplicates:
+    if duplicates == set():
         return list(duplicates)
     return False
 
@@ -79,7 +82,7 @@ def poetry_yun_jiao(poem: str, yun_shu: int, set_num: int = None) -> tuple[str, 
     Returns:
         返回四个值：
             韵字字符串
-            第一句末汉字与第二句末汉字共同的韵列表，如果没有共同韵部，返回 False
+            第一句末汉字与其余韵句末汉字共同的韵列表，如果没有共同韵部，返回 False
             第一句末汉字
             第二句末汉字
     """
@@ -90,12 +93,18 @@ def poetry_yun_jiao(poem: str, yun_shu: int, set_num: int = None) -> tuple[str, 
     elif poem_length % 14 == 0:
         indices = list(range(14, poem_length + 1, 14))
     extracted = [poem[hanzi_yun_jiao - 1] for hanzi_yun_jiao in indices]
+    second_hanzi = ''
+    pos = poem_length
     if poem_length % 5 == 0 and set_num != 7:
         first_hanzi = poem[4]
-        second_hanzi = poem[9]
+        while pos > 8:
+            second_hanzi += poem[pos - 1]
+            pos -= 10
     else:
         first_hanzi = poem[6]
-        second_hanzi = poem[13]
+        while pos > 12:
+            second_hanzi += poem[pos - 1]
+            pos -= 14  # 或许可以简化这段代码
     first_yayun = first_hard(first_hanzi, second_hanzi, yun_shu)
     if first_yayun:
         extracted.insert(0, first_hanzi)

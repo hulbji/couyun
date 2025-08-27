@@ -84,6 +84,7 @@ class YunDataProcessor:
                 'group': yun.group,
                 'is_yayun': yun.is_yayun,
             })
+        # print(result)
         return result
 
 
