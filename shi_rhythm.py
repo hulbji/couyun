@@ -22,7 +22,7 @@ lyu_ju_rule_dict = {
 sh = ['〇', '●', '◎', '？']  # 如果需要更改符号在这里改
 
 
-def most_frequent_rhythm(nested_list: list[list[int]], lis=False) -> int | list | None:
+def most_frequent_rhythm(nested_list: list[list[int]], lis=False) -> int | list:
     """
     统计以数字表示的韵字韵部列表中各个元素的出现频率，并找出出现次数最多的元素。
     Args:
@@ -37,12 +37,10 @@ def most_frequent_rhythm(nested_list: list[list[int]], lis=False) -> int | list 
             if num != 107:
                 freq[num] += 1
     if not freq.values():
-        return None
+        return [107] if lis else 107
     max_count = max(freq.values())
     most_num = [num for num, count in freq.items() if count == max_count]
-    if lis:
-        return most_num
-    return most_num[0]
+    return most_num if lis else most_num[0]
 
 
 def first_hard(first_hanzi: str, other_hanzis: str, yun_shu: int) -> list | bool:
@@ -62,12 +60,19 @@ def first_hard(first_hanzi: str, other_hanzis: str, yun_shu: int) -> list | bool
         yun_shu = nw.xin_yun if yun_shu == 2 else nw.tong_yun
         first_list = nw.convert_yun(nw.get_new_yun(first_hanzi), yun_shu)
         other_list = [nw.convert_yun(nw.get_new_yun(other_hanzi), yun_shu) for other_hanzi in other_hanzis]
+    all_unknown = True
+    for _ in other_list:
+        if _ != [107]:
+            all_unknown = False
+            break
+    if all_unknown:
+        return first_list
     duplicates = set(first_list) & set(most_frequent_rhythm(other_list, lis=True))
     if yun_shu == 1 and not duplicates:  # 使用平水韵时首句检测词林，首句可能押邻韵
         first_ci = hanzi_rhythm(first_hanzi, ci_lin=True)
         second_ci = hanzi_rhythm(other_hanzis[0], ci_lin=True)
         duplicates = set(first_ci) & set(second_ci)
-    if duplicates == set():
+    if duplicates:
         return list(duplicates)
     return False
 
@@ -93,22 +98,22 @@ def poetry_yun_jiao(poem: str, yun_shu: int, set_num: int = None) -> tuple[str, 
     elif poem_length % 14 == 0:
         indices = list(range(14, poem_length + 1, 14))
     extracted = [poem[hanzi_yun_jiao - 1] for hanzi_yun_jiao in indices]
-    second_hanzi = ''
+    other_hanzis = ''
     pos = poem_length
     if poem_length % 5 == 0 and set_num != 7:
         first_hanzi = poem[4]
         while pos > 8:
-            second_hanzi += poem[pos - 1]
+            other_hanzis += poem[pos - 1]
             pos -= 10
     else:
         first_hanzi = poem[6]
         while pos > 12:
-            second_hanzi += poem[pos - 1]
+            other_hanzis += poem[pos - 1]
             pos -= 14  # 或许可以简化这段代码
-    first_yayun = first_hard(first_hanzi, second_hanzi, yun_shu)
+    first_yayun = first_hard(first_hanzi, other_hanzis, yun_shu)
     if first_yayun:
         extracted.insert(0, first_hanzi)
-    return ''.join(extracted), first_yayun, first_hanzi, second_hanzi
+    return ''.join(extracted), first_yayun, first_hanzi, other_hanzis
 
 
 def lyu_ju(sentence: str, rule: int, yun_shu: int, poem_pingze: int,
@@ -198,11 +203,17 @@ def check_real_first(first: list | bool, second: int, first_sen: str,
     """
     last1 = hanzi_to_pingze(first_sen[-1], yun_shu)
     last3 = hanzi_to_pingze(first_sen[-3], yun_shu)
-    if last1 != '0':
+    if last1 not in ['0', '3']:
         return sen_type, second
     change_dict = {1: 2, 3: 4, 4: 3, 2: 1, 5: 6, 6: 5, 7: 8, 8: 7}
-    if not first and second:  # 那就一定不押韵
-        return change_dict[sen_type], 0
+    if not first and second:  # 在第一句末是多音字情况下，那就一定不押韵
+        if last1 == '0':
+            return change_dict[sen_type], 0
+        else:  # 如果第一句末是生僻字，默认与第一句倒数第三个字平仄相反
+            if last3 == '1' and second == 1:
+                return change_dict[sen_type], 0
+            elif last3 == '2' and second == -1:
+                return change_dict[sen_type], 0
     if first and second:  # 押不押韵得看格式以及倒数第三个字
         if sen_type in [3, 7] and last3 == '1':
             return change_dict[sen_type], 0
@@ -329,7 +340,7 @@ def special_two_pingze(hanzi1: str, hanzi2: str, yun_shu: int, poem_pingze: int)
         yun_shu: 使用的韵书代码
         poem_pingze: 全诗的押韵平仄，1平 -1仄
     Returns:
-        第二个判断标准
+        第二个判断标准（两者平仄是否相同）
     """
     ping_ze1 = hanzi_to_pingze(hanzi1, yun_shu)
     if ping_ze1 == '3':
@@ -396,9 +407,14 @@ def part_shi(yun_shu: int, poem: str, set_num: int = None) \
     """
     yun_jiaos, f_rhythm, f_hanzi, s_hanzi = poetry_yun_jiao(poem, yun_shu, set_num)
     rhythm_lists = [hanzi_to_yun(yun_jiao, yun_shu) for yun_jiao in yun_jiaos]
-    this_rhythm = most_frequent_rhythm(rhythm_lists)
-    if not this_rhythm:
+    all_unknown = True
+    for _ in rhythm_lists:
+        if _ != [107]:
+            all_unknown = False
+            break
+    if all_unknown:
         return None, None, None, None, None
+    this_rhythm = most_frequent_rhythm(rhythm_lists)
     if f_rhythm:
         f_rhythm_check = set(f_rhythm) & {this_rhythm}
         f_rhythm = next(iter(f_rhythm_check)) if f_rhythm_check else f_rhythm[0]

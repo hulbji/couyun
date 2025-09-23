@@ -65,19 +65,32 @@ def convert_to_traditional(text, is_traditional, mode):
         return text
     cc = OpenCC('s2t')
     converted_lines = []
-    for line in text.split('\n'):
-        if "你的格式" in line:
-            converted_line = cc.convert(line)
-        elif '\t' in line or ' ' in line:
-            sep = '\t' if '\t' in line else ' '
-            word_part, non_word_part = line.split(sep, 1)
-            converted_non_word = cc.convert(non_word_part)
-            converted_line = f"{word_part}{sep}{converted_non_word}"
-        elif '在：' in line and mode == 's':
-            converted_line = line
-        else:
-            converted_line = cc.convert(line)
-        converted_lines.append(converted_line)
+    if mode != 's':
+        counter = 0
+        for line in text.split('\n'):
+            # 空白行：计数归零，原样输出（也可转繁，按需求）
+            if line.strip() == '':
+                counter = 0
+                converted_lines.append(line)
+                continue
+            counter += 1
+            if counter == 2:
+                pos = line.rfind('\u3000')
+                if pos == -1:  # 找不到 \u3000
+                    converted_lines.append(cc.convert(line))
+                else:
+                    head = line[:pos + 1]  # 含 \u3000 本身
+                    tail = line[pos + 1:]
+                    converted_lines.append(head + cc.convert(tail))
+            else:  # 其余计数（0、1、3、4…）
+                converted_lines.append(cc.convert(line))
+    else:
+        for line in text.split('\n'):
+            if '：' in line:
+                converted_line = line
+            else:
+                converted_line = cc.convert(line)
+            converted_lines.append(converted_line)
     converted_text = '\n'.join(converted_lines)
     return converted_text.replace('鹹韻', "咸韻").replace('十五鹹', "十五咸")
 
@@ -107,6 +120,8 @@ def on_close(state):
 # noinspection PyTypeChecker,DuplicatedCode
 class RhythmCheckerGUI:
     def __init__(self, roots):
+        self.edition = 'v.1.4.3'
+
         self.yunshu_var = None
         self.opencc_s2t = OpenCC('s2t')
         self.opencc_t2s = OpenCC('t2s')
@@ -142,6 +157,8 @@ class RhythmCheckerGUI:
         self.toggle_button = tk.Button(self.root, text='简体' if self.is_traditional else "繁體",
                                        command=self.toggle_language, font=self.small_font)
         self.toggle_button.place(relx=0.99, rely=0.99, anchor='se')
+        self.version_label = tk.Label(self.root, text=self.edition, font=self.small_font)
+        self.version_label.place(relx=0.99, rely=0.01, anchor='ne')
 
         self.input_text = None
         self.output_text = None
@@ -151,6 +168,12 @@ class RhythmCheckerGUI:
                                    '詞林正韻': 1, "平水韻": 1, "中華新韻": 2, "中華通韻": 3}
 
         self.create_main_interface()
+
+    def my_warn(self, title, msg):
+        if self.is_traditional:
+            title = self.opencc_s2t.convert(title)
+            msg = self.opencc_s2t.convert(msg)
+        messagebox.showwarning(title, msg)
 
     def register(self, widget):
         """注册需要翻译的控件"""
@@ -328,22 +351,24 @@ class RhythmCheckerGUI:
         ci_pai_name = self.cipai_var.get()
         ci_form = self.cipai_form.get()
         if not ci_pai_name:
-            messagebox.showwarning("找茬是吧？", "请输入词牌名！")
+            self.my_warn("找茬是吧？", "请输入词牌名！")
             return
         if not ci_form.isnumeric():
-            messagebox.showwarning("找茬是吧？", "请输入正确的格式！")
+            self.my_warn("找茬是吧？", "请输入正确的格式！")
             return
         ci_num = search_ci(ci_pai_name)
         if ci_num is None:
-            messagebox.showwarning("找茬是吧？", "无法找到对应的词牌，请检查输入内容！")
+            self.my_warn("找茬是吧？", "无法找到对应的词牌，请检查输入内容！")
             return
         all_types = ci_type_extraction(ci_num)
         all_length = len(all_types)
         if int(ci_form) > all_length:
-            messagebox.showwarning("找茬是吧？", "不存在此格式！")
+            self.my_warn("找茬是吧？", "不存在此格式！")
             return
         sample_ci_list = all_types[int(ci_form) - 1]['ci_sep']
         sample_ci = '。'.join(sample_ci_list).replace('\u3000', '，').replace('，，', '，') + '。'
+        if self.is_traditional:
+            sample_ci = self.opencc_s2t.convert(sample_ci)
         self.input_text.delete("1.0", tk.END)
         self.input_text.insert(tk.END, sample_ci)
 
@@ -379,28 +404,21 @@ class RhythmCheckerGUI:
         text = it.get("1.0", tk.END).strip()
         start_time = time.time()
         if not text:
-            title, msg = "找茬是吧？", "请输入需要校验的诗！"
-            if self.is_traditional:
-                title = self.opencc_s2t.convert(title)
-                msg = self.opencc_s2t.convert(msg)
-            messagebox.showwarning(title, msg)
+            self.my_warn("找茬是吧？", "请输入需要校验的诗！")
             return
         processed = extract_chinese(text)
         processed_comma = extract_chinese(text, comma_remain=True)
         length = len(processed)
         if (length % 10 != 0 and length % 14 != 0) or length < 20:
-            messagebox.showwarning("要不检查下？", f"诗的字数不正确，可能有不能识别的生僻字，你输入了{length}字")
+            self.my_warn("要不检查下？", f"诗的字数不正确，可能有不能识别的生僻字，你输入了{length}字")
             it.delete("1.0", tk.END)
             it.insert(tk.END, processed)
             return
         res = real_shi(self.current_yun_shu, processed, processed_comma)
-        msgs = {1: '一句的长短不符合律诗的标准！请检查标点及字数。', 2: '你输入的每一个韵脚都不在韵书里面诶，我没法分析的！'}
+        msgs = {1: '一句的长短不符合律诗的标准！请检查标点及字数。',
+                2: '你输入的每一个韵脚都不在韵书里面诶，我没法分析的！'}
         if res in msgs:
-            title, msg = "怎么回事？", msgs[res]
-            if self.is_traditional:
-                title = self.opencc_s2t.convert(title)
-                msg = self.opencc_s2t.convert(msg)
-            messagebox.showwarning(title, msg)
+            self.my_warn("怎么回事？", msgs[res])
             return
         end_time = time.time()
         time_result = f'检测完毕，耗时{end_time - start_time:.5f}s\n'
@@ -418,7 +436,7 @@ class RhythmCheckerGUI:
         text = it.get("1.0", tk.END).strip()
         start_time = time.time()
         if not text:
-            messagebox.showwarning("找茬是吧？", "请输入需要校验的词！")
+            self.my_warn("找茬是吧？", "请输入需要校验的词！")
             return
         cipai_to_s = OpenCC('t2s')
         cp, fm = cipai_to_s.convert(self.cipai_var.get().strip()), self.cipai_form.get().strip()
@@ -429,10 +447,10 @@ class RhythmCheckerGUI:
         msgs = {0: "不能找到你输入的词牌！", 1: f"格式与输入词牌不匹配，可能有不能识别的生僻字，你输入了{length}字！",
                 2: "格式数字错误！", 3: f"输入的内容无法匹配已有的词牌，请检查内容，你输入了{length}字"}
         if res in msgs:
-            messagebox.showwarning("要不检查下？", msgs[res])
+            self.my_warn("要不检查下？", msgs[res])
             return
         end_time = time.time()
-        time_result = f'检测完毕，耗时{end_time - start_time:.5f}s\n'
+        time_result = f'检测完毕，耗时{end_time - start_time:.5f}s\n\n'
         res += time_result
         res = convert_to_traditional(res, self.is_traditional, 'c')
         bar = current_state['tk_value']['ci_bar']
@@ -446,13 +464,13 @@ class RhythmCheckerGUI:
     def check_char(self, it, ot):
         text = it.get("1.0", tk.END).strip()
         if not text:
-            messagebox.showwarning("找茬是吧？", "请输入需要查询的汉字！")
+            self.my_warn("找茬是吧？", "请输入需要查询的汉字！")
             return
         if len(text) != 1:
-            messagebox.showwarning("找茬是吧？", "请输入单个汉字！")
+            self.my_warn("找茬是吧？", "请输入单个汉字！")
             return
         if not re.match(r'[\u4e00-\u9fff\u3400-\u4dbf\u3007\u2642\U00020000-\U0002A6DF]', text):
-            messagebox.showwarning("你在干嘛呢？", "非汉字或超出区段（基本区及拓展A、B区）")
+            self.my_warn("你在干嘛呢？", "非汉字或超出区段（基本区及拓展A、B区）")
             return
         res = show_all_rhythm(text)
         res = convert_to_traditional(res, self.is_traditional, 's')

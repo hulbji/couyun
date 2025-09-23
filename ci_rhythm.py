@@ -110,7 +110,7 @@ def show_ci(ge_lyu_final: list, text_final: list, yun_final: list, your_lyu_fina
     result = ''
     for _ in range(len(ge_lyu_final)):
         result += ge_lyu_final[_] + '\n'
-        result += text_final[_] + ' '
+        result += text_final[_] + '\u3000'
         result += yun_final[_] + '\n'
         if "不押韵" in yun_final[_]:
             result += your_lyu_final[_][:-1] + '■' + '\n\n'
@@ -120,7 +120,7 @@ def show_ci(ge_lyu_final: list, text_final: list, yun_final: list, your_lyu_fina
             else:
                 result += your_lyu_final[_][:-1] + '□' + '\n\n'
         if "不知韵部" in yun_final[_]:
-            result += your_lyu_final[_] + '\n'
+            result += your_lyu_final[_] + '\n\n'
     return result.rstrip() + '\n'
 
 
