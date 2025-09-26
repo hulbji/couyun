@@ -63,7 +63,7 @@ def convert_yun(yun_list: list, rhyme_dict: dict) -> list:
                 else:
                     converted_list.append(-category)
                 break
-    return converted_list
+    return converted_list if converted_list else [107]
 
 
 def new_ping_ze(yun_list: list) -> str:
@@ -99,7 +99,7 @@ def show_yun(hanzi: str | list, yun_rule: dict, yun_hanzi: list) -> str:
         hanzi_yun_list = convert_yun(get_new_yun(hanzi), yun_rule)
     else:
         hanzi_yun_list = hanzi
-    if not hanzi_yun_list:
+    if not hanzi_yun_list or hanzi_yun_list == [107]:
         return ''
     show_list = []
     for _ in hanzi_yun_list:

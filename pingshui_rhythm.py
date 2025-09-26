@@ -90,4 +90,5 @@ def hanzi_rhythm(search_str: str, showit=False, only_ping_ze=False, ci_lin=False
     elif ci_lin:
         return list(set(rh_list[3] for rh_list in matching_lists))
     else:
-        return list(set(rh_list[4] for rh_list in matching_lists))
+        yun_list = list(set(rh_list[4] for rh_list in matching_lists))
+        return yun_list if yun_list else [107]

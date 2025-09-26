@@ -11,8 +11,9 @@ from opencc import OpenCC
 import json
 
 from common import show_all_rhythm, current_dir
-from shi_rhythm import real_shi
-from ci_rhythm import real_ci, search_ci, ci_type_extraction
+from ci_search import search_ci, ci_type_extraction
+from shi_rhythm import ShiRhythm
+from ci_rhythm import CiRhythm
 
 
 def load_font(font_path):
@@ -117,12 +118,13 @@ def on_close(state):
     root.destroy()
 
 
-# noinspection PyTypeChecker,DuplicatedCode
+# noinspection PyTypeChecker
 class RhythmCheckerGUI:
     def __init__(self, roots):
-        self.edition = 'v.1.4.3'
+        self.edition = 'v.1.4.4'
 
         self.yunshu_var = None
+        self.cipu_var = None
         self.opencc_s2t = OpenCC('s2t')
         self.opencc_t2s = OpenCC('t2s')
         self.is_traditional = current_state['is_traditional']
@@ -130,7 +132,12 @@ class RhythmCheckerGUI:
         self.comboboxes = []
 
         self.yun_shu_map = {1: '平水韵', 2: '中华新韵', 3: '中华通韵'}
+        self.ci_pu_map = {1: '钦定词谱', 2: '龙榆生词谱'}
+        self.yunshu_reverse_map = {'词林正韵': 1, "平水韵": 1, "中华新韵": 2, "中华通韵": 3,
+                                   '詞林正韻': 1, "平水韻": 1, "中華新韻": 2, "中華通韻": 3}
+        self.ci_pu_reverse_map = {'钦定词谱': 1, "龙榆生词谱": 2, '欽定詞譜': 1, "龍榆生詞譜": 2}
         self.current_yun_shu = current_state['yun_shu']
+        self.current_ci_pu = current_state['ci_pu']
 
         self.small_font = font.Font(family="霞鹜文楷等宽", size=12)
         self.default_font = font.Font(family="霞鹜文楷等宽", size=14)
@@ -164,8 +171,6 @@ class RhythmCheckerGUI:
         self.output_text = None
         self.main_interface = None
         self.cipai_var = None
-        self.yunshu_reverse_map = {'词林正韵': 1, "平水韵": 1, "中华新韵": 2, "中华通韵": 3,
-                                   '詞林正韻': 1, "平水韻": 1, "中華新韻": 2, "中華通韻": 3}
 
         self.create_main_interface()
 
@@ -260,7 +265,6 @@ class RhythmCheckerGUI:
             fl = ttk.Label(fb, text="选择韵书:", font=self.default_font)
             fl.pack(side=tk.LEFT, padx=5)
             self.register(fl)
-
             self.yunshu_var = tk.StringVar()
             self.yunshu_var.set(self.yun_shu_map[self.current_yun_shu])
             cb = ttk.Combobox(fb, textvariable=self.yunshu_var,
@@ -288,6 +292,18 @@ class RhythmCheckerGUI:
             self.cipai_form = tk.StringVar()
             ttk.Entry(ff, textvariable=self.cipai_form,
                       font=self.default_font, width=10).pack(side=tk.LEFT, padx=5)
+
+            pf = ttk.Frame(generic)
+            pf.pack(pady=5, anchor=tk.W)
+            ttk.Label(pf, text="选择词谱:", font=self.default_font).pack(side=tk.LEFT, padx=5)
+
+            self.cipu_var = tk.StringVar(value=self.ci_pu_map[self.current_ci_pu])
+            cb_cipu = ttk.Combobox(pf, textvariable=self.cipu_var,
+                                   values=[self.ci_pu_map[k] for k in sorted(self.ci_pu_map)],
+                                   font=self.default_font, width=12, state="readonly")
+            cb_cipu.pack(side=tk.LEFT, padx=5)
+            self.comboboxes.append(cb_cipu)
+            self.cipu_var.trace("w", lambda *args: self.on_cipu_change())
 
         mf = ttk.Frame(generic)
         mf.pack(pady=10)
@@ -356,11 +372,13 @@ class RhythmCheckerGUI:
         if not ci_form.isnumeric():
             self.my_warn("找茬是吧？", "请输入正确的格式！")
             return
-        ci_num = search_ci(ci_pai_name)
-        if ci_num is None:
+        ci_num = search_ci(ci_pai_name, self.current_ci_pu)
+        if ci_num == 'err1':
             self.my_warn("找茬是吧？", "无法找到对应的词牌，请检查输入内容！")
             return
-        all_types = ci_type_extraction(ci_num)
+        if ci_num == 'err2':
+            self.my_warn("要不检查下？", "这个词牌没有龙谱，请选择隔壁钦谱！")
+        all_types = ci_type_extraction(ci_num, self.current_ci_pu)
         all_length = len(all_types)
         if int(ci_form) > all_length:
             self.my_warn("找茬是吧？", "不存在此格式！")
@@ -375,6 +393,10 @@ class RhythmCheckerGUI:
     def on_yunshu_change(self):
         self.current_yun_shu = self.yunshu_reverse_map[self.yunshu_var.get()]
         current_state['yun_shu'] = self.current_yun_shu
+
+    def on_cipu_change(self):
+        self.current_ci_pu = self.ci_pu_reverse_map[self.cipu_var.get()]
+        current_state['ci_pu'] = self.current_ci_pu
 
     def open_poem_interface(self):
         self.input_text, self.output_text = self.create_generic_interface(
@@ -414,7 +436,8 @@ class RhythmCheckerGUI:
             it.delete("1.0", tk.END)
             it.insert(tk.END, processed)
             return
-        res = real_shi(self.current_yun_shu, processed, processed_comma)
+        process = ShiRhythm(self.current_yun_shu, processed, processed_comma)
+        res = process.main_shi()
         msgs = {1: '一句的长短不符合律诗的标准！请检查标点及字数。',
                 2: '你输入的每一个韵脚都不在韵书里面诶，我没法分析的！'}
         if res in msgs:
@@ -443,9 +466,11 @@ class RhythmCheckerGUI:
         proc = extract_chinese(text)
         proc_with_comma = extract_chinese(text, comma_remain=True)
         length = len(proc)
-        res = real_ci(self.current_yun_shu, cp, proc, proc_with_comma, fm)
+        process = CiRhythm(self.current_yun_shu, cp, proc, proc_with_comma, fm, self.current_ci_pu)
+        res = process.main_ci()
         msgs = {0: "不能找到你输入的词牌！", 1: f"格式与输入词牌不匹配，可能有不能识别的生僻字，你输入了{length}字！",
-                2: "格式数字错误！", 3: f"输入的内容无法匹配已有的词牌，请检查内容，你输入了{length}字"}
+                2: "格式数字错误！", 3: f"输入的内容无法匹配已有的词牌，请检查内容或将词谱更换为钦谱，你输入了{length}字",
+                4: "龙谱中没有该词谱，请切换为钦谱。"}
         if res in msgs:
             self.my_warn("要不检查下？", msgs[res])
             return
