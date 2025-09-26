@@ -5,3 +5,5 @@ pingshui_data/
 ci_origin/
 ci_list_long_origin/
 couyun.spec
+build/
+dist/

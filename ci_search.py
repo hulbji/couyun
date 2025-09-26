@@ -1,5 +1,6 @@
 import json
 import os
+from opencc import OpenCC
 from common import current_dir
 
 idx_file = os.path.join(current_dir, 'ci_list', 'ci_index.json')
@@ -7,16 +8,20 @@ with open(idx_file, encoding='utf-8') as f:
     idx = json.load(f)
 
 
-def search_ci(input_name: str, ci_pu: int, reverse_search=False) -> str:
+def search_ci(input_name: str, ci_pu: int, reverse_search=False, traditial=False) -> str:
     """
     从词牌名称，在词牌索引中读取编号。或者通过编号读取词牌名。
     Args:
         input_name: 词牌实际名称或编号
         ci_pu: 给定的词谱。
         reverse_search: 是否反向搜索，通过编号读取词牌名。
+        traditial: 是否为繁体
     Returns:
         词牌的编号值（字符串）或编号值对应的词牌名，如果没有，返回None
     """
+    if traditial:
+        cc = OpenCC('t2s')
+        input_name = cc.convert(input_name)
     if reverse_search:
         return idx[input_name][0]
     else:

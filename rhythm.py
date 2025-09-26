@@ -16,6 +16,11 @@ from shi_rhythm import ShiRhythm
 from ci_rhythm import CiRhythm
 
 
+def resource_path(*paths):
+    """统一的资源路径拼接"""
+    return os.path.join(current_dir, *paths)
+
+
 def load_font(font_path):
     ctypes.windll.gdi32.AddFontResourceW(font_path, 0x10, 0)
 
@@ -34,9 +39,9 @@ def save_state(state_path, state):
         json.dump(state, f, ensure_ascii=False, indent=4)
 
 
-ico_path = os.path.join(current_dir, 'picture', 'ei.ico')
-jpg_fold = os.path.join(current_dir, 'picture')
-state_file = os.path.join(current_dir, 'state', 'state.json')
+ico_path = resource_path('picture', 'ei.ico')
+jpg_fold = resource_path('picture')
+state_file = resource_path('state', 'state.json')
 current_state = load_state(state_file)
 size_tuple = current_state['tk_value']['size']
 size_string = 'x'.join(map(str, size_tuple))
@@ -112,7 +117,7 @@ def settings(mode):
 
 def on_close(state):
     """关闭窗口时的行为，卸载字体。将新状态写入json文件。"""
-    font_path = os.path.join(current_dir, 'font', "LXGWWenKaiMono-Regular.ttf")
+    font_path = resource_path('font', "LXGWWenKaiMono-Regular.ttf")
     unload_font(font_path)
     save_state(state_file, state)
     root.destroy()
@@ -128,9 +133,13 @@ class RhythmCheckerGUI:
         self.opencc_s2t = OpenCC('s2t')
         self.opencc_t2s = OpenCC('t2s')
         self.is_traditional = current_state['is_traditional']
-        self.widgets_to_translate = []
-        self.comboboxes = []
 
+        # 翻译/下拉框分组
+        self.widgets_to_translate = []
+        self.yun_shu_boxes = []
+        self.cipu_boxes = []
+
+        # 映射
         self.yun_shu_map = {1: '平水韵', 2: '中华新韵', 3: '中华通韵'}
         self.ci_pu_map = {1: '钦定词谱', 2: '龙榆生词谱'}
         self.yunshu_reverse_map = {'词林正韵': 1, "平水韵": 1, "中华新韵": 2, "中华通韵": 3,
@@ -139,6 +148,7 @@ class RhythmCheckerGUI:
         self.current_yun_shu = current_state['yun_shu']
         self.current_ci_pu = current_state['ci_pu']
 
+        # 字体与样式
         self.small_font = font.Font(family="霞鹜文楷等宽", size=12)
         self.default_font = font.Font(family="霞鹜文楷等宽", size=14)
         self.bigger_font = font.Font(family="霞鹜文楷等宽", size=16)
@@ -174,6 +184,47 @@ class RhythmCheckerGUI:
 
         self.create_main_interface()
 
+    def cc_convert(self, text, to_traditional: bool):
+        """根据目标模式转换文本"""
+        return self.opencc_s2t.convert(text) if to_traditional else self.opencc_t2s.convert(text)
+
+    def box_toggle(self, boxes, single_map, current, to_traditional: bool):
+        """统一处理简繁切换下拉框"""
+        for cb in boxes:
+            if to_traditional:
+                trad_map = {k: self.opencc_s2t.convert(v) for k, v in single_map.items()}
+                cb['values'] = [trad_map[k] for k in sorted(trad_map)]
+                cb.set(trad_map[current])
+            else:
+                cb['values'] = [single_map[k] for k in sorted(single_map)]
+                cb.set(single_map[current])
+
+    def translate_new_widgets(self, start_widgets, start_yun, start_ci):
+        """新界面创建后，若当前是繁体模式，立即翻译新增控件和下拉框"""
+        # 只在当前已经是繁体时才做转换
+        if not self.is_traditional:
+            return
+        for w in self.widgets_to_translate[start_widgets:]:
+            w.config(text=self.opencc_s2t.convert(w.cget('text')))
+        # 只把新增的下拉框翻译（传入起始索引）
+        self.box_toggle(self.yun_shu_boxes[start_yun:], self.yun_shu_map, self.current_yun_shu, True)
+        self.box_toggle(self.cipu_boxes[start_ci:], self.ci_pu_map, self.current_ci_pu, True)
+
+    def display_result(self, ot, res, mode):
+        """统一输出结果到 Text 控件"""
+        res = convert_to_traditional(res, self.is_traditional, mode)
+        if mode == 'p':
+            ot.pack(side=tk.RIGHT, padx=5)
+        elif mode == 'c':
+            ot.pack(side=tk.RIGHT, padx=5)
+        else:  # 's'
+            ot.pack(side=tk.BOTTOM, padx=5)
+        ot.config(state=tk.NORMAL)
+        ot.delete("1.0", tk.END)
+        ot.insert(tk.END, res)
+        ot.config(state=tk.DISABLED)
+    # -----------------------------------------------
+
     def my_warn(self, title, msg):
         if self.is_traditional:
             title = self.opencc_s2t.convert(title)
@@ -185,32 +236,33 @@ class RhythmCheckerGUI:
         self.widgets_to_translate.append(widget)
 
     def toggle_language(self):
-        """在简体和繁体之间切换"""
+        """在简体和繁体之间切换（注意：使用目标模式来渲染）"""
+        to_trad = not self.is_traditional  # 目标模式
         for widget in self.widgets_to_translate:
             orig = widget.cget('text')
-            new = self.opencc_t2s.convert(orig) if self.is_traditional else self.opencc_s2t.convert(orig)
+            new = self.cc_convert(orig, to_trad)
             widget.config(text=new)
-        for cb in self.comboboxes:
-            if not self.is_traditional:
-                trad_map = {k: self.opencc_s2t.convert(v) for k, v in self.yun_shu_map.items()}
-                cb['values'] = [trad_map[k] for k in sorted(trad_map)]
-                cb.set(trad_map[self.current_yun_shu])
-            else:
-                cb['values'] = [self.yun_shu_map[k] for k in sorted(self.yun_shu_map)]
-                cb.set(self.yun_shu_map[self.current_yun_shu])
+
+        # 统一处理两类下拉框（使用目标模式）
+        self.box_toggle(self.yun_shu_boxes, self.yun_shu_map, self.current_yun_shu, to_trad)
+        self.box_toggle(self.cipu_boxes, self.ci_pu_map, self.current_ci_pu, to_trad)
+
+        # 按钮/标题文本（保留原来显示逻辑）
         btn_text = '繁體' if self.is_traditional else '简体'
         self.toggle_button.config(text=btn_text)
         change_text = '切换封面' if self.is_traditional else '切換封面'
         self.cover_button.config(text=change_text)
         title_text = '凑韵' if self.is_traditional else '湊韻'
         self.root.title(title_text)
-        self.is_traditional = not self.is_traditional
+
+        # 最后更新状态标志
+        self.is_traditional = to_trad
         current_state['is_traditional'] = self.is_traditional
 
     def switch_background(self):
         self.bg_index = (self.bg_index + 1) % len(self.bg_images)
         current_state['bg_index'] = self.bg_index
-        image_path = os.path.join(current_dir, "picture", self.bg_images[self.bg_index])
+        image_path = resource_path("picture", self.bg_images[self.bg_index])
         self.background_image = load_background_image(image_path)
         self.background_label.config(image=self.background_image)
 
@@ -243,7 +295,8 @@ class RhythmCheckerGUI:
 
     def create_generic_interface(self, title_text, hint_text, button_text, command_func, mode):
         old_widgets = len(self.widgets_to_translate)
-        old_comboboxes = len(self.comboboxes)
+        old_yun = len(self.yun_shu_boxes)
+        old_ci = len(self.cipu_boxes)
 
         self.main_interface.pack_forget()
         generic = ttk.Frame(self.root)
@@ -256,6 +309,7 @@ class RhythmCheckerGUI:
 
         if mode != 's':
             if mode == 'c':
+                # 词模式下第1项为词林正韵
                 self.yun_shu_map[1] = '词林正韵'
             else:
                 self.yun_shu_map[1] = '平水韵'
@@ -271,7 +325,7 @@ class RhythmCheckerGUI:
                               font=self.default_font, width=15, state="readonly")
             cb['values'] = [self.yun_shu_map[k] for k in sorted(self.yun_shu_map)]
             cb.pack(side=tk.LEFT, padx=5)
-            self.comboboxes.append(cb)
+            self.yun_shu_boxes.append(cb)
             self.yunshu_var.trace("w", lambda *args: self.on_yunshu_change())
 
         if mode == 'c':
@@ -302,7 +356,7 @@ class RhythmCheckerGUI:
                                    values=[self.ci_pu_map[k] for k in sorted(self.ci_pu_map)],
                                    font=self.default_font, width=12, state="readonly")
             cb_cipu.pack(side=tk.LEFT, padx=5)
-            self.comboboxes.append(cb_cipu)
+            self.cipu_boxes.append(cb_cipu)
             self.cipu_var.trace("w", lambda *args: self.on_cipu_change())
 
         mf = ttk.Frame(generic)
@@ -322,11 +376,13 @@ class RhythmCheckerGUI:
             self.scrollbar = ttk.Scrollbar(mf, orient=tk.HORIZONTAL, command=ot.xview)
             ot.configure(xscrollcommand=self.scrollbar.set)
             self.scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
+            # 初始高度设为0，不显示
             self.scrollbar.place(relx=0, rely=1, relwidth=1, height=0)
         elif mode == 'p':
             self.scrollbar = ttk.Scrollbar(mf, orient=tk.VERTICAL, command=ot.yview)
             ot.configure(yscrollcommand=self.scrollbar.set)
             self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            # 初始高度设为0，不显示
             self.scrollbar.place(relx=0, rely=1, relwidth=1, height=0)
 
         bf = ttk.Frame(generic)
@@ -352,14 +408,8 @@ class RhythmCheckerGUI:
 
         ot.pack_forget()
 
-        # 若已是繁体模式，立即翻译新控件
-        if self.is_traditional:
-            for w in self.widgets_to_translate[old_widgets:]:
-                w.config(text=self.opencc_s2t.convert(w.cget('text')))
-            for cb_new in self.comboboxes[old_comboboxes:]:
-                trad_map = {k: self.opencc_s2t.convert(v) for k, v in self.yun_shu_map.items()}
-                cb_new['values'] = [trad_map[k] for k in sorted(trad_map)]
-                cb_new.set(trad_map[self.current_yun_shu])
+        # 若已是繁体模式，立即翻译新控件（只翻译新增部分）
+        self.translate_new_widgets(old_widgets, old_yun, old_ci)
 
         return it, ot
 
@@ -372,7 +422,10 @@ class RhythmCheckerGUI:
         if not ci_form.isnumeric():
             self.my_warn("找茬是吧？", "请输入正确的格式！")
             return
-        ci_num = search_ci(ci_pai_name, self.current_ci_pu)
+        # 转换为简体再搜索
+        cipai_to_s = OpenCC('t2s')
+        cp = cipai_to_s.convert(ci_pai_name.strip())
+        ci_num = search_ci(cp, self.current_ci_pu)
         if ci_num == 'err1':
             self.my_warn("找茬是吧？", "无法找到对应的词牌，请检查输入内容！")
             return
@@ -406,7 +459,7 @@ class RhythmCheckerGUI:
 
     def open_ci_interface(self):
         self.input_text, self.output_text = self.create_generic_interface(
-            title_text="词校验", hint_text='请输入需要分析的词：',
+            title_text="词校验", hint_text='请输入需要校验的词：',
             button_text="开始分析", command_func=self.check_ci, mode='c'
         )
 
@@ -446,14 +499,9 @@ class RhythmCheckerGUI:
         end_time = time.time()
         time_result = f'检测完毕，耗时{end_time - start_time:.5f}s\n'
         res += time_result
-        res = convert_to_traditional(res, self.is_traditional, 'p')
         bar = current_state['tk_value']['shi_bar']
         self.scrollbar.place(relx=bar[0], rely=bar[1], relwidth=bar[2], height=bar[3])
-        ot.pack(side=tk.RIGHT, padx=5)
-        ot.config(state=tk.NORMAL)
-        ot.delete("1.0", tk.END)
-        ot.insert(tk.END, res)
-        ot.config(state=tk.DISABLED)
+        self.display_result(ot, res, 'p')
 
     def check_ci(self, it, ot):
         text = it.get("1.0", tk.END).strip()
@@ -477,14 +525,9 @@ class RhythmCheckerGUI:
         end_time = time.time()
         time_result = f'检测完毕，耗时{end_time - start_time:.5f}s\n\n'
         res += time_result
-        res = convert_to_traditional(res, self.is_traditional, 'c')
         bar = current_state['tk_value']['ci_bar']
         self.scrollbar.place(relx=bar[0], rely=bar[1], relwidth=bar[2], height=bar[3])
-        ot.pack(side=tk.RIGHT, padx=5)
-        ot.config(state=tk.NORMAL)
-        ot.delete("1.0", tk.END)
-        ot.insert(tk.END, res)
-        ot.config(state=tk.DISABLED)
+        self.display_result(ot, res, 'c')
 
     def check_char(self, it, ot):
         text = it.get("1.0", tk.END).strip()
@@ -498,17 +541,12 @@ class RhythmCheckerGUI:
             self.my_warn("你在干嘛呢？", "非汉字或超出区段（基本区及拓展A、B区）")
             return
         res = show_all_rhythm(text)
-        res = convert_to_traditional(res, self.is_traditional, 's')
-        ot.pack(side=tk.BOTTOM, padx=5)
-        ot.config(state=tk.NORMAL)
-        ot.delete("1.0", tk.END)
-        ot.insert(tk.END, res)
-        ot.config(state=tk.DISABLED)
+        self.display_result(ot, res, 's')
 
 
 if __name__ == "__main__":
     root = tk.Tk()
-    load_font(os.path.join(current_dir, 'font', "LXGWWenKaiMono-Regular.ttf"))
+    load_font(resource_path('font', "LXGWWenKaiMono-Regular.ttf"))
     root.tk.call('tk', 'scaling', 2)
     ttk.Style().theme_use('vista')
     root.protocol("WM_DELETE_WINDOW", lambda: on_close(current_state))
