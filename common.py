@@ -4,6 +4,7 @@ from pingshui_rhythm import hanzi_rhythm
 import new_rhythm as nw
 import os
 import re
+import json
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 cn_nums = {'一': 1, '二': 2, '两': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9, '十': 10}
@@ -118,3 +119,12 @@ def count_poem_para(string: str) -> tuple[int, int, int]:
         if '押韵' in line:
             yayun_count += 1
     return total_count, yayun_count, yun_types
+
+
+def load_state(state_path):
+    with open(state_path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+
+state_file = os.path.join(current_dir, 'state', 'state.json')
+current_state = load_state(state_file)

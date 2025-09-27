@@ -4,6 +4,7 @@ from opencc import OpenCC
 from common import current_dir
 
 idx_file = os.path.join(current_dir, 'ci_list', 'ci_index.json')
+
 with open(idx_file, encoding='utf-8') as f:
     idx = json.load(f)
 
@@ -23,16 +24,16 @@ def search_ci(input_name: str, ci_pu: int, reverse_search=False, traditial=False
         cc = OpenCC('t2s')
         input_name = cc.convert(input_name)
     if reverse_search:
-        return idx[input_name][0]
+        return idx[int(input_name)]['names'][0]
     else:
-        for num, names in idx.items():
-            if input_name in names:
+        for single_ci in idx:
+            if input_name in single_ci['names']:
                 if ci_pu == 1:
-                    return num
+                    return single_ci['idx']
                 else:
-                    file_path = os.path.join(current_dir, 'ci_list_long', f'cipai_{num}_long.json')
+                    file_path = os.path.join(current_dir, 'ci_list_long', f'cipai_{single_ci["idx"]}_long.json')
                     if os.path.exists(file_path):
-                        return num
+                        return single_ci['idx']
                     return 'err2'
         return 'err1'
 

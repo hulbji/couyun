@@ -1,5 +1,5 @@
 """凑韵诗词格律检测工具主体tk模块，支持简体/繁体切换，使用方法请参照README文件。"""
-
+import json
 import re
 import os
 import time
@@ -8,12 +8,12 @@ from tkinter import ttk, messagebox, font
 import ctypes
 from PIL import Image, ImageTk
 from opencc import OpenCC
-import json
 
-from common import show_all_rhythm, current_dir
+from common import show_all_rhythm, current_dir, current_state, state_file
 from ci_search import search_ci, ci_type_extraction
 from shi_rhythm import ShiRhythm
 from ci_rhythm import CiRhythm
+from ci_pu_browser import CiPuBrowser
 
 
 def resource_path(*paths):
@@ -29,20 +29,8 @@ def unload_font(font_path):
     ctypes.windll.gdi32.RemoveFontResourceW(font_path, 0x10, 0)
 
 
-def load_state(state_path):
-    with open(state_path, 'r', encoding='utf-8') as f:
-        return json.load(f)
-
-
-def save_state(state_path, state):
-    with open(state_path, 'w', encoding='utf-8') as f:
-        json.dump(state, f, ensure_ascii=False, indent=4)
-
-
 ico_path = resource_path('picture', 'ei.ico')
 jpg_fold = resource_path('picture')
-state_file = resource_path('state', 'state.json')
-current_state = load_state(state_file)
 size_tuple = current_state['tk_value']['size']
 size_string = 'x'.join(map(str, size_tuple))
 if os.name == 'nt':
@@ -73,11 +61,13 @@ def convert_to_traditional(text, is_traditional, mode):
     converted_lines = []
     if mode != 's':
         counter = 0
+        meet_empty = False
         for line in text.split('\n'):
             # 空白行：计数归零，原样输出（也可转繁，按需求）
             if line.strip() == '':
                 counter = 0
                 converted_lines.append(line)
+                meet_empty = True
                 continue
             counter += 1
             if counter == 2:
@@ -87,18 +77,20 @@ def convert_to_traditional(text, is_traditional, mode):
                 else:
                     head = line[:pos + 1]  # 含 \u3000 本身
                     tail = line[pos + 1:]
-                    converted_lines.append(head + cc.convert(tail))
-            else:  # 其余计数（0、1、3、4…）
+                    converted_lines.append(head + cc.convert(tail).replace('鹹', '咸'))  # 轉換出錯修改
+            elif not meet_empty:  # 其余计数（0、1、3、4…）
                 converted_lines.append(cc.convert(line))
+            else:
+                converted_lines.append(cc.convert(line).replace('葉', '叶'))
     else:
         for line in text.split('\n'):
             if '：' in line:
                 converted_line = line
             else:
-                converted_line = cc.convert(line)
+                converted_line = cc.convert(line).replace('鹹', '咸')
             converted_lines.append(converted_line)
     converted_text = '\n'.join(converted_lines)
-    return converted_text.replace('鹹韻', "咸韻").replace('十五鹹', "十五咸")
+    return converted_text
 
 
 def load_background_image(image_path):
@@ -115,6 +107,11 @@ def settings(mode):
     return current_state['tk_value']['frame_width'][1]
 
 
+def save_state(state_path, state):
+    with open(state_path, 'w', encoding='utf-8') as f:
+        json.dump(state, f, ensure_ascii=False, indent=4)
+
+
 def on_close(state):
     """关闭窗口时的行为，卸载字体。将新状态写入json文件。"""
     font_path = resource_path('font', "LXGWWenKaiMono-Regular.ttf")
@@ -126,7 +123,7 @@ def on_close(state):
 # noinspection PyTypeChecker
 class RhythmCheckerGUI:
     def __init__(self, roots):
-        self.edition = 'v.1.4.4'
+        self.edition = 'v.1.4.5 test'
 
         self.yunshu_var = None
         self.cipu_var = None
@@ -167,13 +164,16 @@ class RhythmCheckerGUI:
         self.background_image = load_background_image(os.path.join(jpg_fold, self.bg_images[self.bg_index]))
         self.background_label = tk.Label(self.root, image=self.background_image)
         self.background_label.place(relwidth=1, relheight=1)
+
         self.cover_button = tk.Button(self.root, text='切換封面' if self.is_traditional else "切换封面",
                                       command=self.switch_background, font=self.small_font)
         self.cover_button.place(relx=0.01, rely=0.99, anchor='sw')
-
         self.toggle_button = tk.Button(self.root, text='简体' if self.is_traditional else "繁體",
                                        command=self.toggle_language, font=self.small_font)
         self.toggle_button.place(relx=0.99, rely=0.99, anchor='se')
+        self.ci_pu_button = tk.Button(self.root, text='詞譜查詢' if self.is_traditional else "词谱查询",
+                                      command=self.open_cipu_browser, font=self.small_font)
+        self.ci_pu_button.place(relx=0.5, rely=0.99, anchor='s')
         self.version_label = tk.Label(self.root, text=self.edition, font=self.small_font)
         self.version_label.place(relx=0.99, rely=0.01, anchor='ne')
 
@@ -187,6 +187,22 @@ class RhythmCheckerGUI:
     def cc_convert(self, text, to_traditional: bool):
         """根据目标模式转换文本"""
         return self.opencc_s2t.convert(text) if to_traditional else self.opencc_t2s.convert(text)
+
+    def open_cipu_browser(self):
+        fonts = {
+            'small': self.small_font,
+            'default': self.default_font,
+            'bigger': self.bigger_font
+        }
+        CiPuBrowser(
+            master=self.root,
+            json_path=resource_path('ci_list', 'ci_index.json'),
+            fonts=fonts,
+            resource_path=resource_path,
+            state=current_state,  # 仅用于初始化繁简状态
+            origin_dir=resource_path('ci_origin'),
+            long_dir=resource_path('ci_list_long_origin')
+        )
 
     def box_toggle(self, boxes, single_map, current, to_traditional: bool):
         """统一处理简繁切换下拉框"""
@@ -223,6 +239,7 @@ class RhythmCheckerGUI:
         ot.delete("1.0", tk.END)
         ot.insert(tk.END, res)
         ot.config(state=tk.DISABLED)
+
     # -----------------------------------------------
 
     def my_warn(self, title, msg):
@@ -252,6 +269,8 @@ class RhythmCheckerGUI:
         self.toggle_button.config(text=btn_text)
         change_text = '切换封面' if self.is_traditional else '切換封面'
         self.cover_button.config(text=change_text)
+        cipu_text = '词谱查询' if self.is_traditional else '詞譜查詢'
+        self.ci_pu_button.config(text=cipu_text)
         title_text = '凑韵' if self.is_traditional else '湊韻'
         self.root.title(title_text)
 
@@ -471,6 +490,9 @@ class RhythmCheckerGUI:
 
     def return_to_main(self):
         for w in self.root.winfo_children():
+            # 忽略所有 Toplevel 子窗口
+            if isinstance(w, tk.Toplevel):
+                continue
             if w not in (self.main_interface, self.toggle_button):
                 w.pack_forget()
         self.main_interface.pack(pady=200)

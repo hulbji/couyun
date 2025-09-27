@@ -1,8 +1,9 @@
 {
-    "is_traditional": false,
+    "is_traditional": true,
     "yun_shu": 1,
     "ci_pu": 2,
     "bg_index": 0,
+    "sort_mode": 1,
     "tk_value": {
         "size": [
             1200,
