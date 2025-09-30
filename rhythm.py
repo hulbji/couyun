@@ -1,8 +1,12 @@
-"""凑韵诗词格律检测工具主体tk模块，支持简体/繁体切换，使用方法请参照README文件。"""
+"""
+凑韵诗词格律检测工具主体tk模块，支持简体/繁体切换，使用方法请参照README文件。
+目前问题：1.繁简切换问题 2.去扒繁体词谱
+"""
 import json
 import re
 import os
 import time
+import sys
 import tkinter as tk
 from tkinter import ttk, messagebox, font
 import ctypes
@@ -27,17 +31,6 @@ def load_font(font_path):
 
 def unload_font(font_path):
     ctypes.windll.gdi32.RemoveFontResourceW(font_path, 0x10, 0)
-
-
-ico_path = resource_path('picture', 'ei.ico')
-jpg_fold = resource_path('picture')
-size_tuple = current_state['tk_value']['size']
-size_string = 'x'.join(map(str, size_tuple))
-if os.name == 'nt':
-    try:
-        ctypes.windll.shcore.SetProcessDpiAwareness(2)
-    except (OSError, AttributeError, ctypes.ArgumentError):
-        ctypes.windll.user32.SetProcessDPIAware()
 
 
 def extract_chinese(text: str, comma_remain=False) -> str:
@@ -123,7 +116,7 @@ def on_close(state):
 # noinspection PyTypeChecker
 class RhythmCheckerGUI:
     def __init__(self, roots):
-        self.edition = 'v.1.4.5 test'
+        self.edition = 'v.1.4.5'
 
         self.yunshu_var = None
         self.cipu_var = None
@@ -181,6 +174,7 @@ class RhythmCheckerGUI:
         self.output_text = None
         self.main_interface = None
         self.cipai_var = None
+        self._opening_cipu = False
 
         self.create_main_interface()
 
@@ -189,20 +183,33 @@ class RhythmCheckerGUI:
         return self.opencc_s2t.convert(text) if to_traditional else self.opencc_t2s.convert(text)
 
     def open_cipu_browser(self):
-        fonts = {
-            'small': self.small_font,
-            'default': self.default_font,
-            'bigger': self.bigger_font
-        }
-        CiPuBrowser(
+        # 防止连点
+        if getattr(self, '_opening_cipu', False):
+            return
+        self._opening_cipu = True
+
+        def _done():
+            # 窗口关闭后把标志复位
+            self._opening_cipu = False
+
+        fonts = {'small': self.small_font,
+                 'default': self.default_font,
+                 'bigger': self.bigger_font}
+
+        browser = CiPuBrowser(
             master=self.root,
             json_path=resource_path('ci_list', 'ci_index.json'),
             fonts=fonts,
             resource_path=resource_path,
-            state=current_state,  # 仅用于初始化繁简状态
+            state=current_state,
             origin_dir=resource_path('ci_origin'),
-            long_dir=resource_path('ci_list_long_origin')
+            long_dir=resource_path('ci_long_origin'),
+            origin_trad_dir=resource_path('ci_trad'),
+            long_trad_dir=resource_path('ci_long_trad'),
         )
+        # 窗口销毁时回调
+        browser.protocol("WM_DELETE_WINDOW", lambda: (browser.destroy(), _done()))
+
 
     def box_toggle(self, boxes, single_map, current, to_traditional: bool):
         """统一处理简繁切换下拉框"""
@@ -566,6 +573,30 @@ class RhythmCheckerGUI:
         self.display_result(ot, res, 's')
 
 
+ico_path = resource_path('picture', 'ei.ico')
+jpg_fold = resource_path('picture')
+size_tuple = current_state['tk_value']['size']
+size_string = 'x'.join(map(str, size_tuple))
+MUTEX_NAME = "RhythmChecker_v145"
+ERROR_ALREADY_EXISTS = 183
+kernel32 = ctypes.windll.kernel32
+handle = kernel32.CreateMutexW(None, False, MUTEX_NAME)
+last_error = kernel32.GetLastError()
+if os.name == 'nt':
+    try:
+        ctypes.windll.shcore.SetProcessDpiAwareness(2)
+    except (OSError, AttributeError, ctypes.ArgumentError):
+        ctypes.windll.user32.SetProcessDPIAware()
+if last_error == ERROR_ALREADY_EXISTS:
+    try:
+        window_title = "湊韻" if current_state.get('is_traditional', False) else "凑韵"
+        hwnd = ctypes.windll.user32.FindWindowW(None, window_title)
+        if hwnd:
+            ctypes.windll.user32.ShowWindow(hwnd, 5)   # SW_SHOW
+            ctypes.windll.user32.SetForegroundWindow(hwnd)
+    except (OSError, ctypes.WinError):
+        pass
+    sys.exit(0)
 if __name__ == "__main__":
     root = tk.Tk()
     load_font(resource_path('font', "LXGWWenKaiMono-Regular.ttf"))

@@ -1,10 +1,9 @@
 import json
 import os
-import re
 import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
-from opencc import OpenCC
+# import time
 from common import current_state
 
 
@@ -16,31 +15,48 @@ def load_ci_index(json_path):
 
 # noinspection PyTypeChecker
 class CiPuBrowser(tk.Toplevel):
-    def __init__(self, master, json_path, fonts,
-                 resource_path, state,
-                 origin_dir, long_dir):
-        super().__init__(master)
-        self.detail_frame = None
-        self.is_trad = state.get('is_traditional', False)
-        self.cc_s2t = OpenCC('s2t')
-        self.cc_t2s = OpenCC('t2s')
+    _instance = None
 
-        self.title("词谱查询" if not self.is_trad else "詞譜查詢")
+    def __init__(self, master, json_path, fonts, resource_path,
+                 state, origin_dir, long_dir, origin_trad_dir, long_trad_dir):
+        if CiPuBrowser._instance is not None and CiPuBrowser._instance.winfo_exists():
+            CiPuBrowser._instance.lift()
+            return
+        if CiPuBrowser._instance is not None:
+            CiPuBrowser._instance.destroy()
+
+        super().__init__(master)
+
+        self.detail_text = None
+        self.current_show = 'qin'
+        self.long_raw = None
+        self.qin_raw = None
+        self.detail_frame = None
+        self.detail_title = None
+        self.qin_btn = None
+        self.long_btn = None
+        self.btn_frame = None
+
+        self.qin_raw_s = None
+        self.qin_raw_t = None
+        self.long_raw_s = None
+        self.long_raw_t = None
+        self.current_item = None
+
+        self.is_trad = state.get('is_traditional', False)
+
+        self.title("詞譜查詢" if self.is_trad else "词谱查询")
         self.geometry('1200x800')
         self.iconbitmap(resource_path('picture', 'ei.ico'))
-        self.resizable(True, True)
-
-        # 资源与字体
+        self.resizable(False, False)
         self.fonts = fonts
         self.resource_path = resource_path
         self.current_state = state
         self.origin_dir = origin_dir
         self.long_dir = long_dir
-
-        # 排序模式 0:拼音 1:字数 2:类型(平仄换叶)+字数
+        self.origin_trad_dir = origin_trad_dir
+        self.long_trad_dir = long_trad_dir
         self.sort_mode = state['sort_mode']
-
-        # 载入数据并建立索引（包含拼音集合）
         self.indexed = load_ci_index(json_path)
 
         # 背景图（按新窗口大小）
@@ -54,7 +70,6 @@ class CiPuBrowser(tk.Toplevel):
 
         # 主框架（放在背景之上）
         self.main_frame = ttk.Frame(self)
-        # 用 place 放置在背景上方，留边距
         self.main_frame.place(relx=0.02, rely=0.03, relwidth=0.96, relheight=0.82)
 
         # 搜索栏
@@ -62,7 +77,7 @@ class CiPuBrowser(tk.Toplevel):
         search_frame.pack(pady=8, fill=tk.X)
         self.search_var = tk.StringVar()
         self.search_hint = ttk.Label(search_frame,
-                                     text=self.tr_text("输入词谱名/拼音："),
+                                     text="輸入詞譜名/拼音：" if self.is_trad else "输入词谱名/拼音：",
                                      font=fonts['default'])
         self.search_hint.pack(side=tk.LEFT)
         entry = ttk.Entry(search_frame, textvariable=self.search_var,
@@ -85,93 +100,106 @@ class CiPuBrowser(tk.Toplevel):
         self.no_result_label.pack(pady=4)
 
         small_font = fonts['small']
-        self.sort_btn = tk.Button(self, text=self.tr_text("排序:拼音"),
+        self.sort_btn = tk.Button(self, text=self.sort_label(),
                                   font=small_font, command=self.toggle_sort)
         self.sort_btn.place(relx=0.02, rely=0.95, anchor='sw')
 
-        self.return_btn = tk.Button(self, text=self.tr_text("返回"),
+        self.return_btn = tk.Button(self, text="返回",
                                     font=small_font, command=self.back_to_main)
-        # 初始隐藏，进入详情页时显示（使用 place）
         self.return_btn.place_forget()
 
         self.toggle_btn = tk.Button(self, text=("简体" if self.is_trad else "繁體"),
                                     font=small_font, command=self.toggle_lang)
         self.toggle_btn.place(relx=0.98, rely=0.95, anchor='se')
 
-        # 当前匹配集合（按当前排序与过滤）
         self.current_matched = []
+        self.result_box.insert(tk.END, "")  # 触发初始化
+        self.result_box.delete(0, tk.END)
         self.update_list()
 
-    # ---------------- 繁简支持 ----------------
-    def tr_text(self, txt: str) -> str:
-        """根据子窗口的繁简状态返回转换后的文本"""
-        if not isinstance(txt, str):
-            txt = str(txt)
-        changed_txt = self.cc_s2t.convert(txt) if self.is_trad else self.cc_t2s.convert(txt)
-        return self.special_process(changed_txt)
-
-    def special_process(self, text: str) -> str:
-        if "葉" in text and self.is_trad:
-            pattern = re.compile(r'(?<=[平中仄換　])葉|葉(?=韻)')
-            text = pattern.sub('叶', text)
-        if '三臺（大麴）' in text:
-            text = text.replace('三臺（大麴）', '三臺（大曲）')
-        return text
+    @staticmethod
+    def show_ci_pu(text_area: tk.Text, raw_text: str):
+        """
+        在指定 Text 控件中显示词谱内容。
+        raw_text 必须是未经过繁简转换的原文。
+        """
+        if raw_text is None:
+            return
+        text_area.config(state=tk.NORMAL)
+        text_area.delete('1.0', tk.END)
+        text_area.insert(tk.END, raw_text)
+        text_area.config(state=tk.DISABLED)
 
     def toggle_lang(self):
+        """翻转简繁状态并全局刷新：主界面 + 详情页（若已打开）"""
+        # t0 = time.perf_counter()
         self.is_trad = not self.is_trad
-        # 更新按钮与提示文本
-        small_font = self.fonts['small']
-        self.toggle_btn.config(text=("简体" if self.is_trad else "繁體"), font=small_font)
-        self.sort_btn.config(text=self.tr_text(self.sort_label()))
-        self.search_hint.config(text=self.tr_text("输入词谱名/拼音："))
-        self.return_btn.config(text=self.tr_text("返回"))
-        # 刷新列表显示（名称/信息需要转换）
+        self.title("詞譜查詢" if self.is_trad else "词谱查询")
+        self.toggle_btn.config(text="繁體" if self.is_trad else "简体",
+                               font=self.fonts['small'])
+        self.sort_btn.config(text=self.sort_label())
+        self.search_hint.config(text="輸入詞譜名/拼音：" if self.is_trad else "输入词谱名/拼音：")
+        self.return_btn.config(text="返回")
+        if getattr(self, 'detail_frame', None) is not None and self.detail_frame.winfo_exists():
+            self._refresh_detail_lang()
         self.update_list()
+        # t1 = time.perf_counter()
+        # print(f"[toggle_lang] time {t1 - t0:.3f}s")
 
-    # ---------------- 排序 ----------------
+    def _refresh_detail_lang(self):
+        # t0 = time.perf_counter()
+        self.qin_raw = self.qin_raw_t if self.is_trad else self.qin_raw_s
+        self.long_raw = self.long_raw_t if self.is_trad else self.long_raw_s
+
+        self.detail_title.config(
+            text=self.current_item['names_trad'][0] if self.is_trad else self.current_item['names'][0]
+        )
+        self.qin_btn.config(text='欽譜' if self.is_trad else '钦谱',
+                            command=self._on_qin)
+        if self.long_btn is not None:
+            self.long_btn.config(text='龍譜' if self.is_trad else '龙谱',
+                                 command=self._on_long)
+
+        raw = self.qin_raw if self.current_show == 'qin' else self.long_raw
+        self.show_ci_pu(self.detail_text, raw)
+        # t1 = time.perf_counter()
+        # print(f"[_refresh_detail_lang] time {t1 - t0:.3f}s")
+
     def sort_label(self):
-        return ["排序:拼音", "排序:字数", "排序:类型"][self.sort_mode]
+        return ["排序:拼音", "排序:字數", "排序:類型"][self.sort_mode] if self.is_trad else \
+        ["排序:拼音", "排序:字数", "排序:类型"][self.sort_mode]
 
     def toggle_sort(self):
         self.sort_mode = (self.sort_mode + 1) % 3
         current_state['sort_mode'] = self.sort_mode
-        # 更新按钮文本（tr_text 会根据当前 is_trad 转换）
-        self.sort_btn.config(text=self.tr_text(self.sort_label()))
+        self.sort_btn.config(text=self.sort_label())
         self.update_list()
 
-    # ---------------- 列表刷新 ----------------
     def update_list(self, _=None):
+        # t0 = time.perf_counter()
         key = self.search_var.get().strip().lower()
         self.result_box.delete(0, tk.END)
+        # t1 = time.perf_counter()
 
-        # 排序键函数
         def sort_key(ci_pais):
             t = ci_pais['type']
             if self.sort_mode == 0:
-                # ① 按拼音
                 return ci_pais['full']
             elif self.sort_mode == 1:
-                # ② 按字数
                 return t[1]  # 已确认是 int
             else:
-                # ③ 按“平/仄/换/叶”分组，再按字数，再按拼音
                 order_map = {'平': 0, '仄': 1, '换': 2, '叶': 3}
                 order_val = order_map[t[-1]]
                 num = t[1]
                 return order_val, num, ci_pais['full']
 
         ordered = sorted(self.indexed, key=sort_key)
+        # t2 = time.perf_counter()
 
-        # 过滤：汉字子串匹配（主名和别名）或拼音匹配（全拼或首字母拼）
         matched = []
         if key:
             for item in ordered:
-                names_lower = [n.lower() for n in item['names']]
-                if any(key in n for n in names_lower):
-                    matched.append(item)
-                    continue
-                if any(key in p for p in item['pinyins']):
+                if any(key in n for n in item['names']) or any(key in p for p in item['pinyins']):
                     matched.append(item)
         else:
             matched = ordered
@@ -179,24 +207,17 @@ class CiPuBrowser(tk.Toplevel):
         self.current_matched = matched
 
         if not matched:
-            self.no_result_label.config(text=self.tr_text("找不到符合条件的词谱"))
+            self.no_result_label.config(text="找不到符合條件的詞譜"if self.is_trad else "找不到符合条件的词谱")
             return
         else:
             self.no_result_label.config(text="")
+        # t3 = time.perf_counter()
 
-        # 插入显示文本： 名称 + 若干全角空格(\u3000) + 信息（用 type 列表的各部分）
-        for item in matched:
-            main_name = item['names'][0] if item['names'] else ''
-            nm = self.tr_text(main_name)
-            tparts = item.get('type', [])
-            info_parts = [str(p) for p in tparts]
-            info_text = self.tr_text('\u3000'.join(part for part in info_parts))
-            fill = max(0, 8 - len(nm))
-            space = "\u3000" * fill
-            display = nm + space + info_text
-            self.result_box.insert(tk.END, display)
+        displays = [item['display_t'] if self.is_trad else item['display_s'] for item in matched]
+        self.result_box.insert(tk.END, *displays)
+        # t4 = time.perf_counter()
+        # print(f"[update_list] time {t1 - t0:.3f}s {t2 - t1:.3f}s {t3 - t2:.3f}s {t4 - t3:.3f}s")
 
-    # ---------------- 详情页 ----------------
     def open_detail(self, _=None):
         sel = self.result_box.curselection()
         if not sel:
@@ -205,89 +226,141 @@ class CiPuBrowser(tk.Toplevel):
         item = self.current_matched[idx_in_matched]
         self.show_detail(item)
 
-    def show_detail(self, item):
-        # 隐藏主列表
-        self.main_frame.place_forget()
+    @staticmethod
+    def read_file(path):
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                return f.read()
+        except FileNotFoundError:
+            return None
 
-        # 显示返回按钮（放在背景上）
+    # ---------- 拆分后的三个函数 ----------
+    def load_ci_files(self, item):
+        """
+        根据 idx 一次性把 4 个文件读出来，返回 dict。
+        键：qin_raw_s / qin_raw_t / long_raw_s / long_raw_t
+        读不到返回 None。
+        """
+        idx = item['idx']
+        return {
+            'qin_raw_s': self.read_file(os.path.join(self.origin_dir, f'cipai_{idx}.txt')),
+            'qin_raw_t': self.read_file(os.path.join(self.origin_trad_dir, f'cipai_{idx}_trad.txt')),
+            'long_raw_s': self.read_file(os.path.join(self.long_dir, f'cipai_{idx}_long.txt')),
+            'long_raw_t': self.read_file(os.path.join(self.long_trad_dir, f'cipai_{idx}_long_trad.txt')),
+        }
+
+    def _on_qin(self):
+        self.current_show = 'qin'
+        raw = self.qin_raw_t if self.is_trad else self.qin_raw_s
+        self.show_ci_pu(self.detail_text, raw)
+
+    def _on_long(self):
+        self.current_show = 'long'
+        raw = self.long_raw_t if self.is_trad else self.long_raw_s
+        self.show_ci_pu(self.detail_text, raw)
+
+    def show_detail_body(self, detail, text_area, btn_frame, files_dict):
+        """
+        根据已读到的文件内容，完成：
+        1. 按当前繁/简模式给 self.qin_raw / self.long_raw 赋值
+        2. 创建“钦谱/龙谱”按钮并绑定事件
+        3. 默认显示钦谱
+        """
+        small_font = self.fonts['small']
+
+        # 按当前模式选取简体 or 繁体
+        self.qin_raw_s = files_dict['qin_raw_s']
+        self.qin_raw_t = files_dict['qin_raw_t']
+        self.long_raw_s = files_dict['long_raw_s']
+        self.long_raw_t = files_dict['long_raw_t']
+        self.qin_raw = self.qin_raw_t if self.is_trad else self.qin_raw_s
+        self.long_raw = self.long_raw_t if self.is_trad else self.long_raw_s
+
+        # 钦谱按钮
+        self.qin_btn = tk.Button(btn_frame,
+                  text='欽譜' if self.is_trad else '钦谱',
+                  font=small_font,
+                  command=self._on_qin
+                  )
+        self.qin_btn.pack(side=tk.LEFT, padx=6)
+
+        # 龙谱按钮（有内容才显示）
+        if self.long_raw is not None:
+            self.long_btn = tk.Button(btn_frame,
+                      text='龍譜' if self.is_trad else '龙谱',
+                      font=small_font,
+                      command=self._on_long
+                      )
+            self.long_btn.pack(padx=6)
+
+        # 默认显示钦谱
+        self.show_ci_pu(text_area, self.qin_raw)
+        # 把 detail 保存到实例变量，方便返回按钮销毁
+        self.detail_frame = detail
+
+    def show_detail(self, item):
+        """原函数只保留界面骨架，逻辑部分通过上面两个新函数完成。"""
+        # t0 = time.perf_counter()
+        self.main_frame.place_forget()
+        self.sort_btn.place_forget()
+        self.current_item = item
+
         small_font = self.fonts['small']
         self.return_btn.place(relx=0.5, rely=0.95, anchor='s')
-        self.return_btn.config(font=small_font, text=self.tr_text("返回"))
+        self.return_btn.config(font=small_font, text="返回")
 
-        # 详情区（同样用 place 放在背景上）
         detail = ttk.Frame(self)
         detail.place(relx=0.02, rely=0.03, relwidth=0.96, relheight=0.82)
 
-        ttk.Label(detail, text=self.tr_text(item['names'][0]),
-                  font=self.fonts['bigger']).pack(pady=6)
+        self.detail_title = ttk.Label(detail,
+                  text=item['names_trad'][0] if self.is_trad else item['names'][0],
+                  font=self.fonts['bigger'])
+        self.detail_title.pack(pady=6)
 
-        btn_frame = ttk.Frame(detail)
-        btn_frame.pack(pady=6)
+        self.btn_frame = ttk.Frame(detail)
+        self.btn_frame.pack(pady=6)
 
-        # 文本区：水平与垂直滚动条
         text_frame = ttk.Frame(detail)
         text_frame.pack(fill=tk.BOTH, expand=True, padx=6, pady=6)
+
         x_scroll = ttk.Scrollbar(text_frame, orient=tk.HORIZONTAL)
         y_scroll = ttk.Scrollbar(text_frame, orient=tk.VERTICAL)
         text_area = tk.Text(text_frame, wrap=tk.NONE, font=self.fonts['small'])
         text_area.configure(xscrollcommand=x_scroll.set, yscrollcommand=y_scroll.set)
+        self.detail_text = text_area
         x_scroll.config(command=text_area.xview)
         y_scroll.config(command=text_area.yview)
+
         text_area.grid(row=0, column=0, sticky="nsew")
         y_scroll.grid(row=0, column=1, sticky="ns")
         x_scroll.grid(row=1, column=0, sticky="ew")
         text_frame.grid_rowconfigure(0, weight=1)
         text_frame.grid_columnconfigure(0, weight=1)
 
-        # 读取对应文件（依据 item['idx']）
-        idx = item['idx']
-        qin_path = os.path.join(self.origin_dir, f"cipai_{idx}.txt")
-        long_path = os.path.join(self.long_dir, f"cipai_{idx}_long.txt")
-
-        def read_file(path):
-            try:
-                with open(path, 'r', encoding='utf-8') as f:
-                    return f.read()
-            except FileNotFoundError:
-                return None
-
-        qin_text = read_file(qin_path)
-        long_text = read_file(long_path)
-        if isinstance(qin_text, str):
-            qin_text = self.tr_text(qin_text)
-        if isinstance(long_text, str):
-            long_text = self.tr_text(long_text)
-
-        def show_qin():
-            text_area.config(state=tk.NORMAL)
-            text_area.delete('1.0', tk.END)
-            text_area.insert(tk.END, qin_text)
-            text_area.config(state=tk.DISABLED)
-
-        def show_long():
-            if long_text is None:
-                return
-            text_area.config(state=tk.NORMAL)
-            text_area.delete('1.0', tk.END)
-            text_area.insert(tk.END, long_text)
-            text_area.config(state=tk.DISABLED)
-
-        # 按钮使用小号字体
-        tk.Button(btn_frame, text=self.tr_text("钦谱"), font=small_font,
-                  command=show_qin).pack(side=tk.LEFT, padx=6)
-        if long_text is not None:
-            tk.Button(btn_frame, text=self.tr_text("龙谱"), font=small_font,
-                      command=show_long).pack(side=tk.LEFT, padx=6)
-
-        show_qin()
-        # 保存 detail frame 引用以便返回销毁
-        self.detail_frame = detail
+        # ====== 拆分后的调用 ======
+        files_dict = self.load_ci_files(item)  # 1. 读文件
+        self.show_detail_body(detail, text_area, self.btn_frame, files_dict)  # 2. 填内容
+        self.current_show = 'qin'
+        # t1 = time.perf_counter()
+        # print(f"[show_detail] time {t1 - t0:.3f}s")
 
     # ---------------- 返回主列表 ----------------
     def back_to_main(self):
         if hasattr(self, 'detail_frame'):
+            self.qin_btn = None
+            self.long_btn = None
             self.detail_frame.destroy()
             del self.detail_frame
+
+        # 清理与详情页相关的属性
+        for attr in ('detail_text', 'qin_raw', 'long_raw', 'current_show'):
+            if hasattr(self, attr):
+                delattr(self, attr)
+
+        self.sort_btn.place(relx=0.02, rely=0.95, anchor='sw')
+        self.return_btn.place_forget()
+        self.main_frame.place(relx=0.02, rely=0.03, relwidth=0.96, relheight=0.82)
+        self.update_list()
 
         # 隐藏返回按钮
         self.return_btn.place_forget()

@@ -1,10 +1,11 @@
 """诗歌校验模块内容，可以校验五言或七言的绝句或律诗或排律，可以校验孤雁入群的特殊格式。支持拗救。支持三韵。"""
-
+import re
 import math
 from collections import defaultdict
 
 from pingshui_rhythm import rhythm_name, rhythm_correspond  # 平水韵模块
-from common import *
+import new_rhythm as nw
+from common import hanzi_rhythm, hanzi_to_pingze, hanzi_to_yun, result_check
 from num_to_cn import num_to_cn
 from shi_first import ShiFirst  # 判断首句格式
 

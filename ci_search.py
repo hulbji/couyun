@@ -31,7 +31,7 @@ def search_ci(input_name: str, ci_pu: int, reverse_search=False, traditial=False
                 if ci_pu == 1:
                     return single_ci['idx']
                 else:
-                    file_path = os.path.join(current_dir, 'ci_list_long', f'cipai_{single_ci["idx"]}_long.json')
+                    file_path = os.path.join(current_dir, 'ci_long', f'cipai_{single_ci["idx"]}_long.json')
                     if os.path.exists(file_path):
                         return single_ci['idx']
                     return 'err2'
@@ -47,7 +47,7 @@ def ci_type_extraction(ci_number: str | int, ci_pu: int) -> list[dict]:
     Returns:
         词牌所有格式的列表，列表中的列表包含每一个格式的例词内容，格律和词牌描述。
     """
-    middle = 'ci_list' if ci_pu == 1 else 'ci_list_long'
+    middle = 'ci_list' if ci_pu == 1 else 'ci_long'
     last = '' if ci_pu == 1 else '_long'
     file_path = os.path.join(current_dir, middle, f'cipai_{ci_number}{last}.json')
     with open(file_path, 'r', encoding='utf-8') as file:
