@@ -1,0 +1,2 @@
+opencc_python_reimplemented==0.1.7
+pillow==11.1.0
