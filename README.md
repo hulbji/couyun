@@ -11,7 +11,7 @@
 
 ## 使用方法：  
 下载应用程序或按照requirements安装py库，运行couyun/ui/rhythm.py即可。分为3个模块。  
-`pip install -r requiremnets.txt`
+`pip install -r requirements.txt`
 
 ### 诗校验：  
 输入五言或七言的律诗或绝句或排律，选择使用的韵书（默认为平水韵）程序会自动判断其所属的格式，并给出判断结果。输入的诗歌可以带标点以及括号内的注释，程序会自动忽略括号中的内容。并通过以下内容展示。  
