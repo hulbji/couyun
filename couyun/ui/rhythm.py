@@ -19,8 +19,7 @@ from couyun.ci.ci_search import search_ci, ci_type_extraction
 from couyun.common.common import show_all_rhythm
 from couyun.shi.shi_rhythm import ShiRhythm
 from couyun.ui.paths import (
-    ICO_PATH, FONT_PATH, CI_LIST, CI_LONG_ORIGIN, CI_LONG_TRAD, CI_ORIGIN, CI_TRAD,
-    bg_pic, load_state, save_state
+    ICO_PATH, FONT_PATH, bg_pic, load_state, save_state
 )
 
 resource_path = lambda *p: Path(__file__).parent / 'assets' / Path(*p)
