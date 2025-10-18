@@ -329,7 +329,7 @@ class ShiRhythm:
                 yun_jiao_content += f'{"、".join(zi_list)}{yun} ' + f'用{lin}韵 押{yun} '
         else:
             yun_jiao_content += f'{"、".join(zi_list)}{yun} ' + f'{"" if if_ya_yun else "不"}押{yun} '
-        if '？' in yun_jiao_content or yun_jiao_content == f'{yun} 不押{yun} ':
+        if '�' in yun_jiao_content or '？' in yun_jiao_content or yun_jiao_content == f'{yun} 不押{yun} ':
             yun_jiao_content = f'不知{yun}部'  # 生僻字处理模块
         return yun_jiao_content
 

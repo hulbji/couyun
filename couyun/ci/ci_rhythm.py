@@ -148,7 +148,7 @@ class CiRhythm:
         Returns:
             分割好的字符串平仄正误列表
         """
-        conversion = {True: '〇', 'duo': '◎', False: '●', 'pi': '？'}
+        conversion = {True: '〇', 'duo': '◎', False: '●', 'pi': '�'}
         result_list = []
         ptr = 0
 
@@ -321,7 +321,10 @@ class CiRhythm:
 
         # 2. 拼装词牌名 + 降级提示（若有）
         if not self.ci_pai_name:
-            best = ci_idx['ci_num']['names_trad'][0] + '\n' + best
+            if self.is_trad:
+                best = ci_idx[int(ci_num)]['names_trad'][0] + '\n' + best
+            else:
+                best = ci_idx[int(ci_num)]['names'][0] + '\n' + best
         if warn:
             if self.is_trad:
                 warn_word = "給定格式與實際相差過大或沒有此格式，將另行匹配。\n"

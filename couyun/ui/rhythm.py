@@ -34,7 +34,7 @@ def scaled_tk_value():
     return {
         "size": [int(base_size[0] * scale), int(base_size[1] * scale)],
         "main_pady": int(133 * scale),
-        "generic_pady": [int(x * scale) for x in [120, 70, 170]],
+        "generic_pady": [int(x * scale) for x in [120, 70, 110]],
         "frame_width": [int(x * scale) for x in base_fw[0]],
         "zi_width": [int(x * scale) for x in base_fw[1]]
     }
@@ -168,16 +168,17 @@ class RhythmCheckerGUI:
 
         browser = CiPuBrowser(
             master=self.root,
-            json_path=CI_LIST / 'ci_index.json',  # Path 支持 / 运算符
+            json_path=BASE_DIR / 'ci_pu' / 'ci_list' / 'ci_index.json',
             fonts=fonts,
-            resource_path=lambda *p: Path(__file__).parent / 'assets' / Path(*p),  # 保留接口兼容
+            resource_path=lambda *p: BASE_DIR / 'ui' / 'assets' / Path(*p),
             state=current_state,
-            origin_dir=CI_ORIGIN,
-            long_dir=CI_LONG_ORIGIN,
-            origin_trad_dir=CI_TRAD,
-            long_trad_dir=CI_LONG_TRAD,
+            origin_dir=BASE_DIR / 'ci_pu' / 'ci_origin',
+            long_dir=BASE_DIR / 'ci_pu' / 'ci_long_origin',
+            origin_trad_dir=BASE_DIR / 'ci_pu' / 'ci_trad',
+            long_trad_dir=BASE_DIR / 'ci_pu' / 'ci_long_trad',
             current_state=current_state
         )
+
         # 窗口销毁时回调
         browser.protocol("WM_DELETE_WINDOW", lambda: (browser.destroy(), _done()))
 
@@ -549,6 +550,11 @@ if os.name == 'nt':
         ctypes.windll.shcore.SetProcessDpiAwareness(2)
     except (OSError, AttributeError, ctypes.ArgumentError):
         ctypes.windll.user32.SetProcessDPIAware()
+
+if getattr(sys, 'frozen', False):
+    BASE_DIR = Path(sys._MEIPASS) / 'couyun'
+else:
+    BASE_DIR = Path(__file__).resolve().parent.parent
 
 MUTEX_NAME = "RhythmChecker"
 ERROR_ALREADY_EXISTS = 183
