@@ -42,7 +42,7 @@ class CiPuBrowser(tk.Toplevel):
         self.current_item = None
         self.current_state = current_state
 
-        self.is_trad = state.get('is_traditional', False)
+        self.is_trad = state.get('is_trad', False)
 
         self.title("詞譜查詢" if self.is_trad else "词谱查询")
         base_size = [860, 645]

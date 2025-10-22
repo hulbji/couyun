@@ -98,7 +98,7 @@ class RhythmCheckerGUI:
                                  '輯麽後顯龍詢圖載準長數楡傳幹譜來誒務題類將樣單确區當間寫鶩鈕點請兩腳個關別參統湊書',
                                  '简输没标处状误里宽与为开对这选组并汉业态绝检验错无调逻块词诗转结内该体译留创识经闭择韵应钦华据号换'
                                  '辑么后显龙询图载准长数榆传干谱来诶务题类将样单确区当间写鹜钮点请两脚个关别参统凑书')
-        self.is_trad = current_state['is_traditional']
+        self.is_trad = current_state['is_trad']
 
         # 翻译/下拉框分组
         self.widgets_to_translate = []
@@ -259,6 +259,7 @@ class RhythmCheckerGUI:
         # 最后更新状态标志
         self.is_trad = to_trad
         current_state['is_trad'] = self.is_trad
+        print(current_state)
 
     def switch_background(self):
         self.bg_index = (self.bg_index + 1) % 3
