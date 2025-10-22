@@ -1,8 +1,7 @@
 import json
-from couyun.ui.paths import CI_LIST, CI_LONG
+from couyun import CI_LIST, CI_LONG, CI_INDEX
 
-idx_file = CI_LIST / 'ci_index.json'
-with idx_file.open(encoding='utf-8') as f:
+with open(CI_INDEX, 'r', encoding='utf-8') as f:
     ci_idx = json.load(f)
 
 

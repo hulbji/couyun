@@ -5,46 +5,48 @@ import ctypes
 import os
 import re
 import sys
-import time
+from time import time
+import json
 import tkinter as tk
-from pathlib import Path
 from tkinter import ttk, messagebox, font
+from PIL import Image, ImageTk
 
-from opencc import OpenCC
-
-from ci_pu_browser import CiPuBrowser
+from couyun.ui.ci_pu_browser import CiPuBrowser
 from couyun.ci.ci_rhythm import CiRhythm
 from couyun.ci.ci_search import search_ci, ci_type_extraction
-# --------------- 业务模块 ---------------
 from couyun.common.common import show_all_rhythm
 from couyun.shi.shi_rhythm import ShiRhythm
-from couyun.ui.paths import (
-    ICO_PATH, FONT_PATH, bg_pic, load_state, save_state
-)
-
-resource_path = lambda *p: Path(__file__).parent / 'assets' / Path(*p)
-current_state = load_state()
+from couyun import (CI_INDEX, ASSETS_DIR, STATE_PATH, CI_ORIGIN, CI_LONG_ORIGIN,
+                    CI_TRAD, CI_LONG_TRAD, FONT_PATH, ICO_PATH, bg_pic)
 
 
 def scaled_tk_value():
-    scale = 1.5
-    base_size = [800, 600]
-    base_fw = [[23, 44, 6, 3.3], [10, 31, 6, 3.3]]
     return {
-        "size": [int(base_size[0] * scale), int(base_size[1] * scale)],
-        "main_pady": int(133 * scale),
-        "generic_pady": [int(x * scale) for x in [120, 70, 110]],
-        "frame_width": [int(x * scale) for x in base_fw[0]],
-        "zi_width": [int(x * scale) for x in base_fw[1]]
+        "size": [1200, 900],
+        "main_pady": 200,
+        "generic_pady": [180, 105, 165],
+        "frame_width": [35, 65, 10, 5],
+        "zi_width": [15, 45, 10, 5]
     }
 
 
-def load_font(font_path: Path) -> None:
+def load_font(font_path) -> None:
     ctypes.windll.gdi32.AddFontResourceW(str(font_path))
 
 
-def unload_font(font_path: Path) -> None:
+def unload_font(font_path) -> None:
     ctypes.windll.gdi32.RemoveFontResourceW(str(font_path))
+
+
+def load_state() -> dict:
+    if os.path.isfile(STATE_PATH):
+        with open(STATE_PATH, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return {'is_traditional': False, 'yun_shu': 1, 'ci_pu': 1, 'bg_index': 0}
+
+def save_state(state: dict) -> None:
+    with open(STATE_PATH, 'w', encoding='utf-8') as f:
+        json.dump(state, f, ensure_ascii=False, indent=4)
 
 
 def extract_chinese(text: str, comma_remain=False) -> str:
@@ -62,8 +64,6 @@ def extract_chinese(text: str, comma_remain=False) -> str:
 
 def load_background_image(image_path):
     """加载并调整背景图片大小"""
-    from PIL import Image, ImageTk
-
     image = Image.open(image_path)
     image = image.resize(size_tuple, Image.Resampling.LANCZOS)
     return ImageTk.PhotoImage(image)
@@ -78,7 +78,6 @@ def settings(mode):
 
 def on_close(state):
     """关闭窗口时的行为，卸载字体。将新状态写入json文件。"""
-    from couyun.ui.paths import FONT_PATH
     unload_font(FONT_PATH)
     save_state(state)
     root.destroy()
@@ -91,9 +90,15 @@ class RhythmCheckerGUI:
 
         self.yunshu_var = None
         self.cipu_var = None
-        self.opencc_s2t = OpenCC('s2t')
-        self.opencc_t2s = OpenCC('t2s')
-        self.is_traditional = current_state['is_traditional']
+        self.s2t = str.maketrans('简输没标处状误里宽与为开对这选组并汉业态绝检验错无调逻块词诗转结内该体译留创识经闭择韵应钦华据号换'
+                                 '辑么后显龙询图载准长数榆传干谱来诶务题类将样单确区当间写鹜钮点请两脚个关别参统凑书',
+                                 '簡輸沒標處狀誤裏寛與為開對這選組幷漢業態絶檢驗錯無調邏塊詞詩轉結內該體譯畱創識經閉擇韻應欽華據號換'
+                                 '輯麽後顯龍詢圖載準長數楡傳幹譜來誒務題類將樣單确區當間寫鶩鈕點請兩腳個關別參統湊書')
+        self.t2s = str.maketrans('簡輸沒標處狀誤裏寛與為開對這選組幷漢業態絶檢驗錯無調邏塊詞詩轉結內該體譯畱創識經閉擇韻應欽華據號換'
+                                 '輯麽後顯龍詢圖載準長數楡傳幹譜來誒務題類將樣單确區當間寫鶩鈕點請兩腳個關別參統湊書',
+                                 '简输没标处状误里宽与为开对这选组并汉业态绝检验错无调逻块词诗转结内该体译留创识经闭择韵应钦华据号换'
+                                 '辑么后显龙询图载准长数榆传干谱来诶务题类将样单确区当间写鹜钮点请两脚个关别参统凑书')
+        self.is_trad = current_state['is_traditional']
 
         # 翻译/下拉框分组
         self.widgets_to_translate = []
@@ -105,7 +110,7 @@ class RhythmCheckerGUI:
         self.ci_pu_map = {1: '钦定词谱', 2: '龙榆生词谱'}
         self.yunshu_reverse_map = {'词林正韵': 1, "平水韵": 1, "中华新韵": 2, "中华通韵": 3,
                                    '詞林正韻': 1, "平水韻": 1, "中華新韻": 2, "中華通韻": 3}
-        self.ci_pu_reverse_map = {'钦定词谱': 1, "龙榆生词谱": 2, '欽定詞譜': 1, "龍榆生詞譜": 2}
+        self.ci_pu_reverse_map = {'钦定词谱': 1, "龙榆生词谱": 2, '欽定詞譜': 1, "龍楡生詞譜": 2}
         self.current_yun_shu = current_state['yun_shu']
         self.current_ci_pu = current_state['ci_pu']
 
@@ -120,7 +125,7 @@ class RhythmCheckerGUI:
         self.root = roots
         self.root.iconbitmap(ICO_PATH)
         self.root.resizable(width=False, height=False)
-        self.root.title("湊韻" if self.is_traditional else "凑韵")
+        self.root.title("湊韻" if self.is_trad else "凑韵")
         self.root.geometry(size_string)
 
         self.bg_images = ["ei.jpg", "ei_2.jpg", "ei_3.jpg"]
@@ -129,13 +134,13 @@ class RhythmCheckerGUI:
         self.background_label = tk.Label(self.root, image=self.background_image)
         self.background_label.place(relwidth=1, relheight=1)
 
-        self.cover_button = tk.Button(self.root, text='切換封面' if self.is_traditional else "切换封面",
+        self.cover_button = tk.Button(self.root, text='切換封面' if self.is_trad else "切换封面",
                                       command=self.switch_background, font=self.small_font)
         self.cover_button.place(relx=0.01, rely=0.99, anchor='sw')
-        self.toggle_button = tk.Button(self.root, text='简体' if self.is_traditional else "繁體",
+        self.toggle_button = tk.Button(self.root, text='简体' if self.is_trad else "繁體",
                                        command=self.toggle_language, font=self.small_font)
         self.toggle_button.place(relx=0.99, rely=0.99, anchor='se')
-        self.ci_pu_button = tk.Button(self.root, text='詞譜查詢' if self.is_traditional else "词谱查询",
+        self.ci_pu_button = tk.Button(self.root, text='詞譜查詢' if self.is_trad else "词谱查询",
                                       command=self.open_cipu_browser, font=self.small_font)
         self.ci_pu_button.place(relx=0.5, rely=0.99, anchor='s')
         self.version_label = tk.Label(self.root, text=self.edition, font=self.small_font)
@@ -149,9 +154,9 @@ class RhythmCheckerGUI:
 
         self.create_main_interface()
 
-    def cc_convert(self, text, to_traditional: bool):
+    def cc_convert(self, text, to_trad: bool):
         """根据目标模式转换文本"""
-        return self.opencc_s2t.convert(text) if to_traditional else self.opencc_t2s.convert(text)
+        return text.translate(self.s2t) if to_trad else text.translate(self.t2s)
 
     def open_cipu_browser(self):
         if getattr(self, '_opening_cipu', False):
@@ -167,18 +172,16 @@ class RhythmCheckerGUI:
 
         browser = CiPuBrowser(
             master=self.root,
-            json_path=BASE_DIR / 'ci_pu' / 'ci_list' / 'ci_index.json',
+            json_path=CI_INDEX,
             fonts=fonts,
-            resource_path=lambda *p: BASE_DIR / 'ui' / 'assets' / Path(*p),
+            resource_path = lambda *p: os.path.abspath(os.path.join(ASSETS_DIR, *p)),
             state=current_state,
-            origin_dir=BASE_DIR / 'ci_pu' / 'ci_origin',
-            long_dir=BASE_DIR / 'ci_pu' / 'ci_long_origin',
-            origin_trad_dir=BASE_DIR / 'ci_pu' / 'ci_trad',
-            long_trad_dir=BASE_DIR / 'ci_pu' / 'ci_long_trad',
+            origin_dir=CI_ORIGIN,
+            long_dir=CI_LONG_ORIGIN,
+            origin_trad_dir=CI_TRAD,
+            long_trad_dir=CI_LONG_TRAD,
             current_state=current_state
         )
-
-        # 窗口销毁时回调
         browser.protocol("WM_DELETE_WINDOW", lambda: (browser.destroy(), _done()))
 
 
@@ -186,7 +189,7 @@ class RhythmCheckerGUI:
         """统一处理简繁切换下拉框"""
         for cb in boxes:
             if to_traditional:
-                trad_map = {k: self.opencc_s2t.convert(v) for k, v in single_map.items()}
+                trad_map = {k: v.translate(self.s2t) for k, v in single_map.items()}
                 cb['values'] = [trad_map[k] for k in sorted(trad_map)]
                 cb.set(trad_map[current])
             else:
@@ -196,10 +199,10 @@ class RhythmCheckerGUI:
     def translate_new_widgets(self, start_widgets, start_yun, start_ci):
         """新界面创建后，若当前是繁体模式，立即翻译新增控件和下拉框"""
         # 只在当前已经是繁体时才做转换
-        if not self.is_traditional:
+        if not self.is_trad:
             return
         for w in self.widgets_to_translate[start_widgets:]:
-            w.config(text=self.opencc_s2t.convert(w.cget('text')))
+            w.config(text=w.cget('text').translate(self.s2t))
         # 只把新增的下拉框翻译（传入起始索引）
         self.box_toggle(self.yun_shu_boxes[start_yun:], self.yun_shu_map, self.current_yun_shu, True)
         self.box_toggle(self.cipu_boxes[start_ci:], self.ci_pu_map, self.current_ci_pu, True)
@@ -220,12 +223,11 @@ class RhythmCheckerGUI:
         ot.insert(tk.END, res)
         ot.config(state=tk.DISABLED)
 
-    # -----------------------------------------------
 
     def my_warn(self, title, msg):
-        if self.is_traditional:
-            title = self.opencc_s2t.convert(title)
-            msg = self.opencc_s2t.convert(msg)
+        if self.is_trad:
+            title = title.translate(self.s2t)
+            msg = msg.translate(self.s2t)
         messagebox.showwarning(title, msg)
 
     def register(self, widget):
@@ -234,7 +236,7 @@ class RhythmCheckerGUI:
 
     def toggle_language(self):
         """在简体和繁体之间切换（注意：使用目标模式来渲染）"""
-        to_trad = not self.is_traditional  # 目标模式
+        to_trad = not self.is_trad  # 目标模式
         for widget in self.widgets_to_translate:
             orig = widget.cget('text')
             new = self.cc_convert(orig, to_trad)
@@ -245,18 +247,18 @@ class RhythmCheckerGUI:
         self.box_toggle(self.cipu_boxes, self.ci_pu_map, self.current_ci_pu, to_trad)
 
         # 按钮/标题文本（保留原来显示逻辑）
-        btn_text = '繁體' if self.is_traditional else '简体'
+        btn_text = '繁體' if self.is_trad else '简体'
         self.toggle_button.config(text=btn_text)
-        change_text = '切换封面' if self.is_traditional else '切換封面'
+        change_text = '切换封面' if self.is_trad else '切換封面'
         self.cover_button.config(text=change_text)
-        cipu_text = '词谱查询' if self.is_traditional else '詞譜查詢'
+        cipu_text = '词谱查询' if self.is_trad else '詞譜查詢'
         self.ci_pu_button.config(text=cipu_text)
-        title_text = '凑韵' if self.is_traditional else '湊韻'
+        title_text = '凑韵' if self.is_trad else '湊韻'
         self.root.title(title_text)
 
         # 最后更新状态标志
-        self.is_traditional = to_trad
-        current_state['is_traditional'] = self.is_traditional
+        self.is_trad = to_trad
+        current_state['is_trad'] = self.is_trad
 
     def switch_background(self):
         self.bg_index = (self.bg_index + 1) % 3
@@ -268,7 +270,7 @@ class RhythmCheckerGUI:
         self.main_interface = ttk.Frame(self.root)
         self.main_interface.pack(pady=tk_value['main_pady'])
 
-        label = '湊韻詩詞格律校驗工具' if self.is_traditional else "凑韵诗词格律校验工具"
+        label = '湊韻詩詞格律校驗工具' if self.is_trad else "凑韵诗词格律校验工具"
         title_label = ttk.Label(self.main_interface, text=label, font=self.bigger_font)
         title_label.pack(pady=10)
         self.register(title_label)
@@ -276,12 +278,12 @@ class RhythmCheckerGUI:
         frame = ttk.Frame(self.main_interface)
         frame.pack(pady=10)
 
-        poem_button = tk.Button(frame, text="詩校驗" if self.is_traditional else "诗校验",
+        poem_button = tk.Button(frame, text="詩校驗" if self.is_trad else "诗校验",
                                 command=self.open_poem_interface, font=self.default_font, bg=self.my_purple, width=20)
         poem_button.pack(side=tk.TOP, padx=5, pady=10)
         self.register(poem_button)
 
-        ci_button = tk.Button(frame, text="詞校驗" if self.is_traditional else "词校验",
+        ci_button = tk.Button(frame, text="詞校驗" if self.is_trad else "词校验",
                               command=self.open_ci_interface, font=self.default_font, bg=self.my_purple, width=20)
         ci_button.pack(side=tk.TOP, padx=5, pady=10)
         self.register(ci_button)
@@ -307,7 +309,6 @@ class RhythmCheckerGUI:
 
         if mode != 's':
             if mode == 'c':
-                # 词模式下第1项为词林正韵
                 self.yun_shu_map[1] = '词林正韵'
             else:
                 self.yun_shu_map[1] = '平水韵'
@@ -347,8 +348,9 @@ class RhythmCheckerGUI:
 
             pf = ttk.Frame(generic)
             pf.pack(pady=5, anchor=tk.W)
-            ttk.Label(pf, text="选择词谱:", font=self.default_font).pack(side=tk.LEFT, padx=5)
-
+            fl3 = ttk.Label(pf, text="选择词谱:", font=self.default_font)
+            fl3.pack(side=tk.LEFT, padx=5)
+            self.register(fl3)
             self.cipu_var = tk.StringVar(value=self.ci_pu_map[self.current_ci_pu])
             cb_cipu = ttk.Combobox(pf, textvariable=self.cipu_var,
                                    values=[self.ci_pu_map[k] for k in sorted(self.ci_pu_map)],
@@ -428,7 +430,7 @@ class RhythmCheckerGUI:
         if int(ci_form) > all_length:
             self.my_warn("找茬是吧？", "不存在此格式！")
             return
-        if self.is_traditional:
+        if self.is_trad:
             sample_ci = all_types[int(ci_form) - 1]['origin_trad']
         else:
             sample_ci = all_types[int(ci_form) - 1]['origin']
@@ -472,7 +474,7 @@ class RhythmCheckerGUI:
 
     def check_poem(self, it, ot):
         text = it.get("1.0", tk.END).strip()
-        start_time = time.time()
+        start_time = time()
         if not text:
             self.my_warn("找茬是吧？", "请输入需要校验的诗！")
             return
@@ -484,15 +486,15 @@ class RhythmCheckerGUI:
             it.delete("1.0", tk.END)
             it.insert(tk.END, processed)
             return
-        process = ShiRhythm(self.current_yun_shu, processed, processed_comma, self.is_traditional)
+        process = ShiRhythm(self.current_yun_shu, processed, processed_comma, self.is_trad)
         res = process.main_shi()
         msgs = {1: '一句的长短不符合律诗的标准！请检查标点及字数。',
                 2: '你输入的每一个韵脚都不在韵书里面诶，我没法分析的！'}
         if res in msgs:
             self.my_warn("怎么回事？", msgs[res])
             return
-        end_time = time.time()
-        if self.is_traditional:
+        end_time = time()
+        if self.is_trad:
             time_result = f'檢測完畢，耗時{end_time - start_time:.5f}s\n'
         else:
             time_result = f'检测完毕，耗时{end_time - start_time:.5f}s\n'
@@ -503,7 +505,7 @@ class RhythmCheckerGUI:
 
     def check_ci(self, it, ot):
         text = it.get("1.0", tk.END).strip()
-        start_time = time.time()
+        start_time = time()
         if not text:
             self.my_warn("找茬是吧？", "请输入需要校验的词！")
             return
@@ -512,7 +514,7 @@ class RhythmCheckerGUI:
         proc_with_comma = extract_chinese(text, comma_remain=True)
         length = len(proc)
         process = CiRhythm(self.current_yun_shu, cp, proc, proc_with_comma, fm,
-                           self.current_ci_pu, self.is_traditional)
+                           self.current_ci_pu, self.is_trad)
         res = process.main_ci()
         msgs = {0: "不能找到你输入的词牌！", 1: f"格式与输入词牌不匹配，可能有不能识别的生僻字，你输入了{length}字！",
                 2: "格式数字错误！", 3: f"输入的内容无法匹配已有的词牌，请检查内容或将词谱更换为钦谱，你输入了{length}字",
@@ -520,8 +522,8 @@ class RhythmCheckerGUI:
         if res in msgs:
             self.my_warn("要不检查下？", msgs[res])
             return
-        end_time = time.time()
-        if self.is_traditional:
+        end_time = time()
+        if self.is_trad:
             time_result = f'檢測完畢，耗時{end_time - start_time:.5f}s\n\n'
         else:
             time_result = f'检测完毕，耗时{end_time - start_time:.5f}s\n\n'
@@ -541,7 +543,7 @@ class RhythmCheckerGUI:
         if not re.match(r'[\u4e00-\u9fff\u3400-\u4dbf\u3007\u2642\U00020000-\U0002A6DF]', text):
             self.my_warn("你在干嘛呢？", "非汉字或超出区段（基本区及拓展A、B区）")
             return
-        res = show_all_rhythm(text, self.is_traditional)
+        res = show_all_rhythm(text, self.is_trad)
         self.display_result(ot, res, 's')
 
 if os.name == 'nt':
@@ -550,11 +552,7 @@ if os.name == 'nt':
     except (OSError, AttributeError, ctypes.ArgumentError):
         ctypes.windll.user32.SetProcessDPIAware()
 
-if getattr(sys, 'frozen', False):
-    BASE_DIR = Path(sys._MEIPASS) / 'couyun'
-else:
-    BASE_DIR = Path(__file__).resolve().parent.parent
-
+current_state = load_state()
 MUTEX_NAME = "RhythmChecker"
 ERROR_ALREADY_EXISTS = 183
 kernel32 = ctypes.windll.kernel32

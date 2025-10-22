@@ -7,3 +7,4 @@ build/
 dist/
 file_version.txt
 README.pdf
+build_nuikta.py

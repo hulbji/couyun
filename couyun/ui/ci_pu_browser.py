@@ -219,10 +219,7 @@ class CiPuBrowser(tk.Toplevel):
 
         self.result_box.pack_forget()
         self.result_box.delete(0, tk.END)
-        batch = 200
-        for i in range(0, len(displays), batch):
-            self.result_box.insert(tk.END, *displays[i:i + batch])
-            self.result_box.update_idletasks()
+        self.result_box.insert(tk.END, *displays)
         self.result_box.update_idletasks()
         self.result_box.pack(fill='both', expand=True)
 
