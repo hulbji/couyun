@@ -36,6 +36,6 @@ def ci_type_extraction(ci_number: str | int, ci_pu: int) -> list[dict]:
     """
     base = CI_LIST if ci_pu == 1 else CI_LONG
     last = '' if ci_pu == 1 else '_long'
-    file_path = base / f'cipai_{ci_number}{last}.json'
-    with file_path.open('r', encoding='utf-8') as file:
+    file_path = f'{base}\\cipai_{ci_number}{last}.json'
+    with open(file_path, 'r', encoding='utf-8') as file:
         return json.load(file)
