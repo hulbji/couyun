@@ -306,8 +306,8 @@
             "回波乐"
         ],
         "pinyins": [
-            "huibole",
-            "hbl"
+            "huiboyue",
+            "hby"
         ],
         "display_s": "回波乐　　　　　单调　24 　平 仄",
         "display_t": "回波樂　　　　　單調　24 　平 仄",
@@ -319,7 +319,7 @@
                 "仄"
             ]
         ],
-        "full": "huibole",
+        "full": "huiboyue",
         "names_trad": [
             "回波樂"
         ],
@@ -551,10 +551,10 @@
             "渔父乐"
         ],
         "pinyins": [
-            "yufule",
+            "yufuyue",
             "yf",
             "ygz",
-            "yfl",
+            "yfy",
             "yugezi",
             "yufu"
         ],
@@ -1198,8 +1198,8 @@
             "抛毬乐"
         ],
         "pinyins": [
-            "pql",
-            "paoqiule"
+            "pqy",
+            "paoqiuyue"
         ],
         "display_s": "抛毬乐　　　　　单调　30 　平 仄",
         "display_t": "拋毬樂　　　　　單調　30 　平 仄",
@@ -1211,7 +1211,7 @@
                 "仄"
             ]
         ],
-        "full": "paoqiule",
+        "full": "paoqiuyue",
         "names_trad": [
             "拋毬樂"
         ],
@@ -2188,8 +2188,8 @@
             "中兴乐"
         ],
         "pinyins": [
-            "zhongxingle",
-            "zxl"
+            "zhongxingyue",
+            "zxy"
         ],
         "display_s": "中兴乐　　　　　双调　41 　平 换",
         "display_t": "中興樂　　　　　雙調　41 　平 換",
@@ -2201,7 +2201,7 @@
                 "换"
             ]
         ],
-        "full": "zhongxingle",
+        "full": "zhongxingye",
         "names_trad": [
             "中興樂"
         ],
@@ -2285,8 +2285,8 @@
             "平湖乐"
         ],
         "pinyins": [
-            "pinghule",
-            "phl"
+            "pinghuyue",
+            "phy"
         ],
         "display_s": "平湖乐　　　　　双调　42 　叶",
         "display_t": "平湖樂　　　　　雙調　42 　叶",
@@ -2297,7 +2297,7 @@
                 "叶"
             ]
         ],
-        "full": "pinghule",
+        "full": "pinghuyue",
         "names_trad": [
             "平湖樂"
         ],
@@ -3125,8 +3125,8 @@
             "清平乐"
         ],
         "pinyins": [
-            "qingpingle",
-            "qpl"
+            "qingpingyue",
+            "qpy"
         ],
         "display_s": "清平乐　　　　　双调　46 　仄 换",
         "display_t": "清平樂　　　　　雙調　46 　仄 換",
@@ -3138,7 +3138,7 @@
                 "换"
             ]
         ],
-        "full": "qingpingle",
+        "full": "qingpingyue",
         "names_trad": [
             "清平樂"
         ],
@@ -4807,8 +4807,8 @@
             "归田乐"
         ],
         "pinyins": [
-            "gtl",
-            "guitianle"
+            "gty",
+            "guitianyue"
         ],
         "display_s": "归田乐　　　　　双调　50 　仄",
         "display_t": "歸田樂　　　　　雙調　50 　仄",
@@ -4819,7 +4819,7 @@
                 "仄"
             ]
         ],
-        "full": "guitianle",
+        "full": "guitianyue",
         "names_trad": [
             "歸田樂"
         ],
@@ -5384,8 +5384,8 @@
             "迎春乐"
         ],
         "pinyins": [
-            "ycl",
-            "yingchunle"
+            "ycy",
+            "yingchunyue"
         ],
         "display_s": "迎春乐　　　　　双调　52 　仄",
         "display_t": "迎春樂　　　　　雙調　52 　仄",
@@ -5396,7 +5396,7 @@
                 "仄"
             ]
         ],
-        "full": "yingchunle",
+        "full": "yingchunyue",
         "names_trad": [
             "迎春樂"
         ],
@@ -6157,8 +6157,8 @@
             "天下乐"
         ],
         "pinyins": [
-            "txl",
-            "tianxiale"
+            "txy",
+            "tianxiayue"
         ],
         "display_s": "天下乐　　　　　双调　54 　仄",
         "display_t": "天下樂　　　　　雙調　54 　仄",
@@ -6169,7 +6169,7 @@
                 "仄"
             ]
         ],
-        "full": "tianxiale",
+        "full": "tianxiayue",
         "names_trad": [
             "天下樂"
         ],
@@ -6794,8 +6794,8 @@
             "思归乐"
         ],
         "pinyins": [
-            "siguile",
-            "sgl"
+            "siguiyue",
+            "sgy"
         ],
         "display_s": "思归乐　　　　　双调　56 　仄",
         "display_t": "思歸樂　　　　　雙調　56 　仄",
@@ -6806,7 +6806,7 @@
                 "仄"
             ]
         ],
-        "full": "siguile",
+        "full": "siguiyue",
         "names_trad": [
             "思歸樂"
         ],
@@ -8218,8 +8218,8 @@
             "黄钟乐"
         ],
         "pinyins": [
-            "hzl",
-            "huangzhongle"
+            "hzy",
+            "huangzhongyue"
         ],
         "display_s": "黄钟乐　　　　　双调　64 　平",
         "display_t": "黃鐘樂　　　　　雙調　64 　平",
@@ -8230,7 +8230,7 @@
                 "平"
             ]
         ],
-        "full": "huangzhongle",
+        "full": "huangzhongyue",
         "names_trad": [
             "黃鐘樂"
         ],
@@ -9157,8 +9157,8 @@
             "三登乐"
         ],
         "pinyins": [
-            "sdl",
-            "sandengle"
+            "sdy",
+            "sandengyue"
         ],
         "display_s": "三登乐　　　　　双调　71 　仄",
         "display_t": "三登樂　　　　　雙調　71 　仄",
@@ -9253,8 +9253,8 @@
             "于飞乐"
         ],
         "pinyins": [
-            "yfl",
-            "yufeile"
+            "yfy",
+            "yufeiyue"
         ],
         "display_s": "于飞乐　　　　　双调　72 　平",
         "display_t": "于飛樂　　　　　雙調　72 　平",
@@ -9265,7 +9265,7 @@
                 "平"
             ]
         ],
-        "full": "yufeile",
+        "full": "yufeiyue",
         "names_trad": [
             "于飛樂"
         ],
@@ -9639,8 +9639,8 @@
             "长生乐"
         ],
         "pinyins": [
-            "csl",
-            "changshengle"
+            "csy",
+            "changshengyue"
         ],
         "display_s": "长生乐　　　　　双调　75 　平",
         "display_t": "長生樂　　　　　雙調　75 　平",
@@ -9651,7 +9651,7 @@
                 "平"
             ]
         ],
-        "full": "changshengle",
+        "full": "changshengyue",
         "names_trad": [
             "長生樂"
         ],
@@ -10385,8 +10385,8 @@
             "应景乐"
         ],
         "pinyins": [
-            "yjl",
-            "yingjingle"
+            "yjy",
+            "yingjingyue"
         ],
         "display_s": "应景乐　　　　　双调　80 　仄",
         "display_t": "應景樂　　　　　雙調　80 　仄",
@@ -10397,7 +10397,7 @@
                 "仄"
             ]
         ],
-        "full": "yingjingle",
+        "full": "yingjingyue",
         "names_trad": [
             "應景樂"
         ],
@@ -10772,8 +10772,8 @@
             "长寿乐"
         ],
         "pinyins": [
-            "csl",
-            "changshoule"
+            "csy",
+            "changshouyue"
         ],
         "display_s": "长寿乐　　　　　双调　83 　仄",
         "display_t": "長壽樂　　　　　雙調　83 　仄",
@@ -10784,7 +10784,7 @@
                 "仄"
             ]
         ],
-        "full": "changshoule",
+        "full": "changshouyue",
         "names_trad": [
             "長壽樂"
         ],
@@ -12316,8 +12316,8 @@
             "保寿乐"
         ],
         "pinyins": [
-            "bsl",
-            "baoshoule"
+            "bsy",
+            "baoshouyue"
         ],
         "display_s": "保寿乐　　　　　双调　94 　仄",
         "display_t": "保壽樂　　　　　雙調　94 　仄",
@@ -12328,7 +12328,7 @@
                 "仄"
             ]
         ],
-        "full": "baoshoule",
+        "full": "baoshouyue",
         "names_trad": [
             "保壽樂"
         ],
@@ -12728,8 +12728,8 @@
             "小圣乐"
         ],
         "pinyins": [
-            "xiaoshengle",
-            "xsl"
+            "xiaoshengyue",
+            "xsy"
         ],
         "display_s": "小圣乐　　　　　双调　95 　叶",
         "display_t": "小聖樂　　　　　雙調　95 　叶",
@@ -12740,7 +12740,7 @@
                 "叶"
             ]
         ],
-        "full": "xiaoshengle",
+        "full": "xiaoshengyue",
         "names_trad": [
             "小聖樂"
         ],
@@ -13754,8 +13754,8 @@
             "昼夜乐"
         ],
         "pinyins": [
-            "zyl",
-            "zhouyele"
+            "zyy",
+            "zhouyeyue"
         ],
         "display_s": "昼夜乐　　　　　双调　98 　仄",
         "display_t": "晝夜樂　　　　　雙調　98 　仄",
@@ -13766,7 +13766,7 @@
                 "仄"
             ]
         ],
-        "full": "zhouyele",
+        "full": "zhouyeyue",
         "names_trad": [
             "晝夜樂"
         ],
@@ -13853,8 +13853,8 @@
             "逍遥乐"
         ],
         "pinyins": [
-            "xiaoyaole",
-            "xyl"
+            "xiaoyaoyue",
+            "xyy"
         ],
         "display_s": "逍遥乐　　　　　双调　98 　仄",
         "display_t": "逍遙樂　　　　　雙調　98 　仄",
@@ -13865,7 +13865,7 @@
                 "仄"
             ]
         ],
-        "full": "xiaoyaole",
+        "full": "xiaoyaoyue",
         "names_trad": [
             "逍遙樂"
         ],
@@ -14309,8 +14309,8 @@
             "三部乐"
         ],
         "pinyins": [
-            "sanbule",
-            "sbl"
+            "sanbuyue",
+            "sby"
         ],
         "display_s": "三部乐　　　　　双调　99 　仄",
         "display_t": "三部樂　　　　　雙調　99 　仄",
@@ -14321,7 +14321,7 @@
                 "仄"
             ]
         ],
-        "full": "sanbule",
+        "full": "sanbuyue",
         "names_trad": [
             "三部樂"
         ],
@@ -15932,8 +15932,8 @@
             "西平乐"
         ],
         "pinyins": [
-            "xpl",
-            "xipingle"
+            "xpy",
+            "xipingyue"
         ],
         "display_s": "西平乐　　　　　双调　102　平 仄",
         "display_t": "西平樂　　　　　雙調　102　平 仄",
@@ -15945,7 +15945,7 @@
                 "仄"
             ]
         ],
-        "full": "xipingle",
+        "full": "xipingyue",
         "names_trad": [
             "西平樂"
         ],
@@ -16248,8 +16248,8 @@
             "齐天乐"
         ],
         "pinyins": [
-            "qtl",
-            "qitianle"
+            "qty",
+            "qitianyue"
         ],
         "display_s": "齐天乐　　　　　双调　102　仄",
         "display_t": "齊天樂　　　　　雙調　102　仄",
@@ -16260,7 +16260,7 @@
                 "仄"
             ]
         ],
-        "full": "qitianle",
+        "full": "qitianyue",
         "names_trad": [
             "齊天樂"
         ],
@@ -16514,8 +16514,8 @@
             "还京乐"
         ],
         "pinyins": [
-            "haijingle",
-            "hjl"
+            "haijingyue",
+            "hjy"
         ],
         "display_s": "还京乐　　　　　双调　103　仄",
         "display_t": "還京樂　　　　　雙調　103　仄",
@@ -16526,7 +16526,7 @@
                 "仄"
             ]
         ],
-        "full": "haijingle",
+        "full": "haijingyue",
         "names_trad": [
             "還京樂"
         ],
@@ -16587,8 +16587,8 @@
             "安平乐慢"
         ],
         "pinyins": [
-            "aplm",
-            "anpingleman"
+            "apym",
+            "anpingyueman"
         ],
         "display_s": "安平乐慢　　　　双调　103　平",
         "display_t": "安平樂慢　　　　雙調　103　平",
@@ -16599,7 +16599,7 @@
                 "平"
             ]
         ],
-        "full": "anpingleman",
+        "full": "anpingyueman",
         "names_trad": [
             "安平樂慢"
         ],
@@ -16852,8 +16852,8 @@
             "升平乐"
         ],
         "pinyins": [
-            "shengpingle",
-            "spl"
+            "shengpingyue",
+            "spy"
         ],
         "display_s": "升平乐　　　　　双调　103　平",
         "display_t": "昇平樂　　　　　雙調　103　平",
@@ -16864,7 +16864,7 @@
                 "平"
             ]
         ],
-        "full": "shengpingle",
+        "full": "shengpingyue",
         "names_trad": [
             "昇平樂"
         ],
@@ -16948,8 +16948,8 @@
             "永遇乐"
         ],
         "pinyins": [
-            "yongyule",
-            "yyl"
+            "yongyuyue",
+            "yyy"
         ],
         "display_s": "永遇乐　　　　　双调　104　平 仄",
         "display_t": "永遇樂　　　　　雙調　104　平 仄",
@@ -16961,7 +16961,7 @@
                 "仄"
             ]
         ],
-        "full": "yongyule",
+        "full": "yongyuyue",
         "names_trad": [
             "永遇樂"
         ],
@@ -16997,8 +16997,8 @@
             "倾杯乐"
         ],
         "pinyins": [
-            "qbl",
-            "qingbeile"
+            "qby",
+            "qingbeiyue"
         ],
         "display_s": "倾杯乐　　　　　双调　104　仄",
         "display_t": "傾杯樂　　　　　雙調　104　仄",
@@ -17009,7 +17009,7 @@
                 "仄"
             ]
         ],
-        "full": "qingbeile",
+        "full": "qingbeiyue",
         "names_trad": [
             "傾杯樂"
         ],
@@ -17865,8 +17865,8 @@
             "征部乐"
         ],
         "pinyins": [
-            "zbl",
-            "zhengbule"
+            "zby",
+            "zhengbuyue"
         ],
         "display_s": "征部乐　　　　　双调　106　仄",
         "display_t": "徵部樂　　　　　雙調　106　仄",
@@ -17877,7 +17877,7 @@
                 "仄"
             ]
         ],
-        "full": "zhengbule",
+        "full": "zhengbuyue",
         "names_trad": [
             "徵部樂"
         ],
@@ -18615,8 +18615,8 @@
             "大圣乐"
         ],
         "pinyins": [
-            "dsl",
-            "dashengle"
+            "dsy",
+            "dashengyue"
         ],
         "display_s": "大圣乐　　　　　双调　110　仄 叶",
         "display_t": "大聖樂　　　　　雙調　110　仄 叶",
@@ -18628,7 +18628,7 @@
                 "叶"
             ]
         ],
-        "full": "dashengle",
+        "full": "dashengyue",
         "names_trad": [
             "大聖樂"
         ],
@@ -19360,8 +19360,8 @@
             "破阵乐"
         ],
         "pinyins": [
-            "pzl",
-            "pozhenle"
+            "pzy",
+            "pozhenyue"
         ],
         "display_s": "破阵乐　　　　　双调　133　仄",
         "display_t": "破陣樂　　　　　雙調　133　仄",
@@ -19372,7 +19372,7 @@
                 "仄"
             ]
         ],
-        "full": "pozhenle",
+        "full": "pozhenyue",
         "names_trad": [
             "破陣樂"
         ],
@@ -19579,8 +19579,8 @@
             "夜半乐"
         ],
         "pinyins": [
-            "yebanle",
-            "ybl"
+            "yebanyue",
+            "yby"
         ],
         "display_s": "夜半乐　　　　　三段　144　仄",
         "display_t": "夜半樂　　　　　三段　144　仄",
@@ -19591,7 +19591,7 @@
                 "仄"
             ]
         ],
-        "full": "yebanle",
+        "full": "yebanyue",
         "names_trad": [
             "夜半樂"
         ],

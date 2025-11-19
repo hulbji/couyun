@@ -3,7 +3,26 @@ import os
 import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
+import logging
+import traceback
 
+ci_pu_logger = logging.getLogger("RhythmChecker.CiPuBrowser")
+ci_pu_logger.setLevel(logging.INFO)
+
+
+def log_ci_exceptions(func):
+    """记录词谱浏览器操作的装饰器"""
+    def _cipu_browser(self, *args, **kwargs):
+        func_name = func.__name__
+        try:
+            result = func(self, *args, **kwargs)
+            ci_pu_logger.info(f"【{func_name}】正常完成")
+            return result
+        except Exception as e:
+            ci_pu_logger.error(f"【{func_name}】发生异常: {str(e)}")
+            ci_pu_logger.error(traceback.format_exc())
+            raise
+    return _cipu_browser
 
 def load_ci_index(json_path):
     """读取列表形式的 ci_index（每项为 {'name': [...], 'type': [...] }）"""
@@ -132,6 +151,7 @@ class CiPuBrowser(tk.Toplevel):
         text_area.insert(tk.END, raw_text)
         text_area.config(state=tk.DISABLED)
 
+    @log_ci_exceptions
     def toggle_lang(self):
         """翻转简繁状态并全局刷新：主界面 + 详情页（若已打开）"""
         # t0 = time.perf_counter()
@@ -171,12 +191,14 @@ class CiPuBrowser(tk.Toplevel):
         return ["排序:拼音", "排序:字數", "排序:類型"][self.sort_mode] if self.is_trad else \
         ["排序:拼音", "排序:字数", "排序:类型"][self.sort_mode]
 
+    @log_ci_exceptions
     def toggle_sort(self):
         self.sort_mode = (self.sort_mode + 1) % 3
         self.current_state['sort_mode'] = self.sort_mode
         self.sort_btn.config(text=self.sort_label())
         self.update_list()
 
+    @log_ci_exceptions
     def update_list(self, _=None):
         # t0 = time.perf_counter()
         key = self.search_var.get().strip().lower()
@@ -243,7 +265,6 @@ class CiPuBrowser(tk.Toplevel):
         except FileNotFoundError:
             return None
 
-    # ---------- 拆分后的三个函数 ----------
     def load_ci_files(self, item):
         """
         根据 idx 一次性把 4 个文件读出来，返回 dict。
@@ -268,6 +289,7 @@ class CiPuBrowser(tk.Toplevel):
         raw = self.long_raw_t if self.is_trad else self.long_raw_s
         self.show_ci_pu(self.detail_text, raw)
 
+    @log_ci_exceptions
     def show_detail_body(self, detail, text_area, btn_frame, files_dict):
         """
         根据已读到的文件内容，完成：
@@ -307,6 +329,7 @@ class CiPuBrowser(tk.Toplevel):
         # 把 detail 保存到实例变量，方便返回按钮销毁
         self.detail_frame = detail
 
+    @log_ci_exceptions
     def show_detail(self, item):
         """原函数只保留界面骨架，逻辑部分通过上面两个新函数完成。"""
         # t0 = time.perf_counter()
@@ -350,7 +373,7 @@ class CiPuBrowser(tk.Toplevel):
         # t1 = time.perf_counter()
         # print(f"[show_detail] time {t1 - t0:.3f}s")
 
-    # ---------------- 返回主列表 ----------------
+    @log_ci_exceptions
     def back_to_main(self):
         if hasattr(self, 'detail_frame'):
             self.qin_btn = None

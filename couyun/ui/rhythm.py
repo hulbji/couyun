@@ -2,22 +2,63 @@
 凑韵诗词格律检测工具主体tk模块，支持简体/繁体切换，使用方法请参照README文件。
 """
 import ctypes
+import json
+import logging.handlers
+import traceback
 import os
 import re
 import sys
-from time import time
-import json
 import tkinter as tk
+from time import time
 from tkinter import ttk, messagebox, font
+
 from PIL import Image, ImageTk
 
-from couyun.ui.ci_pu_browser import CiPuBrowser
+from couyun import (CI_INDEX, ASSETS_DIR, STATE_PATH, CI_ORIGIN, CI_LONG_ORIGIN,
+                    CI_TRAD, CI_LONG_TRAD, FONT_PATH, ICO_PATH, bg_pic)
 from couyun.ci.ci_rhythm import CiRhythm
 from couyun.ci.ci_search import search_ci, ci_type_extraction
 from couyun.common.common import show_all_rhythm
 from couyun.shi.shi_rhythm import ShiRhythm
-from couyun import (CI_INDEX, ASSETS_DIR, STATE_PATH, CI_ORIGIN, CI_LONG_ORIGIN,
-                    CI_TRAD, CI_LONG_TRAD, FONT_PATH, ICO_PATH, bg_pic)
+from couyun.ui.ci_pu_browser import CiPuBrowser
+
+
+LOG_DIR = os.path.dirname(STATE_PATH)
+logger = logging.getLogger("RhythmChecker")
+logger.setLevel(logging.INFO)
+formatter = logging.Formatter(
+    "%(asctime)s | %(levelname)s | %(funcName)s | %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
+file_handler = logging.handlers.RotatingFileHandler(
+    filename=os.path.join(LOG_DIR, "app.log"),
+    maxBytes=5 * 1024 * 1024,
+    backupCount=5,
+    encoding="utf-8"
+)
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(formatter)
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.WARNING)
+console_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)
+
+
+def log_exceptions(func):
+    """自动记录函数执行情况和未捕获异常的装饰器"""
+    def _couyun(self, *args, **kwargs):
+        func_name = func.__name__
+        try:
+            result = func(self, *args, **kwargs)
+            logger.info(f"【{func_name}】正常完成")
+            return result
+        except Exception as error:
+            error_msg = f"【{func_name}】发生异常: {str(error)}"
+            logger.error(error_msg)
+            logger.error(traceback.format_exc())
+            raise
+    return _couyun
 
 
 def scaled_tk_value():
@@ -52,7 +93,8 @@ def save_state(state: dict) -> None:
 def extract_chinese(text: str, comma_remain=False) -> str:
     """删除输入文本中的非汉字部分以及括号内的部分"""
     text = re.sub(r'[(（].*?[)）]', '', text)
-    hanzi_range = r'\u4e00-\u9fff\u3400-\u4dbf\u3007\u2642\U00020000-\U0002A6DF'
+    hanzi_range = (r'\u2642\u2E80-\u2EFF\u2F00-\u2FDF\u4e00-\u9fff\u3400-\u4dbf\u3007\uF900-\uFAFF\U00020000-\U0002A6DF'
+                   r'\U0002F800-\U0002FA1F')
     if comma_remain:
         punctuation = r',\.\?!:，。？！、：'
         pattern = re.compile(f'[{hanzi_range}{punctuation}]')
@@ -86,7 +128,7 @@ def on_close(state):
 # noinspection PyTypeChecker
 class RhythmCheckerGUI:
     def __init__(self, roots):
-        self.edition = 'v.1.4.6'
+        self.edition = 'v.1.4.7'
 
         self.yunshu_var = None
         self.cipu_var = None
@@ -158,6 +200,7 @@ class RhythmCheckerGUI:
         """根据目标模式转换文本"""
         return text.translate(self.s2t) if to_trad else text.translate(self.t2s)
 
+    @log_exceptions
     def open_cipu_browser(self):
         if getattr(self, '_opening_cipu', False):
             return
@@ -234,6 +277,7 @@ class RhythmCheckerGUI:
         """注册需要翻译的控件"""
         self.widgets_to_translate.append(widget)
 
+    @log_exceptions
     def toggle_language(self):
         """在简体和繁体之间切换（注意：使用目标模式来渲染）"""
         to_trad = not self.is_trad  # 目标模式
@@ -259,14 +303,15 @@ class RhythmCheckerGUI:
         # 最后更新状态标志
         self.is_trad = to_trad
         current_state['is_trad'] = self.is_trad
-        print(current_state)
 
+    @log_exceptions
     def switch_background(self):
         self.bg_index = (self.bg_index + 1) % 3
         current_state['bg_index'] = self.bg_index
         self.background_image = load_background_image(bg_pic(self.bg_index))
         self.background_label.config(image=self.background_image)
 
+    @log_exceptions
     def create_main_interface(self):
         self.main_interface = ttk.Frame(self.root)
         self.main_interface.pack(pady=tk_value['main_pady'])
@@ -293,6 +338,7 @@ class RhythmCheckerGUI:
                                 font=self.default_font, bg=self.my_purple, width=20)
         char_button.pack(side=tk.TOP, padx=5, pady=10)
         self.register(char_button)
+
 
     def create_generic_interface(self, title_text, hint_text, button_text, command_func, mode):
         old_widgets = len(self.widgets_to_translate)
@@ -373,6 +419,8 @@ class RhythmCheckerGUI:
         ot = tk.Text(mf, width=settings(mode)[1], height=10,
                      font=self.small_font, wrap=tk.NONE, state=tk.DISABLED)
         ot.pack(side=tk.TOP if mode == 's' else tk.LEFT, padx=5)
+        if mode == 's':
+            self.setup_input_text(it)
         if mode == 'c':
             self.scrollbar = ttk.Scrollbar(ot, orient=tk.HORIZONTAL, command=ot.xview)
             ot.configure(xscrollcommand=self.scrollbar.set)
@@ -438,32 +486,38 @@ class RhythmCheckerGUI:
         self.input_text.delete("1.0", tk.END)
         self.input_text.insert(tk.END, sample_ci)
 
+    @log_exceptions
     def on_yunshu_change(self):
         self.current_yun_shu = self.yunshu_reverse_map[self.yunshu_var.get()]
         current_state['yun_shu'] = self.current_yun_shu
 
+    @log_exceptions
     def on_cipu_change(self):
         self.current_ci_pu = self.ci_pu_reverse_map[self.cipu_var.get()]
         current_state['ci_pu'] = self.current_ci_pu
 
+    @log_exceptions
     def open_poem_interface(self):
         self.input_text, self.output_text = self.create_generic_interface(
             title_text="诗校验", hint_text='请输入需要分析的律诗或绝句：',
             button_text="开始分析", command_func=self.check_poem, mode='p'
         )
 
+    @log_exceptions
     def open_ci_interface(self):
         self.input_text, self.output_text = self.create_generic_interface(
             title_text="词校验", hint_text='请输入需要校验的词：',
             button_text="开始分析", command_func=self.check_ci, mode='c'
         )
 
+    @log_exceptions
     def open_char_interface(self):
         self.input_text, self.output_text = self.create_generic_interface(
             title_text="查字", hint_text='请输入需要查询的汉字：',
             button_text="开始查询", command_func=self.check_char, mode='s'
         )
 
+    @log_exceptions
     def return_to_main(self):
         for w in self.root.winfo_children():
             # 忽略所有 Toplevel 子窗口
@@ -473,6 +527,7 @@ class RhythmCheckerGUI:
                 w.pack_forget()
         self.main_interface.pack(pady=200)
 
+    @log_exceptions
     def check_poem(self, it, ot):
         text = it.get("1.0", tk.END).strip()
         start_time = time()
@@ -504,6 +559,7 @@ class RhythmCheckerGUI:
         # self.scrollbar.place(relx=bar[0], rely=bar[1], relwidth=bar[2], height=bar[3])
         self.display_result(ot, res, 'p')
 
+    @log_exceptions
     def check_ci(self, it, ot):
         text = it.get("1.0", tk.END).strip()
         start_time = time()
@@ -533,51 +589,112 @@ class RhythmCheckerGUI:
         # self.scrollbar.place(relx=bar[0], rely=bar[1], relwidth=bar[2], height=bar[3])
         self.display_result(ot, res, 'c')
 
+    @log_exceptions
     def check_char(self, it, ot):
-        text = it.get("1.0", tk.END).strip()
+        """查询第一个汉字的韵律信息"""
+        # 清理文本：删除所有回车符和首尾空格
+        text = it.get("1.0", tk.END).replace('\n', '').replace('\r', '').strip()
+
+        # 同步清理输入框显示（防止用户粘贴带换行的内容）
+        current_content = it.get("1.0", tk.END)
+        cleaned_content = current_content.replace('\n', '').replace('\r', '')
+        if current_content != cleaned_content:
+            it.delete("1.0", tk.END)
+            it.insert("1.0", cleaned_content.strip())
+            # it.mark_set(tk.INSERT, tk.END)
+        match = re.search(r'[\u4e00-\u9fff\u3400-\u4dbf\u3007\u2642\U00020000-\U0002A6DF]', text)
         if not text:
             self.my_warn("找茬是吧？", "请输入需要查询的汉字！")
             return
+        if not match:
+            self.my_warn("你在干嘛呢？", "输入的内容中不含汉字！")
+            return
+        char = match.group(0)
+        res = show_all_rhythm(char, self.is_trad)
         if len(text) != 1:
-            self.my_warn("找茬是吧？", "请输入单个汉字！")
-            return
-        if not re.match(r'[\u4e00-\u9fff\u3400-\u4dbf\u3007\u2642\U00020000-\U0002A6DF]', text):
-            self.my_warn("你在干嘛呢？", "非汉字或超出区段（基本区及拓展A、B区）")
-            return
-        res = show_all_rhythm(text, self.is_trad)
+            warn = '你輸入了多個字符，系統將查詢第一個漢字\n\n' if self.is_trad else '你输入了多个字符，系统将查询第一个汉字\n\n'
+            res =  warn + res
         self.display_result(ot, res, 's')
 
+    @staticmethod
+    def setup_input_text(text_widget):
+        """配置输入文本框：阻止回车键 + 自动清理粘贴内容"""
+
+        def block_enter(event):
+            """阻止回车键输入"""
+            if event.keysym in ('Return', 'KP_Enter'):
+                return 'break'
+            return None
+
+        def clean_paste(_):
+            """粘贴后自动清理回车符"""
+            text_widget.after(10, lambda: clean_text_content(text_widget))
+
+        def clean_text_content(widget):
+            """清理文本框中的回车符"""
+            content = widget.get("1.0", tk.END)
+            cleaned = content.replace('\n', '').replace('\r', '').strip()
+            if content != cleaned:
+                widget.delete("1.0", tk.END)
+                widget.insert("1.0", cleaned)
+                widget.mark_set(tk.INSERT, tk.END)
+        text_widget.bind('<KeyPress>', block_enter)  # 阻止回车键
+        text_widget.bind('<<Paste>>', clean_paste)  # 清理粘贴内容
+
+logger.info("初始化设置")
 if os.name == 'nt':
     try:
         ctypes.windll.shcore.SetProcessDpiAwareness(2)
-    except (OSError, AttributeError, ctypes.ArgumentError):
+        logger.info("DPI 感知设置成功 (SetProcessDpiAwareness)")
+    except (OSError, AttributeError, ctypes.ArgumentError) as e:
+        logger.warning(f"SetProcessDpiAwareness 失败: {e}，尝试备用方法")
         ctypes.windll.user32.SetProcessDPIAware()
+        logger.info("DPI 感知设置成功 (SetProcessDPIAware)")
 
 current_state = load_state()
+logger.info("状态加载完成")
+
+logger.info("正在检测单实例运行...")
 MUTEX_NAME = "RhythmChecker"
 ERROR_ALREADY_EXISTS = 183
 kernel32 = ctypes.windll.kernel32
 handle = kernel32.CreateMutexW(None, False, MUTEX_NAME)
 last_error = kernel32.GetLastError()
+
 if last_error == ERROR_ALREADY_EXISTS:
+    logger.warning("检测到程序已在运行，尝试激活已有窗口...")
     try:
         window_title = "湊韻" if current_state.get('is_traditional', False) else "凑韵"
         hwnd = ctypes.windll.user32.FindWindowW(None, window_title)
         if hwnd:
             ctypes.windll.user32.ShowWindow(hwnd, 5)   # SW_SHOW
             ctypes.windll.user32.SetForegroundWindow(hwnd)
-    except (OSError, ctypes.WinError):
-        pass
+            logger.info("已激活已有窗口，当前实例将退出")
+        else:
+            logger.warning("未找到已有窗口句柄")
+    except (OSError, ctypes.WinError) as e:
+        logger.error(f"激活窗口时出错: {e}")
     sys.exit(0)
+else:
+    logger.info("单实例检测通过，程序继续启动")
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    tk_value = scaled_tk_value()
-    size_tuple = tk_value['size']
-    size_string = 'x'.join(map(str, size_tuple))
-    load_font(FONT_PATH)
-    root.tk.call('tk', 'scaling', 2)
-    ttk.Style().theme_use('vista')
-    root.protocol("WM_DELETE_WINDOW", lambda: on_close(current_state))
-    app = RhythmCheckerGUI(root)
-    root.mainloop()
+    logger.info("程序启动")
+    try:
+        root = tk.Tk()
+        tk_value = scaled_tk_value()
+        size_tuple = tk_value['size']
+        size_string = 'x'.join(map(str, size_tuple))
+        load_font(FONT_PATH)
+        root.tk.call('tk', 'scaling', 2)
+        ttk.Style().theme_use('vista')
+        root.protocol("WM_DELETE_WINDOW", lambda: on_close(current_state))
+        app = RhythmCheckerGUI(root)
+        root.mainloop()
+    except Exception as err:
+        logger.critical(f"程序崩溃: {str(err)}")
+        logger.critical(traceback.format_exc())
+        raise
+
+    finally:
+        logger.info("程序退出\n")
