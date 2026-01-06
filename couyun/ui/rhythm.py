@@ -21,6 +21,7 @@ from couyun.ci.ci_search import search_ci, ci_type_extraction
 from couyun.common.common import show_all_rhythm
 from couyun.shi.shi_rhythm import ShiRhythm
 from couyun.ui.ci_pu_browser import CiPuBrowser
+from couyun.ui.memo_interface import MemoInterface
 
 
 LOG_DIR = os.path.dirname(STATE_PATH)
@@ -128,10 +129,13 @@ def on_close(state):
 # noinspection PyTypeChecker
 class RhythmCheckerGUI:
     def __init__(self, roots):
-        self.edition = 'v.1.4.7'
+
+        self.edition = 'v.1.5.0'
 
         self.yunshu_var = None
         self.cipu_var = None
+        self.current_output_text = None
+        self.current_input_text = None
         self.s2t = str.maketrans('简输没标处状误里宽与为开对这选组并汉业态绝检验错无调逻块词诗转结内该体译留创识经闭择韵应钦华据号换'
                                  '辑么后显龙询图载准长数榆传干谱来诶务题类将样单确区当间写鹜钮点请两脚个关别参统凑书',
                                  '簡輸沒標處狀誤裏寛與為開對這選組幷漢業態絶檢驗錯無調邏塊詞詩轉結內該體譯畱創識經閉擇韻應欽華據號換'
@@ -184,7 +188,10 @@ class RhythmCheckerGUI:
         self.toggle_button.place(relx=0.99, rely=0.99, anchor='se')
         self.ci_pu_button = tk.Button(self.root, text='詞譜查詢' if self.is_trad else "词谱查询",
                                       command=self.open_cipu_browser, font=self.small_font)
-        self.ci_pu_button.place(relx=0.5, rely=0.99, anchor='s')
+        self.ci_pu_button.place(relx=0.65, rely=0.99, anchor='s')
+        self.memo_button = tk.Button(self.root, text='備忘錄' if self.is_trad else "备忘录",
+                                     command=self.open_memo_interface, font=self.small_font)
+        self.memo_button.place(relx=0.35, rely=0.99, anchor='s')
         self.version_label = tk.Label(self.root, text=self.edition, font=self.small_font)
         self.version_label.place(relx=0.99, rely=0.01, anchor='ne')
 
@@ -193,6 +200,9 @@ class RhythmCheckerGUI:
         self.main_interface = None
         self.cipai_var = None
         self._opening_cipu = False
+        self._opening_memo = False
+        self._memo_window = None
+        self._cipu_window = None
 
         self.create_main_interface()
 
@@ -202,18 +212,17 @@ class RhythmCheckerGUI:
 
     @log_exceptions
     def open_cipu_browser(self):
-        if getattr(self, '_opening_cipu', False):
+        if getattr(self, '_cipu_window', None) is not None and self._cipu_window.winfo_exists():
+            # 如果窗口还存在，只是最小化或隐藏，则激活它
+            self._cipu_window.deiconify()
+            self._cipu_window.lift()
             return
-        self._opening_cipu = True
-
-        def _done():
-            self._opening_cipu = False
 
         fonts = {'small': self.small_font,
                  'default': self.default_font,
                  'bigger': self.bigger_font}
 
-        browser = CiPuBrowser(
+        self._cipu_window = CiPuBrowser(
             master=self.root,
             json_path=CI_INDEX,
             fonts=fonts,
@@ -222,10 +231,36 @@ class RhythmCheckerGUI:
             origin_dir=CI_ORIGIN,
             long_dir=CI_LONG_ORIGIN,
             origin_trad_dir=CI_TRAD,
-            long_trad_dir=CI_LONG_TRAD,
-            current_state=current_state
+            long_trad_dir=CI_LONG_TRAD
         )
-        browser.protocol("WM_DELETE_WINDOW", lambda: (browser.destroy(), _done()))
+        self._cipu_window.protocol("WM_DELETE_WINDOW", lambda: (self._cipu_window.on_window_close(),
+                                            setattr(self, '_cipu_window', None)))
+
+    @log_exceptions
+    def open_memo_interface(self):
+        """打开备忘录界面 - 修复单例问题"""
+        if getattr(self, '_memo_window', None) is not None and self._memo_window.winfo_exists():
+            # 如果窗口还存在，只是最小化或隐藏，则激活它
+            self._memo_window.deiconify()
+            self._memo_window.lift()
+            return
+
+        fonts = {
+            'small': self.small_font,
+            'default': self.default_font,
+            'bigger': self.bigger_font
+        }
+
+        self._memo_window = MemoInterface(
+            master=self,
+            fonts=fonts,
+            resource_path=lambda *p: os.path.abspath(os.path.join(ASSETS_DIR, *p)),
+            is_trad=self.is_trad
+        )
+
+        self._memo_window.protocol("WM_DELETE_WINDOW",
+                                   lambda: (self._memo_window.on_window_close(),
+                                            setattr(self, '_memo_window', None)))
 
 
     def box_toggle(self, boxes, single_map, current, to_traditional: bool):
@@ -238,6 +273,36 @@ class RhythmCheckerGUI:
             else:
                 cb['values'] = [single_map[k] for k in sorted(single_map)]
                 cb.set(single_map[current])
+
+    @log_exceptions
+    def validate_content(self, mode, content):
+        """从备忘录校验内容"""
+        self.return_to_main()
+        self.root.deiconify()
+        self.root.lift()
+        if mode == 'poem':
+            self.open_poem_interface()
+            self._do_validate(content, 'poem')
+        else:
+            self.current_ci_pu = 1
+            self.open_ci_interface()
+            self._do_validate(content, 'ci')
+
+    def _do_validate(self, content, mode):
+        """可靠地填充和执行校验"""
+
+        if hasattr(self, 'current_input_text') and self.current_input_text:
+            self.current_input_text.delete("1.0", tk.END)
+            self.current_input_text.insert("1.0", content)
+
+            if mode == 'poem':
+                self.check_poem(self.current_input_text, self.current_output_text)
+            else:
+
+                self.cipai_var.set("")  # 清空词牌名
+                self.check_ci(self.current_input_text, self.current_output_text)
+        else:
+            logger.error("未找到输入输出框")
 
     def translate_new_widgets(self, start_widgets, start_yun, start_ci):
         """新界面创建后，若当前是繁体模式，立即翻译新增控件和下拉框"""
@@ -297,6 +362,8 @@ class RhythmCheckerGUI:
         self.cover_button.config(text=change_text)
         cipu_text = '词谱查询' if self.is_trad else '詞譜查詢'
         self.ci_pu_button.config(text=cipu_text)
+        memo_text = '备忘录' if self.is_trad else '備忘錄'
+        self.memo_button.config(text=memo_text)
         title_text = '凑韵' if self.is_trad else '湊韻'
         self.root.title(title_text)
 
@@ -338,6 +405,7 @@ class RhythmCheckerGUI:
                                 font=self.default_font, bg=self.my_purple, width=20)
         char_button.pack(side=tk.TOP, padx=5, pady=10)
         self.register(char_button)
+
 
 
     def create_generic_interface(self, title_text, hint_text, button_text, command_func, mode):
@@ -454,6 +522,9 @@ class RhythmCheckerGUI:
         self.register(back)
         ot.pack_forget()
         self.translate_new_widgets(old_widgets, old_yun, old_ci)
+
+        self.current_input_text = it
+        self.current_output_text = ot
 
         return it, ot
 

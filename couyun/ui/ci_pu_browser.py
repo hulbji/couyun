@@ -35,7 +35,7 @@ class CiPuBrowser(tk.Toplevel):
     _instance = None
 
     def __init__(self, master, json_path, fonts, resource_path,
-                 state, origin_dir, long_dir, origin_trad_dir, long_trad_dir, current_state):
+                 state, origin_dir, long_dir, origin_trad_dir, long_trad_dir):
         if CiPuBrowser._instance is not None and CiPuBrowser._instance.winfo_exists():
             CiPuBrowser._instance.lift()
             return
@@ -59,7 +59,6 @@ class CiPuBrowser(tk.Toplevel):
         self.long_raw_s = None
         self.long_raw_t = None
         self.current_item = None
-        self.current_state = current_state
 
         self.is_trad = state.get('is_trad', False)
 
@@ -79,6 +78,16 @@ class CiPuBrowser(tk.Toplevel):
         self.long_trad_dir = long_trad_dir
         self.sort_mode = state['sort_mode']
         self.indexed = load_ci_index(json_path)
+
+        self.long_only_idx = {1, 10, 11, 22, 23, 24, 28, 29, 36, 47, 50, 52, 54, 57, 58, 60, 62, 64, 65, 67, 69, 74, 75,
+                              79, 81, 85, 86, 90, 91, 96, 102, 104, 105, 106, 109, 110, 113, 116, 126, 127, 128, 129,
+                              133, 138, 141, 145, 149, 150, 151, 157, 158, 161, 162, 175, 181, 183, 186, 187, 190, 225,
+                              226, 246, 247, 253, 260, 261, 262, 268, 271, 275, 289, 294, 295, 304, 313, 316, 325, 326,
+                              328, 329, 341, 343, 345, 348, 349, 350, 355, 372, 381, 389, 406, 410, 413, 422, 430, 437,
+                              438, 446, 471, 473, 476, 483, 485, 494, 499, 504, 516, 518, 528, 529, 531, 533, 543, 545,
+                              546, 553, 562, 578, 580, 590, 598, 612, 614, 616, 617, 621, 625, 634, 637, 638, 649, 650,
+                              652, 658, 660, 662, 664, 667, 668, 678, 688, 697, 698, 706, 722, 728, 730, 738, 742, 765,
+                              775, 781, 782, 795, 798, 800, 802, 804, 805, 806, 811, 812, 814}
 
         # 背景图（按新窗口大小）
         img_file = (state['bg_images'][state['bg_index']]
@@ -136,6 +145,22 @@ class CiPuBrowser(tk.Toplevel):
         self.current_matched = []
         self.result_box.insert(tk.END, "")  # 触发初始化
         self.result_box.delete(0, tk.END)
+
+        self.long_only_var = tk.BooleanVar(value=False)
+        self.long_only_cb = tk.Checkbutton(
+            self,
+            text="只顯示龍譜" if self.is_trad else "只显示龙谱",
+            font=fonts['small'],
+            variable=self.long_only_var,
+            command=self.toggle_long_only
+        )
+        self.long_only_cb.place(relx=0.95, rely=0.05, anchor='ne')
+
+        self.update_list()
+
+    @log_ci_exceptions
+    def toggle_long_only(self):
+        """切换只显示龙谱模式"""
         self.update_list()
 
     @staticmethod
@@ -154,19 +179,17 @@ class CiPuBrowser(tk.Toplevel):
     @log_ci_exceptions
     def toggle_lang(self):
         """翻转简繁状态并全局刷新：主界面 + 详情页（若已打开）"""
-        # t0 = time.perf_counter()
         self.is_trad = not self.is_trad
         self.title("詞譜查詢" if self.is_trad else "词谱查询")
-        self.toggle_btn.config(text="繁體" if self.is_trad else "简体",
+        self.toggle_btn.config(text="简体" if self.is_trad else "繁體",
                                font=self.fonts['small'])
         self.sort_btn.config(text=self.sort_label())
         self.search_hint.config(text="輸入詞譜名/拼音：" if self.is_trad else "输入词谱名/拼音：")
+        self.long_only_cb.config(text="只顯示龍譜" if self.is_trad else "只显示龙谱")  # 新增
         self.return_btn.config(text="返回")
         if getattr(self, 'detail_frame', None) is not None and self.detail_frame.winfo_exists():
             self._refresh_detail_lang()
         self.update_list()
-        # t1 = time.perf_counter()
-        # print(f"[toggle_lang] time {t1 - t0:.3f}s")
 
     def _refresh_detail_lang(self):
         # t0 = time.perf_counter()
@@ -200,17 +223,15 @@ class CiPuBrowser(tk.Toplevel):
 
     @log_ci_exceptions
     def update_list(self, _=None):
-        # t0 = time.perf_counter()
         key = self.search_var.get().strip().lower()
         self.result_box.delete(0, tk.END)
-        # t1 = time.perf_counter()
 
         def sort_key(ci_pais):
             t = ci_pais['type']
             if self.sort_mode == 0:
                 return ci_pais['full']
             elif self.sort_mode == 1:
-                return t[1]  # 已确认是 int
+                return t[1]
             else:
                 order_map = {'平': 0, '仄': 1, '换': 2, '叶': 3}
                 order_val = order_map[t[-1][0]]
@@ -218,7 +239,10 @@ class CiPuBrowser(tk.Toplevel):
                 return order_val, num, ci_pais['full']
 
         ordered = sorted(self.indexed, key=sort_key)
-        # t2 = time.perf_counter()
+
+        # 添加龙谱过滤逻辑
+        if self.long_only_var.get():
+            ordered = [item for item in ordered if item['idx'] in self.long_only_idx]
 
         matched = []
         if key:
@@ -345,8 +369,8 @@ class CiPuBrowser(tk.Toplevel):
         detail.place(relx=0.02, rely=0.03, relwidth=0.96, relheight=0.82)
 
         self.detail_title = ttk.Label(detail,
-                  text=item['names_trad'][0] if self.is_trad else item['names'][0],
-                  font=self.fonts['bigger'])
+                                      text=item['names_trad'][0] if self.is_trad else item['names'][0],
+                                      font=self.fonts['bigger'])
         self.detail_title.pack(pady=6)
 
         self.btn_frame = ttk.Frame(detail)
@@ -368,8 +392,18 @@ class CiPuBrowser(tk.Toplevel):
         text_frame.grid_columnconfigure(0, weight=1)
 
         files_dict = self.load_ci_files(item)
+
+        # 修改默认显示逻辑
         self.show_detail_body(detail, text_area, self.btn_frame, files_dict)
-        self.current_show = 'qin'
+
+        # 在long_only模式下且龙谱存在时，优先显示龙谱
+        if self.long_only_var.get() and self.long_raw is not None:
+            self.current_show = 'long'
+            raw = self.long_raw_t if self.is_trad else self.long_raw_s
+            self.show_ci_pu(self.detail_text, raw)
+        else:
+            self.current_show = 'qin'
+
         # t1 = time.perf_counter()
         # print(f"[show_detail] time {t1 - t0:.3f}s")
 
@@ -390,3 +424,15 @@ class CiPuBrowser(tk.Toplevel):
         self.return_btn.place_forget()
         self.main_frame.place(relx=0.02, rely=0.03, relwidth=0.96, relheight=0.82)
         self.update_list()
+
+    @log_ci_exceptions
+    def on_window_close(self):
+        if hasattr(CiPuBrowser, '_instance'):
+            CiPuBrowser._instance = None
+
+        # 2. 销毁窗口（确保窗口彻底关闭）
+        if self.winfo_exists():
+            self.destroy()
+
+        if hasattr(self.master, '_cipu_window'):
+            delattr(self.master, '_cipu_window')
