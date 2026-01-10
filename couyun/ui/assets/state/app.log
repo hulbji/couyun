@@ -1,0 +1,74 @@
+2026-01-10 20:55:30 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-10 20:55:30 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
+2026-01-10 20:55:30 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
+2026-01-10 20:55:30 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-10 20:55:30 | INFO | RhythmChecker.singleton | 单实例检测通过
+2026-01-10 20:55:30 | INFO | RhythmChecker.str | 【ensure_single_instance】正常完成
+2026-01-10 20:55:30 | INFO | RhythmChecker.app | tesssssst
+2026-01-10 20:55:30 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-10 20:55:30 | INFO | RhythmChecker.RhythmCheckerGUI | 【create_main_interface】正常完成
+2026-01-10 20:55:33 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-10 20:55:38 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-10 20:55:43 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-10 20:55:44 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-10 21:00:20 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-10 21:00:20 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
+2026-01-10 21:00:20 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
+2026-01-10 21:00:20 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-10 21:00:20 | INFO | RhythmChecker.singleton | 单实例检测通过
+2026-01-10 21:00:20 | INFO | RhythmChecker.str | 【ensure_single_instance】正常完成
+2026-01-10 21:00:20 | INFO | RhythmChecker.app | tesssssst
+2026-01-10 21:00:20 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-10 21:00:21 | INFO | RhythmChecker.RhythmCheckerGUI | 【create_main_interface】正常完成
+2026-01-10 21:00:22 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-10 21:01:43 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-10 21:01:43 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
+2026-01-10 21:01:43 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
+2026-01-10 21:01:43 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-10 21:01:43 | INFO | RhythmChecker.singleton | 单实例检测通过
+2026-01-10 21:01:43 | INFO | RhythmChecker.str | 【ensure_single_instance】正常完成
+2026-01-10 21:01:43 | INFO | RhythmChecker.app | tesssssst
+2026-01-10 21:01:43 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-10 21:01:44 | INFO | RhythmChecker.RhythmCheckerGUI | 【create_main_interface】正常完成
+2026-01-10 21:01:46 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-10 21:01:52 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-10 21:02:00 | ERROR | RhythmChecker.RhythmCheckerGUI | 【check_ci】发生异常: list index out of range
+2026-01-10 21:02:00 | ERROR | RhythmChecker.RhythmCheckerGUI | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\rhythm.py", line 579, in check_ci
+    res = process.main_ci()
+          ^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ci\ci_rhythm.py", line 414, in main_ci
+    report = self._build_single_ci_report(ci_num)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ci\ci_rhythm.py", line 319, in _build_single_ci_report
+    report = self._one_format_report(ci_num, type_list, fmt_id)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ci\ci_rhythm.py", line 381, in _one_format_report
+    report += self._show_ci(cut_lis, my_text, yun_info, yun_final)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ci\ci_rhythm.py", line 239, in _show_ci
+    result += yun_final[_] + '\n'
+              ~~~~~~~~~^^^
+IndexError: list index out of range
+
+2026-01-10 21:02:53 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-10 21:02:53 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
+2026-01-10 21:02:53 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
+2026-01-10 21:02:53 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-10 21:02:53 | INFO | RhythmChecker.singleton | 单实例检测通过
+2026-01-10 21:02:53 | INFO | RhythmChecker.str | 【ensure_single_instance】正常完成
+2026-01-10 21:02:53 | INFO | RhythmChecker.app | tesssssst
+2026-01-10 21:02:53 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-10 21:02:54 | INFO | RhythmChecker.RhythmCheckerGUI | 【create_main_interface】正常完成
+2026-01-10 21:02:56 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-10 21:03:04 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-10 21:03:18 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-10 21:03:24 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-10 21:03:24 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-10 21:03:27 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-10 21:03:33 | INFO | RhythmChecker.__main__ | 程序退出
+

@@ -32,7 +32,7 @@ CI_LONG_ORIGIN = res_path(__file__, 'ci_pu', 'ci_long_origin')
 CI_LONG_TRAD   = res_path(__file__, 'ci_pu', 'ci_long_trad')
 CI_ORIGIN      = res_path(__file__, 'ci_pu', 'ci_origin')
 CI_TRAD        = res_path(__file__, 'ci_pu', 'ci_trad')
-CI_INDEX       = res_path(__file__, 'ci_pu', 'ci_list', 'ci_index.json')
+CI_INDEX       = res_path(__file__, 'ci_pu', 'ci_index.json')
 
 MAIN_VALUE = {
         "size": [1200, 900],
