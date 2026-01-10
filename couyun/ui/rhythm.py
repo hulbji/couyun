@@ -3,74 +3,30 @@
 """
 import ctypes
 import json
-import logging.handlers
-import traceback
 import os
 import re
-import sys
 import tkinter as tk
 from time import time
 from tkinter import ttk, messagebox, font
 
 from PIL import Image, ImageTk
 
-from couyun import (CI_INDEX, ASSETS_DIR, STATE_PATH, CI_ORIGIN, CI_LONG_ORIGIN,
+from couyun import (CI_INDEX, ASSETS_DIR, STATE_PATH, CI_ORIGIN, CI_LONG_ORIGIN, MAIN_VALUE,
                     CI_TRAD, CI_LONG_TRAD, FONT_PATH, ICO_PATH, bg_pic)
 from couyun.ci.ci_rhythm import CiRhythm
 from couyun.ci.ci_search import search_ci, ci_type_extraction
 from couyun.common.common import show_all_rhythm
 from couyun.shi.shi_rhythm import ShiRhythm
+
 from couyun.ui.ci_pu_browser import CiPuBrowser
+
 from couyun.ui.memo_interface import MemoInterface
 
+from couyun.ui.core.logger_config import get_logger, log_exceptions
+from couyun.ui.core.singleton_manager import TkSingletonWindow
+from couyun.ui.bootstrap.app import bootstrap
 
-LOG_DIR = os.path.dirname(STATE_PATH)
-logger = logging.getLogger("RhythmChecker")
-logger.setLevel(logging.INFO)
-formatter = logging.Formatter(
-    "%(asctime)s | %(levelname)s | %(funcName)s | %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S"
-)
-file_handler = logging.handlers.RotatingFileHandler(
-    filename=os.path.join(LOG_DIR, "app.log"),
-    maxBytes=5 * 1024 * 1024,
-    backupCount=5,
-    encoding="utf-8"
-)
-file_handler.setLevel(logging.INFO)
-file_handler.setFormatter(formatter)
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.WARNING)
-console_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
-logger.addHandler(console_handler)
-
-
-def log_exceptions(func):
-    """自动记录函数执行情况和未捕获异常的装饰器"""
-    def _couyun(self, *args, **kwargs):
-        func_name = func.__name__
-        try:
-            result = func(self, *args, **kwargs)
-            logger.info(f"【{func_name}】正常完成")
-            return result
-        except Exception as error:
-            error_msg = f"【{func_name}】发生异常: {str(error)}"
-            logger.error(error_msg)
-            logger.error(traceback.format_exc())
-            raise
-    return _couyun
-
-
-def scaled_tk_value():
-    return {
-        "size": [1200, 900],
-        "main_pady": 200,
-        "generic_pady": [180, 105, 165],
-        "frame_width": [35, 65, 10, 5],
-        "zi_width": [15, 45, 10, 5]
-    }
-
+logger = get_logger(__name__)
 
 def load_font(font_path) -> None:
     ctypes.windll.gdi32.AddFontResourceW(str(font_path))
@@ -115,27 +71,23 @@ def load_background_image(image_path):
 def settings(mode):
     """根据模式调整窗口大小"""
     if mode in ['p', 'c']:
-        return tk_value['frame_width']
-    return tk_value['zi_width']
+        return MAIN_VALUE['frame_width']
+    return MAIN_VALUE['zi_width']
 
 
 def on_close(state):
     """关闭窗口时的行为，卸载字体。将新状态写入json文件。"""
     unload_font(FONT_PATH)
     save_state(state)
+    logger.info('程序退出\n')
     root.destroy()
-
 
 # noinspection PyTypeChecker
 class RhythmCheckerGUI:
     def __init__(self, roots):
 
-        self.edition = 'v.1.5.0'
+        self.edition = 'v.1.5.1'
 
-        self.yunshu_var = None
-        self.cipu_var = None
-        self.current_output_text = None
-        self.current_input_text = None
         self.s2t = str.maketrans('简输没标处状误里宽与为开对这选组并汉业态绝检验错无调逻块词诗转结内该体译留创识经闭择韵应钦华据号换'
                                  '辑么后显龙询图载准长数榆传干谱来诶务题类将样单确区当间写鹜钮点请两脚个关别参统凑书',
                                  '簡輸沒標處狀誤裏寛與為開對這選組幷漢業態絶檢驗錯無調邏塊詞詩轉結內該體譯畱創識經閉擇韻應欽華據號換'
@@ -166,8 +118,6 @@ class RhythmCheckerGUI:
         self.bigger_font = font.Font(family="霞鹜文楷等宽", size=16)
         self.my_purple = "#c9a6eb"
 
-        self.cipai_form = None
-        self.scrollbar = None
         self.root = roots
         self.root.iconbitmap(ICO_PATH)
         self.root.resizable(width=False, height=False)
@@ -197,12 +147,14 @@ class RhythmCheckerGUI:
 
         self.input_text = None
         self.output_text = None
+        self.cipai_form = None
+        self.scrollbar = None
         self.main_interface = None
         self.cipai_var = None
-        self._opening_cipu = False
-        self._opening_memo = False
-        self._memo_window = None
-        self._cipu_window = None
+        self.yunshu_var = None
+        self.cipu_var = None
+        self.current_output_text = None
+        self.current_input_text = None
 
         self.create_main_interface()
 
@@ -212,55 +164,36 @@ class RhythmCheckerGUI:
 
     @log_exceptions
     def open_cipu_browser(self):
-        if getattr(self, '_cipu_window', None) is not None and self._cipu_window.winfo_exists():
-            # 如果窗口还存在，只是最小化或隐藏，则激活它
-            self._cipu_window.deiconify()
-            self._cipu_window.lift()
-            return
-
-        fonts = {'small': self.small_font,
-                 'default': self.default_font,
-                 'bigger': self.bigger_font}
-
-        self._cipu_window = CiPuBrowser(
-            master=self.root,
-            json_path=CI_INDEX,
-            fonts=fonts,
-            resource_path = lambda *p: os.path.abspath(os.path.join(ASSETS_DIR, *p)),
-            state=current_state,
-            origin_dir=CI_ORIGIN,
-            long_dir=CI_LONG_ORIGIN,
-            origin_trad_dir=CI_TRAD,
-            long_trad_dir=CI_LONG_TRAD
-        )
-        self._cipu_window.protocol("WM_DELETE_WINDOW", lambda: (self._cipu_window.on_window_close(),
-                                            setattr(self, '_cipu_window', None)))
+        cipu_init_kwargs = {
+            'master': self.root,
+            'json_path': CI_INDEX,
+            'fonts': {
+                'small': self.small_font,
+                'default': self.default_font,
+                'bigger': self.bigger_font
+            },
+            'resource_path': lambda *p: os.path.abspath(os.path.join(ASSETS_DIR, *p)),
+            'state': current_state,
+            'origin_dir': CI_ORIGIN,
+            'long_dir': CI_LONG_ORIGIN,
+            'origin_trad_dir': CI_TRAD,
+            'long_trad_dir': CI_LONG_TRAD
+        }
+        _cipu_window = TkSingletonWindow.get_instance(CiPuBrowser, **cipu_init_kwargs)
 
     @log_exceptions
     def open_memo_interface(self):
-        """打开备忘录界面 - 修复单例问题"""
-        if getattr(self, '_memo_window', None) is not None and self._memo_window.winfo_exists():
-            # 如果窗口还存在，只是最小化或隐藏，则激活它
-            self._memo_window.deiconify()
-            self._memo_window.lift()
-            return
-
-        fonts = {
-            'small': self.small_font,
-            'default': self.default_font,
-            'bigger': self.bigger_font
+        memo_kwargs = {
+            'parent': self,
+            'fonts': {
+                'small': self.small_font,
+                'default': self.default_font,
+                'bigger': self.bigger_font
+            },
+            'resource_path': lambda *p: os.path.abspath(os.path.join(ASSETS_DIR, *p)),
+            'is_trad': self.is_trad
         }
-
-        self._memo_window = MemoInterface(
-            master=self,
-            fonts=fonts,
-            resource_path=lambda *p: os.path.abspath(os.path.join(ASSETS_DIR, *p)),
-            is_trad=self.is_trad
-        )
-
-        self._memo_window.protocol("WM_DELETE_WINDOW",
-                                   lambda: (self._memo_window.on_window_close(),
-                                            setattr(self, '_memo_window', None)))
+        _memo_window = TkSingletonWindow.get_instance(MemoInterface, **memo_kwargs)
 
 
     def box_toggle(self, boxes, single_map, current, to_traditional: bool):
@@ -381,7 +314,7 @@ class RhythmCheckerGUI:
     @log_exceptions
     def create_main_interface(self):
         self.main_interface = ttk.Frame(self.root)
-        self.main_interface.pack(pady=tk_value['main_pady'])
+        self.main_interface.pack(pady=MAIN_VALUE['main_pady'])
 
         label = '湊韻詩詞格律校驗工具' if self.is_trad else "凑韵诗词格律校验工具"
         title_label = ttk.Label(self.main_interface, text=label, font=self.bigger_font)
@@ -415,7 +348,7 @@ class RhythmCheckerGUI:
 
         self.main_interface.pack_forget()
         generic = ttk.Frame(self.root)
-        pady_len = tk_value['generic_pady']
+        pady_len = MAIN_VALUE['generic_pady']
         generic.pack(pady=pady_len[2] if mode == 's' else pady_len[1] if mode == 'c' else pady_len[0])
 
         title_label = ttk.Label(generic, text=title_text, font=self.bigger_font)
@@ -712,60 +645,17 @@ class RhythmCheckerGUI:
         text_widget.bind('<KeyPress>', block_enter)  # 阻止回车键
         text_widget.bind('<<Paste>>', clean_paste)  # 清理粘贴内容
 
-logger.info("初始化设置")
-if os.name == 'nt':
-    try:
-        ctypes.windll.shcore.SetProcessDpiAwareness(2)
-        logger.info("DPI 感知设置成功 (SetProcessDpiAwareness)")
-    except (OSError, AttributeError, ctypes.ArgumentError) as e:
-        logger.warning(f"SetProcessDpiAwareness 失败: {e}，尝试备用方法")
-        ctypes.windll.user32.SetProcessDPIAware()
-        logger.info("DPI 感知设置成功 (SetProcessDPIAware)")
-
-current_state = load_state()
-logger.info("状态加载完成")
-
-logger.info("正在检测单实例运行...")
-MUTEX_NAME = "RhythmChecker"
-ERROR_ALREADY_EXISTS = 183
-kernel32 = ctypes.windll.kernel32
-handle = kernel32.CreateMutexW(None, False, MUTEX_NAME)
-last_error = kernel32.GetLastError()
-
-if last_error == ERROR_ALREADY_EXISTS:
-    logger.warning("检测到程序已在运行，尝试激活已有窗口...")
-    try:
-        window_title = "湊韻" if current_state.get('is_traditional', False) else "凑韵"
-        hwnd = ctypes.windll.user32.FindWindowW(None, window_title)
-        if hwnd:
-            ctypes.windll.user32.ShowWindow(hwnd, 5)   # SW_SHOW
-            ctypes.windll.user32.SetForegroundWindow(hwnd)
-            logger.info("已激活已有窗口，当前实例将退出")
-        else:
-            logger.warning("未找到已有窗口句柄")
-    except (OSError, ctypes.WinError) as e:
-        logger.error(f"激活窗口时出错: {e}")
-    sys.exit(0)
-else:
-    logger.info("单实例检测通过，程序继续启动")
-
 if __name__ == "__main__":
-    logger.info("程序启动")
-    try:
-        root = tk.Tk()
-        tk_value = scaled_tk_value()
-        size_tuple = tk_value['size']
-        size_string = 'x'.join(map(str, size_tuple))
-        load_font(FONT_PATH)
-        root.tk.call('tk', 'scaling', 2)
-        ttk.Style().theme_use('vista')
-        root.protocol("WM_DELETE_WINDOW", lambda: on_close(current_state))
-        app = RhythmCheckerGUI(root)
-        root.mainloop()
-    except Exception as err:
-        logger.critical(f"程序崩溃: {str(err)}")
-        logger.critical(traceback.format_exc())
-        raise
+    current_state = bootstrap()
 
-    finally:
-        logger.info("程序退出\n")
+    root = tk.Tk()
+    size_tuple = MAIN_VALUE['size']
+    size_string = 'x'.join(map(str, MAIN_VALUE['size']))
+    root.geometry(size_string)
+
+    load_font(FONT_PATH)
+    root.tk.call('tk', 'scaling', 2)
+    ttk.Style().theme_use('vista')
+    root.protocol("WM_DELETE_WINDOW", lambda: on_close(current_state))
+    app = RhythmCheckerGUI(root)
+    root.mainloop()
