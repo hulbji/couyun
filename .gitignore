@@ -1,7 +1,6 @@
 .idea/
 **/__pycache__/
 test/
-memo/
 couyun.spec
 build/
 dist/
