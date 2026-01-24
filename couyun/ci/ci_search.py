@@ -1,4 +1,6 @@
 import json
+import os
+
 from couyun import CI_LIST, CI_LONG, CI_INDEX
 
 with open(CI_INDEX, 'r', encoding='utf-8') as f:
@@ -26,16 +28,9 @@ def search_ci(input_name: str, ci_pu: int) -> str:
 
 
 def ci_type_extraction(ci_number: str | int, ci_pu: int) -> list[dict]:
-    """
-    提取此编号词牌的格式，不同的格式以两行存储。
-    Args:
-        ci_number: 词牌的编号值
-        ci_pu: 选择的词谱
-    Returns:
-        词牌所有格式的列表，列表中的列表包含每一个格式的例词内容，格律和词牌描述。
-    """
     base = CI_LIST if ci_pu == 1 else CI_LONG
     last = '' if ci_pu == 1 else '_long'
-    file_path = f'{base}\\cipai_{ci_number}{last}.json'
+    file_name = f'cipai_{ci_number}{last}.json'
+    file_path = os.path.join(base, file_name)
     with open(file_path, 'r', encoding='utf-8') as file:
         return json.load(file)

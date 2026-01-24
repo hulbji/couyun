@@ -1,13 +1,10 @@
 .idea/
 **/__pycache__/
 test/
-pingshui_data/
+memo/
 couyun.spec
 build/
 dist/
 file_version.txt
 README.pdf
 build_nuikta.py
-couyun/ci_pu/proceed.py
-couyun/ci_pu/s2t.py
-couyun/ci_pu/test.py

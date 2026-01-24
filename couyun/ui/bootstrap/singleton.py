@@ -1,35 +1,26 @@
-# couyun/bootstrap/singleton.py
-import sys
-import ctypes
-from couyun.ui.core.logger_config import get_logger, log_exceptions
+from PyQt6.QtCore import QSharedMemory, QObject
+from PyQt6.QtNetwork import QLocalServer
 
-logger = get_logger(__name__)
 
-_MUTEX_NAME = "RhythmChecker"
-_ERROR_ALREADY_EXISTS = 183
+class SingleInstance(QObject):
+    def __init__(self, key: str):
+        super().__init__()
+        self.key = key
+        self.shared = QSharedMemory(key)
+        self.server = None
 
-@log_exceptions
-def ensure_single_instance(window_title: str):
-    """
-    确保程序单实例运行。
-    若已存在实例，则尝试激活已有窗口并退出当前进程。
-    """
-    kernel32 = ctypes.windll.kernel32
-    # handle = kernel32.CreateMutexW(None, False, _MUTEX_NAME)
-    last_error = kernel32.GetLastError()
+    def is_running(self) -> bool:
+        # 如果能 attach，说明已有实例
+        if self.shared.attach():
+            self.shared.detach()
+            return True
 
-    if last_error == _ERROR_ALREADY_EXISTS:
-        logger.warning("检测到程序已在运行，尝试激活已有窗口...")
-        try:
-            hwnd = ctypes.windll.user32.FindWindowW(None, window_title)
-            if hwnd:
-                ctypes.windll.user32.ShowWindow(hwnd, 5)   # SW_SHOW
-                ctypes.windll.user32.SetForegroundWindow(hwnd)
-                logger.info("已激活已有窗口，当前实例将退出")
-            else:
-                logger.warning("未找到已有窗口句柄")
-        except Exception as e:
-            logger.error(f"激活已有窗口失败: {e}")
-        sys.exit(0)
+        # 否则创建共享内存
+        if not self.shared.create(1):
+            return True
 
-    logger.info("单实例检测通过")
+        # 创建本地服务器（用于激活已有实例等扩展）
+        self.server = QLocalServer()
+        self.server.removeServer(self.key)
+        self.server.listen(self.key)
+        return False

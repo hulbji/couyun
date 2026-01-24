@@ -1,74 +1,1928 @@
-2026-01-10 20:55:30 | INFO | RhythmChecker.app | 初始化启动环境
-2026-01-10 20:55:30 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
-2026-01-10 20:55:30 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
-2026-01-10 20:55:30 | INFO | RhythmChecker.app | 状态加载完成
-2026-01-10 20:55:30 | INFO | RhythmChecker.singleton | 单实例检测通过
-2026-01-10 20:55:30 | INFO | RhythmChecker.str | 【ensure_single_instance】正常完成
-2026-01-10 20:55:30 | INFO | RhythmChecker.app | tesssssst
-2026-01-10 20:55:30 | INFO | RhythmChecker.app | 【bootstrap】正常完成
-2026-01-10 20:55:30 | INFO | RhythmChecker.RhythmCheckerGUI | 【create_main_interface】正常完成
-2026-01-10 20:55:33 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
-2026-01-10 20:55:38 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
-2026-01-10 20:55:43 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
-2026-01-10 20:55:44 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
-2026-01-10 21:00:20 | INFO | RhythmChecker.app | 初始化启动环境
-2026-01-10 21:00:20 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
-2026-01-10 21:00:20 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
-2026-01-10 21:00:20 | INFO | RhythmChecker.app | 状态加载完成
-2026-01-10 21:00:20 | INFO | RhythmChecker.singleton | 单实例检测通过
-2026-01-10 21:00:20 | INFO | RhythmChecker.str | 【ensure_single_instance】正常完成
-2026-01-10 21:00:20 | INFO | RhythmChecker.app | tesssssst
-2026-01-10 21:00:20 | INFO | RhythmChecker.app | 【bootstrap】正常完成
-2026-01-10 21:00:21 | INFO | RhythmChecker.RhythmCheckerGUI | 【create_main_interface】正常完成
-2026-01-10 21:00:22 | INFO | RhythmChecker.__main__ | 程序退出
-
-2026-01-10 21:01:43 | INFO | RhythmChecker.app | 初始化启动环境
-2026-01-10 21:01:43 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
-2026-01-10 21:01:43 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
-2026-01-10 21:01:43 | INFO | RhythmChecker.app | 状态加载完成
-2026-01-10 21:01:43 | INFO | RhythmChecker.singleton | 单实例检测通过
-2026-01-10 21:01:43 | INFO | RhythmChecker.str | 【ensure_single_instance】正常完成
-2026-01-10 21:01:43 | INFO | RhythmChecker.app | tesssssst
-2026-01-10 21:01:43 | INFO | RhythmChecker.app | 【bootstrap】正常完成
-2026-01-10 21:01:44 | INFO | RhythmChecker.RhythmCheckerGUI | 【create_main_interface】正常完成
-2026-01-10 21:01:46 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
-2026-01-10 21:01:52 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
-2026-01-10 21:02:00 | ERROR | RhythmChecker.RhythmCheckerGUI | 【check_ci】发生异常: list index out of range
-2026-01-10 21:02:00 | ERROR | RhythmChecker.RhythmCheckerGUI | Traceback (most recent call last):
+2026-01-23 16:39:58 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 16:39:58 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
+2026-01-23 16:39:58 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
+2026-01-23 16:39:58 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 16:39:58 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 16:40:00 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_poem_interface】正常完成
+2026-01-23 16:40:01 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-23 16:40:02 | ERROR | RhythmChecker.RhythmCheckerGUI | 【toggle_language】发生异常: wrapped C/C++ object of type QComboBox has been deleted
+2026-01-23 16:40:02 | ERROR | RhythmChecker.RhythmCheckerGUI | Traceback (most recent call last):
   File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
     result = func(*args, **kwargs)
              ^^^^^^^^^^^^^^^^^^^^^
-  File "D:\PyCharm_projects\couyun\couyun\ui\rhythm.py", line 579, in check_ci
-    res = process.main_ci()
-          ^^^^^^^^^^^^^^^^^
-  File "D:\PyCharm_projects\couyun\couyun\ci\ci_rhythm.py", line 414, in main_ci
-    report = self._build_single_ci_report(ci_num)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "D:\PyCharm_projects\couyun\couyun\ci\ci_rhythm.py", line 319, in _build_single_ci_report
-    report = self._one_format_report(ci_num, type_list, fmt_id)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "D:\PyCharm_projects\couyun\couyun\ci\ci_rhythm.py", line 381, in _one_format_report
-    report += self._show_ci(cut_lis, my_text, yun_info, yun_final)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "D:\PyCharm_projects\couyun\couyun\ci\ci_rhythm.py", line 239, in _show_ci
-    result += yun_final[_] + '\n'
-              ~~~~~~~~~^^^
-IndexError: list index out of range
+  File "D:\PyCharm_projects\couyun\couyun\ui\rhythm.py", line 389, in toggle_language
+    self.box_toggle(self.yun_shu_boxes, self.yun_shu_map, self.current_yun_shu, to_trad)
+  File "D:\PyCharm_projects\couyun\couyun\ui\rhythm.py", line 298, in box_toggle
+    if cb is None or not cb.isVisible() or sip.isdeleted(cb):
+                         ^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type QComboBox has been deleted
 
-2026-01-10 21:02:53 | INFO | RhythmChecker.app | 初始化启动环境
-2026-01-10 21:02:53 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
-2026-01-10 21:02:53 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
-2026-01-10 21:02:53 | INFO | RhythmChecker.app | 状态加载完成
-2026-01-10 21:02:53 | INFO | RhythmChecker.singleton | 单实例检测通过
-2026-01-10 21:02:53 | INFO | RhythmChecker.str | 【ensure_single_instance】正常完成
-2026-01-10 21:02:53 | INFO | RhythmChecker.app | tesssssst
-2026-01-10 21:02:53 | INFO | RhythmChecker.app | 【bootstrap】正常完成
-2026-01-10 21:02:54 | INFO | RhythmChecker.RhythmCheckerGUI | 【create_main_interface】正常完成
-2026-01-10 21:02:56 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
-2026-01-10 21:03:04 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
-2026-01-10 21:03:18 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
-2026-01-10 21:03:24 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
-2026-01-10 21:03:24 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
-2026-01-10 21:03:27 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
-2026-01-10 21:03:33 | INFO | RhythmChecker.__main__ | 程序退出
+2026-01-23 16:42:10 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 16:42:10 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
+2026-01-23 16:42:10 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
+2026-01-23 16:42:10 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 16:42:10 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 16:42:12 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_poem_interface】正常完成
+2026-01-23 16:42:13 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-23 16:42:14 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 16:42:15 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 16:42:15 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 16:42:16 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 16:42:16 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 16:42:16 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 16:42:17 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 16:42:17 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 16:42:18 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 16:42:18 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 16:42:18 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 16:42:19 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 16:42:19 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-23 16:42:22 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-23 16:42:23 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_char_interface】正常完成
+2026-01-23 16:42:27 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_char】正常完成
+2026-01-23 16:42:28 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-23 16:42:29 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-23 16:42:32 | ERROR | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】发生异常: 'QComboBox' object has no attribute 'get'
+2026-01-23 16:42:32 | ERROR | RhythmChecker.RhythmCheckerGUI | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\rhythm.py", line 633, in on_yunshu_change
+    self.current_yun_shu = self.yunshu_reverse_map[self.yunshu_var.get()]
+                                                   ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'QComboBox' object has no attribute 'get'
+
+2026-01-23 16:43:01 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 16:43:01 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
+2026-01-23 16:43:01 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
+2026-01-23 16:43:01 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 16:43:01 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 16:43:04 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-23 16:43:05 | ERROR | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】发生异常: 'QComboBox' object has no attribute 'get'
+2026-01-23 16:43:05 | ERROR | RhythmChecker.RhythmCheckerGUI | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\rhythm.py", line 638, in on_cipu_change
+    self.current_ci_pu = self.ci_pu_reverse_map[self.cipu_var.get()]
+                                                ^^^^^^^^^^^^^^^^^
+AttributeError: 'QComboBox' object has no attribute 'get'
+
+2026-01-23 16:44:08 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 16:44:08 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
+2026-01-23 16:44:08 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
+2026-01-23 16:44:08 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 16:44:08 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 16:44:11 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 16:44:12 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 16:44:13 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-23 16:44:15 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 16:44:16 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 16:44:17 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 16:44:19 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 16:44:20 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 16:44:21 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 16:44:22 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-23 16:44:22 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_poem_interface】正常完成
+2026-01-23 16:44:24 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 16:44:24 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 16:44:25 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 16:44:26 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-23 16:44:37 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-23 16:53:34 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 16:53:34 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
+2026-01-23 16:53:34 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
+2026-01-23 16:53:34 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 16:53:34 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 16:53:37 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_poem_interface】正常完成
+2026-01-23 16:53:39 | ERROR | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】发生异常: ''
+2026-01-23 16:53:39 | ERROR | RhythmChecker.RhythmCheckerGUI | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\rhythm.py", line 649, in on_yunshu_change
+    self.current_yun_shu = self.yunshu_reverse_map[self.yunshu_var.currentText()]
+                           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: ''
+
+2026-01-23 17:01:28 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 17:01:28 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
+2026-01-23 17:01:28 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
+2026-01-23 17:01:28 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 17:01:28 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 17:01:30 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_poem_interface】正常完成
+2026-01-23 17:01:31 | ERROR | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】发生异常: ''
+2026-01-23 17:01:31 | ERROR | RhythmChecker.RhythmCheckerGUI | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\rhythm.py", line 640, in on_yunshu_change
+    self.current_yun_shu = self.yunshu_reverse_map[self.yunshu_var.currentText()]
+                           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: ''
+
+2026-01-23 17:03:40 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 17:03:40 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
+2026-01-23 17:03:40 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
+2026-01-23 17:03:40 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 17:03:40 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 17:03:43 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-23 17:03:46 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:46 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:46 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:46 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:46 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:03:46 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:46 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:46 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:46 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:46 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:03:47 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:47 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:47 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:47 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:47 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:03:47 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:47 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:47 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:47 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:47 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:03:48 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:48 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:48 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:48 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:48 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:03:48 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:48 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:48 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:48 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:48 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:03:49 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:49 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:49 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:49 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:49 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:03:49 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:49 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:49 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:49 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:49 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:03:50 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:50 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:50 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:50 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:50 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:03:50 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:50 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:50 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:50 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:50 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:03:51 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:51 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:51 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:51 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:51 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:03:51 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:51 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:03:51 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:51 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:03:51 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:03:52 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_memo_interface】正常完成
+2026-01-23 17:03:55 | ERROR | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】发生异常: 'RhythmCheckerGUI' object has no attribute 'root'
+2026-01-23 17:03:55 | ERROR | RhythmChecker.RhythmCheckerGUI | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\rhythm.py", line 265, in open_cipu_browser
+    'master': self.root,
+              ^^^^^^^^^
+AttributeError: 'RhythmCheckerGUI' object has no attribute 'root'
+
+2026-01-23 17:04:02 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 17:04:02 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
+2026-01-23 17:04:02 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
+2026-01-23 17:04:02 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 17:04:02 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 17:04:04 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_char_interface】正常完成
+2026-01-23 17:04:05 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:04:05 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:04:06 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:04:06 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:04:06 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:04:07 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:04:08 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-23 17:04:08 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_poem_interface】正常完成
+2026-01-23 17:04:10 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:10 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:10 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:04:10 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:10 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:10 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:04:10 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:10 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:10 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:04:11 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:11 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:11 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:04:11 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:11 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:11 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:04:12 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:13 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:14 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:15 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:15 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:15 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:04:16 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:16 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:16 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:04:16 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:16 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:16 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:04:16 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:16 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:16 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:04:17 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-23 17:04:18 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-23 17:04:22 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:22 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:22 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:04:22 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:04:22 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:04:23 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:23 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:23 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:04:23 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:04:23 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:04:24 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:24 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:24 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:04:24 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:04:24 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:04:25 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-23 17:04:26 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-23 17:04:27 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:27 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:27 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:04:27 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:04:27 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:04:28 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:28 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:04:28 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:04:28 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:04:28 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:04:30 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-23 17:08:25 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 17:08:25 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
+2026-01-23 17:08:25 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
+2026-01-23 17:08:25 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 17:08:25 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 17:08:26 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_poem_interface】正常完成
+2026-01-23 17:08:27 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:08:27 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:08:27 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:08:28 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:08:28 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:08:28 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:08:28 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:08:28 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:08:28 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:08:29 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-23 17:08:30 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-23 17:08:33 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:08:33 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:08:33 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:08:33 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:08:33 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:08:35 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:08:35 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:08:35 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:08:35 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:08:35 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:08:36 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:08:36 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:08:36 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:08:36 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:08:36 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:08:36 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:08:36 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:08:36 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:08:36 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:08:36 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:08:37 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:08:37 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:08:37 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:08:37 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:08:37 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:08:37 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-23 17:12:07 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 17:12:07 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
+2026-01-23 17:12:07 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
+2026-01-23 17:12:07 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 17:12:07 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 17:12:09 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-23 17:14:17 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 17:14:17 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
+2026-01-23 17:14:17 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
+2026-01-23 17:14:17 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 17:14:17 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 17:14:19 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_poem_interface】正常完成
+2026-01-23 17:14:20 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:14:20 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:14:20 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:14:20 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:14:20 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:14:20 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:14:21 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:14:21 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:14:21 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 17:14:22 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-23 17:14:23 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:14:23 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-23 17:14:23 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:14:23 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 17:14:23 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-23 17:14:25 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-23 17:14:27 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-23 19:46:42 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 19:46:42 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
+2026-01-23 19:46:42 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
+2026-01-23 19:46:42 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 19:46:42 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 19:46:49 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-23 19:46:50 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-23 19:46:57 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-23 19:47:01 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-23 19:49:51 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 19:49:51 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
+2026-01-23 19:49:51 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
+2026-01-23 19:49:51 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 19:49:51 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 19:49:52 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_poem_interface】正常完成
+2026-01-23 19:49:54 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-23 19:49:54 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-23 19:50:16 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-23 19:50:19 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-23 19:50:24 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 19:50:24 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
+2026-01-23 19:50:24 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
+2026-01-23 19:50:24 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 19:50:24 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 19:50:26 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_poem_interface】正常完成
+2026-01-23 19:50:29 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-23 19:50:30 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-23 19:50:31 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 19:50:36 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-23 19:50:47 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-23 19:51:51 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 19:51:51 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
+2026-01-23 19:51:51 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
+2026-01-23 19:51:51 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 19:51:51 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 19:51:53 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_poem_interface】正常完成
+2026-01-23 19:52:10 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_poem】正常完成
+2026-01-23 19:52:17 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-23 19:52:18 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-23 19:52:24 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-23 19:52:29 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-23 19:58:54 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 19:58:54 | INFO | RhythmChecker.dpi | DPI 感知设置成功 (SetProcessDpiAwareness)
+2026-01-23 19:58:54 | INFO | RhythmChecker.dpi | 【setup_dpi】正常完成
+2026-01-23 19:58:54 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 19:58:54 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 19:58:56 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-23 19:59:01 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-23 19:59:02 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-23 19:59:49 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-23 19:59:50 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-23 19:59:51 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-23 20:00:09 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-23 20:01:57 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 20:01:57 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 20:01:57 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 20:02:04 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-23 20:13:09 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 20:13:09 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 20:13:09 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 20:13:22 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-23 20:44:19 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 20:44:19 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 20:44:19 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 20:44:28 | ERROR | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】发生异常: 'RhythmCheckerGUI' object has no attribute 'root'
+2026-01-23 20:44:28 | ERROR | RhythmChecker.RhythmCheckerGUI | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\rhythm.py", line 263, in open_cipu_browser
+    'master': self.root,
+              ^^^^^^^^^
+AttributeError: 'RhythmCheckerGUI' object has no attribute 'root'
+
+2026-01-23 21:03:54 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 21:03:54 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 21:03:54 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 21:03:57 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:03:57 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-23 21:04:00 | ERROR | RhythmChecker.CiPuBrowser | 【show_detail】发生异常: type object 'QTextEdit' has no attribute 'NoWrap'
+2026-01-23 21:04:00 | ERROR | RhythmChecker.CiPuBrowser | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 382, in show_detail
+    text_area.setLineWrapMode(QTextEdit.NoWrap)  # 不自动换行
+                              ^^^^^^^^^^^^^^^^
+AttributeError: type object 'QTextEdit' has no attribute 'NoWrap'
+
+2026-01-23 21:04:00 | ERROR | RhythmChecker.CiPuBrowser | 【open_detail】发生异常: type object 'QTextEdit' has no attribute 'NoWrap'
+2026-01-23 21:04:00 | ERROR | RhythmChecker.CiPuBrowser | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 288, in open_detail
+    self.show_detail(item)
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 382, in show_detail
+    text_area.setLineWrapMode(QTextEdit.NoWrap)  # 不自动换行
+                              ^^^^^^^^^^^^^^^^
+AttributeError: type object 'QTextEdit' has no attribute 'NoWrap'
+
+2026-01-23 21:04:57 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 21:04:57 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 21:04:57 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 21:04:59 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:04:59 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-23 21:05:02 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-23 21:05:02 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-23 21:05:02 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-23 21:05:04 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:05:04 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-23 21:05:12 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-23 21:05:12 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-23 21:05:12 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-23 21:05:17 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:05:17 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-23 21:05:19 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:05:19 | INFO | RhythmChecker.CiPuBrowser | 【toggle_long_only】正常完成
+2026-01-23 21:05:19 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:05:19 | INFO | RhythmChecker.CiPuBrowser | 【toggle_long_only】正常完成
+2026-01-23 21:05:20 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:05:20 | INFO | RhythmChecker.CiPuBrowser | 【toggle_long_only】正常完成
+2026-01-23 21:05:20 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:05:20 | INFO | RhythmChecker.CiPuBrowser | 【toggle_long_only】正常完成
+2026-01-23 21:05:23 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:05:23 | INFO | RhythmChecker.CiPuBrowser | 【toggle_long_only】正常完成
+2026-01-23 21:05:24 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:05:24 | INFO | RhythmChecker.CiPuBrowser | 【toggle_long_only】正常完成
+2026-01-23 21:05:37 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:05:37 | INFO | RhythmChecker.CiPuBrowser | 【toggle_long_only】正常完成
+2026-01-23 21:05:39 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-23 21:05:39 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-23 21:05:39 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-23 21:05:43 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:05:43 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-23 21:05:44 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-23 21:09:54 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 21:09:54 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 21:09:54 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 21:09:58 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:09:58 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-23 21:10:09 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-23 21:10:19 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 21:10:19 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 21:10:19 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 21:10:22 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:10:22 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-23 21:10:24 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-23 21:10:24 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-23 21:10:24 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-23 21:10:31 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:10:31 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-23 21:10:35 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-23 21:10:46 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 21:10:46 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 21:10:46 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 21:10:49 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:10:49 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-23 21:10:49 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:10:49 | INFO | RhythmChecker.CiPuBrowser | 【toggle_sort】正常完成
+2026-01-23 21:10:50 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:10:50 | INFO | RhythmChecker.CiPuBrowser | 【toggle_sort】正常完成
+2026-01-23 21:10:51 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:10:51 | INFO | RhythmChecker.CiPuBrowser | 【toggle_sort】正常完成
+2026-01-23 21:10:51 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:10:51 | INFO | RhythmChecker.CiPuBrowser | 【toggle_sort】正常完成
+2026-01-23 21:10:52 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:10:52 | INFO | RhythmChecker.CiPuBrowser | 【toggle_sort】正常完成
+2026-01-23 21:10:52 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:10:52 | INFO | RhythmChecker.CiPuBrowser | 【toggle_sort】正常完成
+2026-01-23 21:10:55 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-23 21:11:30 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 21:11:30 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 21:11:30 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 21:11:32 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:11:32 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-23 21:11:33 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:11:33 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-23 21:11:34 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:11:34 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-23 21:11:35 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-23 21:11:35 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-23 21:11:35 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-23 21:11:37 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:11:37 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-23 21:11:44 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-23 21:24:17 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-23 21:24:17 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-23 21:24:17 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-23 21:24:19 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:24:19 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-23 21:24:22 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:24:22 | INFO | RhythmChecker.CiPuBrowser | 【toggle_long_only】正常完成
+2026-01-23 21:24:22 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:24:22 | INFO | RhythmChecker.CiPuBrowser | 【toggle_long_only】正常完成
+2026-01-23 21:24:23 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-23 21:24:23 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-23 21:24:23 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-23 21:24:27 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:24:27 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-23 21:24:29 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:24:29 | INFO | RhythmChecker.CiPuBrowser | 【toggle_long_only】正常完成
+2026-01-23 21:24:30 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:24:30 | INFO | RhythmChecker.CiPuBrowser | 【toggle_long_only】正常完成
+2026-01-23 21:24:30 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-23 21:24:31 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-23 21:24:31 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-23 21:24:34 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:24:34 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-23 21:24:40 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:24:40 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-23 21:24:41 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-23 21:24:41 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-23 21:24:41 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-23 21:24:43 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-23 21:24:43 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-23 21:24:44 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 10:50:34 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 10:50:34 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 10:50:34 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 10:50:37 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 10:50:37 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 10:50:51 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 10:56:44 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 10:56:44 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 10:56:44 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 10:56:47 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 10:56:47 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 10:56:51 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 10:56:51 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 10:56:53 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 10:56:53 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 10:56:53 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 10:56:56 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 10:59:12 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 10:59:12 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 10:59:12 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 10:59:14 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 10:59:14 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 10:59:16 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 10:59:16 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 10:59:16 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 10:59:20 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 10:59:34 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 10:59:34 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 10:59:34 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 10:59:36 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 10:59:36 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 10:59:45 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 11:00:52 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 11:00:52 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 11:00:52 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 11:00:55 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:00:55 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 11:01:02 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 11:01:04 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 11:01:04 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 11:01:04 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 11:01:11 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:01:11 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 11:01:18 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:01:18 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:01:18 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:01:23 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 11:09:11 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 11:09:11 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 11:09:11 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 11:09:13 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:09:13 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 11:09:30 | ERROR | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】发生异常: wrapped C/C++ object of type CiPuBrowser has been deleted
+2026-01-24 11:09:30 | ERROR | RhythmChecker.RhythmCheckerGUI | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\rhythm.py", line 271, in open_cipu_browser
+    _cipu_window = CiPuBrowser(
+                   ^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 27, in __init__
+    if CiPuBrowser._instance is not None and CiPuBrowser._instance.isVisible():
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type CiPuBrowser has been deleted
+
+2026-01-24 11:09:35 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 11:09:35 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 11:09:35 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 11:09:39 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:09:39 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 11:09:46 | ERROR | RhythmChecker.CiPuBrowser | 【show_detail_body】发生异常: 'NoneType' object has no attribute 'setReadOnly'
+2026-01-24 11:09:46 | ERROR | RhythmChecker.CiPuBrowser | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 419, in show_detail_body
+    self.show_ci_pu(text_area, self.qin_raw)
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 221, in show_ci_pu
+    text_area.setReadOnly(False)
+    ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'setReadOnly'
+
+2026-01-24 11:09:46 | ERROR | RhythmChecker.CiPuBrowser | 【show_detail】发生异常: 'NoneType' object has no attribute 'setReadOnly'
+2026-01-24 11:09:46 | ERROR | RhythmChecker.CiPuBrowser | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 467, in show_detail
+    self.show_detail_body(self.detail_widget, None, btn_inner_layout, files_dict)
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 419, in show_detail_body
+    self.show_ci_pu(text_area, self.qin_raw)
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 221, in show_ci_pu
+    text_area.setReadOnly(False)
+    ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'setReadOnly'
+
+2026-01-24 11:09:46 | ERROR | RhythmChecker.CiPuBrowser | 【open_detail】发生异常: 'NoneType' object has no attribute 'setReadOnly'
+2026-01-24 11:09:46 | ERROR | RhythmChecker.CiPuBrowser | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 337, in open_detail
+    self.show_detail(item)
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 467, in show_detail
+    self.show_detail_body(self.detail_widget, None, btn_inner_layout, files_dict)
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 419, in show_detail_body
+    self.show_ci_pu(text_area, self.qin_raw)
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 221, in show_ci_pu
+    text_area.setReadOnly(False)
+    ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'setReadOnly'
+
+2026-01-24 11:10:26 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 11:10:26 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 11:10:26 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 11:10:29 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:10:29 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 11:10:32 | ERROR | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】发生异常: wrapped C/C++ object of type CiPuBrowser has been deleted
+2026-01-24 11:10:32 | ERROR | RhythmChecker.RhythmCheckerGUI | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\rhythm.py", line 271, in open_cipu_browser
+    _cipu_window = CiPuBrowser(
+                   ^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 27, in __init__
+    if CiPuBrowser._instance is not None and CiPuBrowser._instance.isVisible():
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: wrapped C/C++ object of type CiPuBrowser has been deleted
+
+2026-01-24 11:14:40 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 11:14:40 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 11:14:40 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 11:14:42 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:14:42 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 11:14:45 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:14:45 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:14:45 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:14:49 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 11:14:51 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 11:29:49 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 11:29:49 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 11:29:49 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 11:29:52 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:29:52 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 11:30:04 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 11:30:04 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 11:31:33 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 11:31:33 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 11:31:33 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 11:31:36 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:31:36 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 11:31:40 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:31:40 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:31:40 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:31:55 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 11:31:57 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 11:32:15 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 11:32:15 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 11:32:15 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 11:32:17 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:17 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 11:32:20 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:20 | INFO | RhythmChecker.CiPuBrowser | 【toggle_sort】正常完成
+2026-01-24 11:32:20 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:20 | INFO | RhythmChecker.CiPuBrowser | 【toggle_sort】正常完成
+2026-01-24 11:32:21 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:21 | INFO | RhythmChecker.CiPuBrowser | 【toggle_sort】正常完成
+2026-01-24 11:32:22 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:22 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:32:22 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:22 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:32:22 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:22 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:32:23 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:23 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:32:23 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:23 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:32:24 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:24 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:32:24 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:24 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:32:24 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:24 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:32:24 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:24 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:32:25 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:25 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:32:25 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:25 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:32:25 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:25 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:32:27 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:28 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:28 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:32:28 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:28 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:32:30 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:30 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:32:31 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:31 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:32:33 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:32:33 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:32:40 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:32:40 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:32:40 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:32:59 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 11:33:00 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 11:33:17 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 11:33:17 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 11:33:17 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 11:33:22 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:33:22 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 11:33:27 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:33:28 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:33:28 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:33:28 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:33:30 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:33:30 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:33:30 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:33:40 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 11:33:43 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 11:40:46 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 11:40:46 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 11:40:46 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 11:40:49 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:40:49 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 11:40:50 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:40:50 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:40:50 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:40:51 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:40:51 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 11:40:52 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:40:52 | ERROR | RhythmChecker.CiPuBrowser | 【show_detail】发生异常: 'CiPuBrowser' object has no attribute 'current_show'
+2026-01-24 11:40:53 | ERROR | RhythmChecker.CiPuBrowser | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 498, in show_detail
+    raw = self.qin_raw if self.current_show == 'qin' else self.long_raw
+                          ^^^^^^^^^^^^^^^^^
+AttributeError: 'CiPuBrowser' object has no attribute 'current_show'. Did you mean: 'current_item'?
+
+2026-01-24 11:40:53 | ERROR | RhythmChecker.CiPuBrowser | 【open_detail】发生异常: 'CiPuBrowser' object has no attribute 'current_show'
+2026-01-24 11:40:53 | ERROR | RhythmChecker.CiPuBrowser | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 355, in open_detail
+    self.show_detail(item)
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 498, in show_detail
+    raw = self.qin_raw if self.current_show == 'qin' else self.long_raw
+                          ^^^^^^^^^^^^^^^^^
+AttributeError: 'CiPuBrowser' object has no attribute 'current_show'. Did you mean: 'current_item'?
+
+2026-01-24 11:41:05 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 11:41:05 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 11:41:05 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 11:41:07 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-24 11:41:08 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:08 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 11:41:10 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:41:10 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:41:10 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:41:13 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:13 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 11:41:16 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:41:16 | ERROR | RhythmChecker.CiPuBrowser | 【show_detail】发生异常: 'CiPuBrowser' object has no attribute 'current_show'
+2026-01-24 11:41:16 | ERROR | RhythmChecker.CiPuBrowser | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 498, in show_detail
+    raw = self.qin_raw if self.current_show == 'qin' else self.long_raw
+                          ^^^^^^^^^^^^^^^^^
+AttributeError: 'CiPuBrowser' object has no attribute 'current_show'. Did you mean: 'current_item'?
+
+2026-01-24 11:41:16 | ERROR | RhythmChecker.CiPuBrowser | 【open_detail】发生异常: 'CiPuBrowser' object has no attribute 'current_show'
+2026-01-24 11:41:16 | ERROR | RhythmChecker.CiPuBrowser | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 355, in open_detail
+    self.show_detail(item)
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 498, in show_detail
+    raw = self.qin_raw if self.current_show == 'qin' else self.long_raw
+                          ^^^^^^^^^^^^^^^^^
+AttributeError: 'CiPuBrowser' object has no attribute 'current_show'. Did you mean: 'current_item'?
+
+2026-01-24 11:41:19 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 11:41:19 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 11:41:19 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 11:41:21 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:21 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 11:41:22 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:41:22 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:41:22 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:41:25 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 11:41:27 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 11:41:47 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 11:41:47 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 11:41:47 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 11:41:49 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:49 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 11:41:50 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:41:50 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:41:50 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:41:51 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:51 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:52 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:52 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:52 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:52 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:52 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:52 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:53 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:53 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:53 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:53 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:53 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:53 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:54 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:54 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:54 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:54 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:55 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:55 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:55 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:55 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:55 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:55 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:56 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:56 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:56 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:56 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:56 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:56 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:57 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:57 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:57 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:57 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:57 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:57 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:58 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:58 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:58 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:58 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:58 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:58 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:41:59 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:41:59 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:42:08 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 11:42:10 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 11:43:22 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 11:43:22 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 11:43:22 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 11:43:24 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:43:24 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 11:43:25 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:43:25 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:43:25 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:43:26 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:43:26 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:43:26 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:43:26 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:43:27 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:43:27 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:43:27 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:43:27 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:43:27 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:43:27 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 11:43:28 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:43:28 | ERROR | RhythmChecker.CiPuBrowser | 【show_detail】发生异常: 'CiPuBrowser' object has no attribute 'current_show'
+2026-01-24 11:43:28 | ERROR | RhythmChecker.CiPuBrowser | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 498, in show_detail
+    raw = self.qin_raw if self.current_show == 'qin' else self.long_raw
+                          ^^^^^^^^^^^^^^^^^
+AttributeError: 'CiPuBrowser' object has no attribute 'current_show'. Did you mean: 'current_item'?
+
+2026-01-24 11:43:28 | ERROR | RhythmChecker.CiPuBrowser | 【open_detail】发生异常: 'CiPuBrowser' object has no attribute 'current_show'
+2026-01-24 11:43:28 | ERROR | RhythmChecker.CiPuBrowser | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 355, in open_detail
+    self.show_detail(item)
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 498, in show_detail
+    raw = self.qin_raw if self.current_show == 'qin' else self.long_raw
+                          ^^^^^^^^^^^^^^^^^
+AttributeError: 'CiPuBrowser' object has no attribute 'current_show'. Did you mean: 'current_item'?
+
+2026-01-24 11:48:10 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 11:48:10 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 11:48:10 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 11:48:12 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:48:12 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 11:48:15 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:48:15 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:48:15 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:48:18 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 11:48:20 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 11:48:53 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 11:48:53 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 11:48:53 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 11:48:55 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:48:55 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 11:48:56 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:48:56 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:48:56 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:48:57 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 11:48:59 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 11:49:27 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 11:49:27 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 11:49:27 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 11:49:29 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:49:29 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 11:49:30 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:49:30 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:49:30 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:49:31 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:49:31 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 11:49:31 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:49:31 | ERROR | RhythmChecker.CiPuBrowser | 【show_detail】发生异常: 'CiPuBrowser' object has no attribute 'current_show'
+2026-01-24 11:49:31 | ERROR | RhythmChecker.CiPuBrowser | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 498, in show_detail
+    raw = self.qin_raw if self.current_show == 'qin' else self.long_raw
+                          ^^^^^^^^^^^^^^^^^
+AttributeError: 'CiPuBrowser' object has no attribute 'current_show'. Did you mean: 'current_item'?
+
+2026-01-24 11:49:31 | ERROR | RhythmChecker.CiPuBrowser | 【open_detail】发生异常: 'CiPuBrowser' object has no attribute 'current_show'
+2026-01-24 11:49:31 | ERROR | RhythmChecker.CiPuBrowser | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 355, in open_detail
+    self.show_detail(item)
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\ci_pu_browser.py", line 498, in show_detail
+    raw = self.qin_raw if self.current_show == 'qin' else self.long_raw
+                          ^^^^^^^^^^^^^^^^^
+AttributeError: 'CiPuBrowser' object has no attribute 'current_show'. Did you mean: 'current_item'?
+
+2026-01-24 11:49:43 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 11:49:43 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 11:49:43 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 11:49:48 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:49:48 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 11:49:55 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:49:55 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:49:55 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:49:56 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:49:56 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 11:49:57 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:49:57 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:49:57 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:49:59 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:49:59 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:49:59 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:49:59 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:49:59 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:49:59 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:49:59 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:49:59 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:49:59 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:49:59 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:49:59 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:49:59 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:00 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:00 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:00 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:00 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:00 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:00 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:00 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:00 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:00 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:00 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:01 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:01 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:02 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:02 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 11:50:03 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:50:03 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:50:03 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:50:06 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:06 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 11:50:07 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:08 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:50:08 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:50:08 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:50:11 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:11 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 11:50:15 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:16 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:18 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:19 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:20 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:20 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:22 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:22 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:23 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:23 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:24 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:24 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:25 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:25 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:25 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:26 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:26 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:26 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:31 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:31 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:32 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:32 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:34 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:34 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:35 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:35 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:36 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:36 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:37 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:37 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:38 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:39 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:40 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:40 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:40 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:40 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:40 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:40 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:40 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:40 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:41 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:41 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:41 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:41 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:41 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:41 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:42 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:50:42 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:50:42 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:50:43 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:43 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:43 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:43 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:43 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:43 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:43 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:43 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:44 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:44 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:44 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:44 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:44 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:44 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:46 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:46 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:46 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:46 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:47 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:47 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:47 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:47 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:49 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:49 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 11:50:49 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:49 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:50:50 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:50:50 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:50:50 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:50:55 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:55 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 11:50:55 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:50:55 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:50:55 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:50:59 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:50:59 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 11:51:02 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:51:03 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:51:03 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:51:03 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:51:06 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:51:06 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 11:51:07 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:51:07 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 11:51:08 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:51:08 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:51:08 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:51:10 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:51:10 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 11:51:11 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:51:11 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:51:11 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:51:13 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 11:51:13 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 11:51:14 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 11:51:14 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 11:51:14 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 11:51:20 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 11:51:21 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 14:38:00 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 14:38:00 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 14:38:00 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 14:38:03 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:38:03 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 14:38:07 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 14:38:09 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 14:41:23 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 14:41:23 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 14:41:23 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 14:41:25 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:41:25 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 14:41:28 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 14:41:30 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 14:43:22 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 14:43:22 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 14:43:22 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 14:43:24 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:43:24 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 14:43:27 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 14:43:27 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 14:43:27 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 14:43:30 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:43:30 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:43:30 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:43:30 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:43:31 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:43:31 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:43:31 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:43:31 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:43:32 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:43:32 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 14:43:36 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 14:43:36 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 14:52:15 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 14:52:15 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 14:52:15 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 14:52:17 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:52:17 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 14:52:19 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 14:52:19 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 14:52:19 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 14:52:21 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:52:21 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 14:52:23 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 14:52:23 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 14:52:23 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 14:52:24 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:52:24 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 14:52:25 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 14:52:25 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 14:52:25 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 14:52:27 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:52:27 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 14:52:28 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:52:28 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 14:52:29 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 14:52:29 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 14:52:31 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:52:31 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 14:52:32 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 14:52:32 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 14:52:32 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 14:52:33 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:52:33 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 14:52:34 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 14:52:34 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 14:52:34 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 14:52:35 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:52:35 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 14:52:36 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 14:52:36 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 14:52:36 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 14:52:38 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:52:38 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 14:52:43 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:52:43 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:52:43 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:52:43 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:52:44 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 14:52:44 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 14:52:44 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 14:53:14 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:53:14 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 14:53:16 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:53:17 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 14:53:17 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 14:53:17 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 14:53:19 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:53:19 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 14:53:20 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:53:21 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 14:53:21 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 14:53:21 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 14:53:22 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 14:53:27 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:53:27 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 14:53:41 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 14:53:41 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 14:53:41 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 14:53:43 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 14:53:46 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-24 14:53:46 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-24 14:53:47 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-24 14:53:47 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-24 14:53:47 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-24 14:53:48 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-24 14:53:49 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-24 14:53:52 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_memo_interface】正常完成
+2026-01-24 14:53:56 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 14:54:09 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 14:54:09 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 14:54:09 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 14:54:11 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-24 14:54:29 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-24 14:54:37 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-24 14:54:37 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-24 14:54:38 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-24 14:54:39 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-24 14:54:40 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-24 14:54:58 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-24 14:55:30 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-24 14:55:43 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-24 14:55:48 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-24 14:55:58 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-24 14:55:59 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-24 14:56:00 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-24 14:56:00 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-24 14:56:00 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-24 14:56:00 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-24 14:56:00 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-24 14:56:00 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:56:01 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-24 14:56:29 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-24 14:56:34 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:56:34 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:56:35 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:56:36 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:56:36 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:56:37 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 14:56:39 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 14:56:39 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 14:56:39 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 14:56:42 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:56:43 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:56:43 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:56:44 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 14:57:51 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 14:57:51 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 14:57:51 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 14:57:53 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:57:54 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:57:54 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:57:54 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:57:54 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:57:55 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:57:55 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:57:55 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:57:55 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:57:55 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:57:56 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:57:57 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 14:57:59 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 14:57:59 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 14:57:59 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 14:58:00 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:58:00 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:58:01 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:58:01 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:58:01 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 14:58:02 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:02 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 14:58:04 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:04 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:04 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:04 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:04 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:04 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:05 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:05 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:05 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:05 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:05 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:05 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:05 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:05 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:05 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:05 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:06 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:06 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:06 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:06 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:06 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:06 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:06 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:06 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:06 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:06 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:07 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:07 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:07 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:07 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:07 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:07 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:07 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:07 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:08 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:08 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:08 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:08 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:08 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:08 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:08 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:08 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:08 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:08 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:08 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:08 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:09 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:09 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:09 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:09 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:09 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:09 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:09 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:09 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:09 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:09 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:10 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:10 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:10 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:10 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:10 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:10 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:10 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:10 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:10 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:10 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:10 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:10 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:11 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:11 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:11 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:11 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:11 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:11 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:11 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:11 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:11 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:11 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:12 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:12 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:12 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:12 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:12 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:12 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:12 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:12 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:12 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:12 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:13 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:13 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:13 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:13 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:13 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:13 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:13 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:13 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:15 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 14:58:15 | INFO | RhythmChecker.CiPuBrowser | 【toggle_lang】正常完成
+2026-01-24 14:58:16 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 14:58:17 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 14:58:34 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 14:58:34 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 14:58:34 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 14:59:20 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_memo_interface】正常完成
+2026-01-24 14:59:22 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-24 14:59:22 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-24 14:59:22 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-24 14:59:22 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-24 14:59:22 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-24 14:59:22 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-24 14:59:36 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-24 15:00:09 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-24 15:00:10 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-24 15:00:10 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-24 15:00:10 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_poem_interface】正常完成
+2026-01-24 15:00:13 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-24 15:00:17 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 15:00:17 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 15:00:34 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 15:00:34 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 15:00:34 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 15:01:28 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 15:01:29 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 15:02:00 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 15:02:00 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 15:02:00 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 15:02:05 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 15:02:05 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 15:02:32 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 15:02:32 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 15:02:32 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 15:02:57 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 15:02:57 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 15:03:04 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 15:03:04 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 15:03:04 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 15:03:06 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 15:03:06 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 15:03:06 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 15:04:17 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 15:04:31 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-24 15:04:32 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-24 15:04:33 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-24 15:04:33 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-24 15:04:33 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-24 15:04:34 | INFO | RhythmChecker.RhythmCheckerGUI | 【switch_background】正常完成
+2026-01-24 15:04:38 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 16:16:47 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 16:16:47 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 16:16:47 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 16:16:49 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 16:16:49 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 16:17:08 | ERROR | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】发生异常: super-class __init__() of type CiPuBrowser was never called
+2026-01-24 16:17:08 | ERROR | RhythmChecker.RhythmCheckerGUI | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\rhythm.py", line 281, in open_cipu_browser
+    _cipu_window.show()
+RuntimeError: super-class __init__() of type CiPuBrowser was never called
+
+2026-01-24 16:17:17 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 16:17:17 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 16:17:17 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 16:17:19 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 16:17:19 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 16:17:31 | ERROR | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】发生异常: super-class __init__() of type CiPuBrowser was never called
+2026-01-24 16:17:31 | ERROR | RhythmChecker.RhythmCheckerGUI | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\rhythm.py", line 281, in open_cipu_browser
+    _cipu_window.show()
+RuntimeError: super-class __init__() of type CiPuBrowser was never called
+
+2026-01-24 16:22:06 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 16:22:06 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 16:22:06 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 16:22:08 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 16:22:08 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 16:22:10 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 16:22:12 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 16:22:12 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 16:22:13 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 16:22:14 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 16:22:14 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 16:22:16 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 16:22:17 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 16:22:17 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 16:22:21 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 16:22:21 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 16:22:22 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 16:22:23 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 16:22:24 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 16:24:21 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 16:24:21 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 16:24:21 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 16:24:23 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 16:24:23 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 16:24:27 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 16:24:27 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 16:24:29 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 16:24:29 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 16:24:30 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 16:25:13 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 16:25:13 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 16:25:13 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 16:25:17 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 16:25:17 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 16:25:20 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 16:25:21 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 16:25:21 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 16:25:30 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 16:25:32 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 16:25:32 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 16:25:36 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 16:25:37 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 16:29:11 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 16:29:11 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 16:29:11 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 16:29:14 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 16:29:14 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 16:29:20 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 16:29:21 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 16:31:17 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 16:31:17 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 16:31:17 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 16:31:19 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 16:31:19 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 16:31:23 | INFO | RhythmChecker.CiPuBrowser | 【on_window_close】正常完成
+2026-01-24 16:31:24 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 16:47:31 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 16:47:31 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 16:47:31 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 16:47:33 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 16:47:35 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 16:47:35 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 16:47:35 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 16:47:36 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 16:47:36 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 16:47:38 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 16:47:44 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 19:55:42 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 19:55:42 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 19:55:42 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 19:55:44 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_memo_interface】正常完成
+2026-01-24 19:55:47 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 20:12:37 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 20:12:37 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 20:12:37 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 20:12:39 | INFO | RhythmChecker.MemoInterface | 【save_data】正常完成
+2026-01-24 20:12:39 | INFO | RhythmChecker.MemoInterface | 【create_main_ui】正常完成
+2026-01-24 20:12:39 | ERROR | RhythmChecker.MemoInterface | 【create_detail_ui】发生异常: setWordWrapMode(self, policy: QTextOption.WrapMode): argument 1 has unexpected type 'bool'
+2026-01-24 20:12:39 | ERROR | RhythmChecker.MemoInterface | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\memo_interface.py", line 279, in create_detail_ui
+    self.content_text.setWordWrapMode(True)
+TypeError: setWordWrapMode(self, policy: QTextOption.WrapMode): argument 1 has unexpected type 'bool'
+
+2026-01-24 20:12:39 | ERROR | RhythmChecker.MemoInterface | 【create_ui】发生异常: setWordWrapMode(self, policy: QTextOption.WrapMode): argument 1 has unexpected type 'bool'
+2026-01-24 20:12:39 | ERROR | RhythmChecker.MemoInterface | Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\memo_interface.py", line 126, in create_ui
+    self.create_detail_ui()
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\memo_interface.py", line 279, in create_detail_ui
+    self.content_text.setWordWrapMode(True)
+TypeError: setWordWrapMode(self, policy: QTextOption.WrapMode): argument 1 has unexpected type 'bool'
+
+2026-01-24 20:12:39 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_memo_interface】正常完成
+2026-01-24 20:12:44 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 20:13:29 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 20:13:29 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 20:13:29 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 20:13:31 | INFO | RhythmChecker.MemoInterface | 【create_main_ui】正常完成
+2026-01-24 20:13:31 | INFO | RhythmChecker.MemoInterface | 【create_detail_ui】正常完成
+2026-01-24 20:13:31 | INFO | RhythmChecker.MemoInterface | 【create_status_bar】正常完成
+2026-01-24 20:13:31 | INFO | RhythmChecker.MemoInterface | 【refresh_notes_list】正常完成
+2026-01-24 20:13:31 | INFO | RhythmChecker.MemoInterface | 【create_ui】正常完成
+2026-01-24 20:13:31 | INFO | RhythmChecker.MemoInterface | 【refresh_notes_list】正常完成
+2026-01-24 20:13:31 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_memo_interface】正常完成
+2026-01-24 20:13:31 | INFO | RhythmChecker.MemoInterface | 【refresh_notes_list】正常完成
+2026-01-24 20:13:31 | INFO | RhythmChecker.MemoInterface | 【_post_ui_init】正常完成
+2026-01-24 20:13:41 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 20:13:54 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 20:13:54 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 20:13:54 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 20:13:56 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 20:14:30 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 20:14:30 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 20:14:30 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 20:14:32 | INFO | RhythmChecker.MemoInterface | 【create_main_ui】正常完成
+2026-01-24 20:14:32 | INFO | RhythmChecker.MemoInterface | 【create_detail_ui】正常完成
+2026-01-24 20:14:32 | INFO | RhythmChecker.MemoInterface | 【create_status_bar】正常完成
+2026-01-24 20:14:32 | INFO | RhythmChecker.MemoInterface | 【refresh_notes_list】正常完成
+2026-01-24 20:14:32 | INFO | RhythmChecker.MemoInterface | 【create_ui】正常完成
+2026-01-24 20:14:32 | INFO | RhythmChecker.MemoInterface | 【refresh_notes_list】正常完成
+2026-01-24 20:14:32 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_memo_interface】正常完成
+2026-01-24 20:14:32 | ERROR | RhythmChecker.MemoInterface | 【refresh_notes_list】发生异常: <class 'logging.LogRecord'> returned a result with an exception set
+2026-01-24 20:14:32 | ERROR | RhythmChecker.MemoInterface | RuntimeError: wrapped C/C++ object of type QListWidget has been deleted
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 62, in wrapper
+    logger.info(f"【{func_name}】正常完成")
+  File "D:\miniconda\envs\pycharm\Lib\logging\__init__.py", line 1539, in info
+    self._log(INFO, msg, args, **kwargs)
+  File "D:\miniconda\envs\pycharm\Lib\logging\__init__.py", line 1682, in _log
+    record = self.makeRecord(self.name, level, fn, lno, msg, args,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\miniconda\envs\pycharm\Lib\logging\__init__.py", line 1651, in makeRecord
+    rv = _logRecordFactory(name, level, fn, lno, msg, args, exc_info, func,
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SystemError: <class 'logging.LogRecord'> returned a result with an exception set
+
+2026-01-24 20:14:32 | ERROR | RhythmChecker.MemoInterface | 【_post_ui_init】发生异常: <class 'logging.LogRecord'> returned a result with an exception set
+2026-01-24 20:14:32 | ERROR | RhythmChecker.MemoInterface | RuntimeError: wrapped C/C++ object of type QListWidget has been deleted
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\memo_interface.py", line 81, in _post_ui_init
+    self.refresh_notes_list()
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 62, in wrapper
+    logger.info(f"【{func_name}】正常完成")
+  File "D:\miniconda\envs\pycharm\Lib\logging\__init__.py", line 1539, in info
+    self._log(INFO, msg, args, **kwargs)
+  File "D:\miniconda\envs\pycharm\Lib\logging\__init__.py", line 1682, in _log
+    record = self.makeRecord(self.name, level, fn, lno, msg, args,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\miniconda\envs\pycharm\Lib\logging\__init__.py", line 1651, in makeRecord
+    rv = _logRecordFactory(name, level, fn, lno, msg, args, exc_info, func,
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SystemError: <class 'logging.LogRecord'> returned a result with an exception set
+
+2026-01-24 20:22:41 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 20:22:41 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 20:22:41 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 20:22:42 | INFO | RhythmChecker.MemoInterface | 【create_main_ui】正常完成
+2026-01-24 20:22:42 | INFO | RhythmChecker.MemoInterface | 【create_detail_ui】正常完成
+2026-01-24 20:22:42 | INFO | RhythmChecker.MemoInterface | 【create_status_bar】正常完成
+2026-01-24 20:22:42 | INFO | RhythmChecker.MemoInterface | 【refresh_notes_list】正常完成
+2026-01-24 20:22:42 | INFO | RhythmChecker.MemoInterface | 【create_ui】正常完成
+2026-01-24 20:22:42 | INFO | RhythmChecker.MemoInterface | 【refresh_notes_list】正常完成
+2026-01-24 20:22:42 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_memo_interface】正常完成
+2026-01-24 20:22:42 | ERROR | RhythmChecker.MemoInterface | 【refresh_notes_list】发生异常: <class 'logging.LogRecord'> returned a result with an exception set
+2026-01-24 20:22:42 | ERROR | RhythmChecker.MemoInterface | RuntimeError: wrapped C/C++ object of type QListWidget has been deleted
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 62, in wrapper
+    logger.info(f"【{func_name}】正常完成")
+  File "D:\miniconda\envs\pycharm\Lib\logging\__init__.py", line 1539, in info
+    self._log(INFO, msg, args, **kwargs)
+  File "D:\miniconda\envs\pycharm\Lib\logging\__init__.py", line 1682, in _log
+    record = self.makeRecord(self.name, level, fn, lno, msg, args,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\miniconda\envs\pycharm\Lib\logging\__init__.py", line 1651, in makeRecord
+    rv = _logRecordFactory(name, level, fn, lno, msg, args, exc_info, func,
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SystemError: <class 'logging.LogRecord'> returned a result with an exception set
+
+2026-01-24 20:22:42 | ERROR | RhythmChecker.MemoInterface | 【_post_ui_init】发生异常: <class 'logging.LogRecord'> returned a result with an exception set
+2026-01-24 20:22:42 | ERROR | RhythmChecker.MemoInterface | RuntimeError: wrapped C/C++ object of type QListWidget has been deleted
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 61, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\PyCharm_projects\couyun\couyun\ui\memo_interface.py", line 81, in _post_ui_init
+    self.refresh_notes_list()
+  File "D:\PyCharm_projects\couyun\couyun\ui\core\logger_config.py", line 62, in wrapper
+    logger.info(f"【{func_name}】正常完成")
+  File "D:\miniconda\envs\pycharm\Lib\logging\__init__.py", line 1539, in info
+    self._log(INFO, msg, args, **kwargs)
+  File "D:\miniconda\envs\pycharm\Lib\logging\__init__.py", line 1682, in _log
+    record = self.makeRecord(self.name, level, fn, lno, msg, args,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\miniconda\envs\pycharm\Lib\logging\__init__.py", line 1651, in makeRecord
+    rv = _logRecordFactory(name, level, fn, lno, msg, args, exc_info, func,
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SystemError: <class 'logging.LogRecord'> returned a result with an exception set
+
+2026-01-24 20:35:21 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 20:35:21 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 20:35:21 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 20:35:23 | INFO | RhythmChecker.MemoInterface | 【create_main_ui】正常完成
+2026-01-24 20:35:23 | INFO | RhythmChecker.MemoInterface | 【create_detail_ui】正常完成
+2026-01-24 20:35:23 | INFO | RhythmChecker.MemoInterface | 【create_status_bar】正常完成
+2026-01-24 20:35:23 | INFO | RhythmChecker.MemoInterface | 【refresh_notes_list】正常完成
+2026-01-24 20:35:23 | INFO | RhythmChecker.MemoInterface | 【update_status】正常完成
+2026-01-24 20:35:23 | INFO | RhythmChecker.MemoInterface | 【create_ui】正常完成
+2026-01-24 20:35:23 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_memo_interface】正常完成
+2026-01-24 20:35:23 | INFO | RhythmChecker.MemoInterface | 【refresh_notes_list】正常完成
+2026-01-24 20:35:23 | INFO | RhythmChecker.MemoInterface | 【update_status】正常完成
+2026-01-24 20:35:23 | INFO | RhythmChecker.MemoInterface | 【_post_ui_init】正常完成
+2026-01-24 20:37:26 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 20:37:26 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 20:37:26 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 20:37:29 | INFO | RhythmChecker.MemoInterface | 【create_main_ui】正常完成
+2026-01-24 20:37:29 | INFO | RhythmChecker.MemoInterface | 【create_detail_ui】正常完成
+2026-01-24 20:37:29 | INFO | RhythmChecker.MemoInterface | 【create_status_bar】正常完成
+2026-01-24 20:37:29 | INFO | RhythmChecker.MemoInterface | 【refresh_notes_list】正常完成
+2026-01-24 20:37:29 | INFO | RhythmChecker.MemoInterface | 【update_status】正常完成
+2026-01-24 20:37:29 | INFO | RhythmChecker.MemoInterface | 【create_ui】正常完成
+2026-01-24 20:37:29 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_memo_interface】正常完成
+2026-01-24 20:37:29 | INFO | RhythmChecker.MemoInterface | 【refresh_notes_list】正常完成
+2026-01-24 20:37:29 | INFO | RhythmChecker.MemoInterface | 【update_status】正常完成
+2026-01-24 20:37:29 | INFO | RhythmChecker.MemoInterface | 【_post_ui_init】正常完成
+2026-01-24 20:40:23 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 20:40:23 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 20:40:23 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 20:40:25 | INFO | RhythmChecker.MemoInterface | 【create_main_ui】正常完成
+2026-01-24 20:40:25 | INFO | RhythmChecker.MemoInterface | 【create_detail_ui】正常完成
+2026-01-24 20:40:25 | INFO | RhythmChecker.MemoInterface | 【create_status_bar】正常完成
+2026-01-24 20:40:25 | INFO | RhythmChecker.MemoInterface | 【refresh_notes_list】正常完成
+2026-01-24 20:40:25 | INFO | RhythmChecker.MemoInterface | 【update_status】正常完成
+2026-01-24 20:40:25 | INFO | RhythmChecker.MemoInterface | 【create_ui】正常完成
+2026-01-24 20:40:25 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_memo_interface】正常完成
+2026-01-24 20:40:25 | INFO | RhythmChecker.MemoInterface | 【refresh_notes_list】正常完成
+2026-01-24 20:40:25 | INFO | RhythmChecker.MemoInterface | 【update_status】正常完成
+2026-01-24 20:40:25 | INFO | RhythmChecker.MemoInterface | 【_post_ui_init】正常完成
+2026-01-24 20:40:30 | INFO | RhythmChecker.MemoInterface | 【save_data】正常完成
+2026-01-24 20:40:30 | INFO | RhythmChecker.MemoInterface | 【closeEvent】正常完成
+2026-01-24 20:40:33 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 20:45:26 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 20:45:26 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 20:45:26 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 20:45:29 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 20:45:51 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 20:45:51 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 20:45:51 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 20:45:53 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 20:46:01 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 20:46:01 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 20:46:01 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 20:46:09 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 20:47:54 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 20:47:54 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 20:47:54 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 20:48:02 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 20:48:19 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 20:48:19 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 20:48:19 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 20:48:20 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 20:48:21 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 20:48:24 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 20:49:31 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 20:49:31 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 20:49:31 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 20:49:37 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 20:49:38 | INFO | RhythmChecker.__main__ | 程序退出
+
+2026-01-24 20:50:39 | INFO | RhythmChecker.app | 初始化启动环境
+2026-01-24 20:50:39 | INFO | RhythmChecker.app | 状态加载完成
+2026-01-24 20:50:39 | INFO | RhythmChecker.app | 【bootstrap】正常完成
+2026-01-24 20:50:42 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_poem_interface】正常完成
+2026-01-24 20:51:05 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_poem】正常完成
+2026-01-24 20:53:18 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-24 20:53:19 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-24 20:53:28 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-24 20:53:29 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-24 20:54:01 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-24 20:54:06 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-24 20:54:29 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-24 20:54:30 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_char_interface】正常完成
+2026-01-24 20:54:35 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_char】正常完成
+2026-01-24 20:54:56 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 20:54:56 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_cipu_browser】正常完成
+2026-01-24 21:03:37 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 21:03:57 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 21:03:57 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 21:03:57 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 21:03:58 | INFO | RhythmChecker.CiPuBrowser | 【show_detail_body】正常完成
+2026-01-24 21:03:58 | INFO | RhythmChecker.CiPuBrowser | 【show_detail】正常完成
+2026-01-24 21:03:58 | INFO | RhythmChecker.CiPuBrowser | 【open_detail】正常完成
+2026-01-24 21:04:20 | INFO | RhythmChecker.CiPuBrowser | 【update_list】正常完成
+2026-01-24 21:04:20 | INFO | RhythmChecker.CiPuBrowser | 【back_to_main】正常完成
+2026-01-24 21:04:26 | INFO | RhythmChecker.RhythmCheckerGUI | 【return_to_main】正常完成
+2026-01-24 21:04:26 | INFO | RhythmChecker.RhythmCheckerGUI | 【open_ci_interface】正常完成
+2026-01-24 21:04:35 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-24 21:04:35 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_yunshu_change】正常完成
+2026-01-24 21:04:35 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-24 21:04:35 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-24 21:04:35 | INFO | RhythmChecker.RhythmCheckerGUI | 【on_cipu_change】正常完成
+2026-01-24 21:04:35 | INFO | RhythmChecker.RhythmCheckerGUI | 【toggle_language】正常完成
+2026-01-24 21:04:39 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-24 21:04:42 | INFO | RhythmChecker.RhythmCheckerGUI | 【check_ci】正常完成
+2026-01-24 21:05:55 | INFO | RhythmChecker.__main__ | 程序退出
 

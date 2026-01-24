@@ -1,5 +1,4 @@
 """诗歌校验模块内容，可以校验五言或七言的绝句或律诗或排律，可以校验孤雁入群的特殊格式。支持拗救。支持三韵。"""
-import re
 import math
 from collections import defaultdict
 
@@ -11,7 +10,7 @@ from couyun.shi.shi_first import ShiFirst  # 判断首句格式
 
 
 class ShiRhythm:
-    def __init__(self, yun_shu, poem, poem_comma, is_trad):
+    def __init__(self, yun_shu, poem, comma_pos, is_trad):
         self.lyu_ju_rule_dict = {
             1: ['11221', '21121', '11121'],  # 平起押韵
             2: ['01122', '11212'],  # 平起不押韵
@@ -26,14 +25,12 @@ class ShiRhythm:
         self.sh = ['〇', '●', '◎', '�']
         self.yun_shu = yun_shu
         self.poem = poem
-        self.poem_comma = poem_comma
+        self.comma_pos = comma_pos
         self.is_trad = is_trad
 
     @staticmethod
-    def _infer_sen_len(poem: str, has_comma: bool) -> int:
+    def _infer_sen_len(poem: str) -> int:
         """根据是否含逗号、总长，推断句长 5 或 7"""
-        if has_comma:
-            return 5 if len(poem) % 5 == 0 else 7
         return 5 if len(poem) % 5 == 0 else 7
 
     def _infer_poem_type(self, total_lines: int) -> str:
@@ -401,10 +398,20 @@ class ShiRhythm:
             Returns:
                 所有片段长度一致时返回该长度，否则返回 None
             """
-        punctuation_pattern = r'[.!?;:,，。？！；：、]'
-        segments = re.split(punctuation_pattern, self.poem_comma)
-        non_empty_segments = [segment.strip() for segment in segments if segment.strip()]
-        return len(non_empty_segments[0])
+        if not isinstance(self.comma_pos, list):
+            return False
+
+        sen = len(self.comma_pos)
+        if sen < 4 or sen % 2 != 0:
+            return False
+
+        is_seven = all(self.comma_pos[i] == 7 * i + 6 for i in range(sen))
+        is_five = all(self.comma_pos[i] == 5 * i + 4 for i in range(sen))
+        if is_seven:
+            return 7
+        if is_five:
+            return 5
+        return None
 
     @staticmethod
     def _fix_f_rhythm(f_rhythm, this_rhythm):
@@ -416,7 +423,7 @@ class ShiRhythm:
     def _build_report(self, maybe_len, main_rhythm, f_rhythm,
                       f_hanzi, s_hanzi, pingze):
         """为单平仄方向生成完整报告"""
-        sen_len = maybe_len or self._infer_sen_len(self.poem, self.poem_comma != self.poem)
+        sen_len = maybe_len or self._infer_sen_len(self.poem)
         total_lines = len(self.poem) // sen_len
         poem_type = self._infer_poem_type(total_lines)
 
@@ -478,7 +485,7 @@ class ShiRhythm:
             校验文本 或 错误码 1/2
         """
         # 1. 快速失败：句长不合法
-        if self.poem_comma != self.poem:
+        if self.comma_pos:
             sen_len = self._check_sentence_lengths()
             if sen_len not in (5, 7):
                 return 1

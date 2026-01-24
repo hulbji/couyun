@@ -99,12 +99,12 @@ def _yun_data_process(yun_jiao_pos: list[int], yun_list: list[str], yun_jiao_cla
 
 
 class CiRhythm:
-    def __init__(self, yun_shu: int, ci_pai_name: str, ci_content: str, ci_comma: str,
+    def __init__(self, yun_shu: int, ci_pai_name: str, ci_content: str, ci_comma_pos: str,
                  give_type: str, ci_pu: int, is_trad: bool):
         self.yun_shu = yun_shu
         self.ci_pai_name = ci_pai_name
         self.ci_content = ci_content
-        self.ci_comma = ci_comma
+        self.ci_comma_pos = ci_comma_pos
         self.give_type = give_type
         self.ci_pu = ci_pu
         self.show_mark = ['◎', '●', '〇', '�']
@@ -274,9 +274,9 @@ class CiRhythm:
                 form_count += 1
                 continue
             cipai_form = self._find_punctuation_positions(single_sample_ci)
-            input_form = self._find_punctuation_positions(self.ci_comma)
-            right = len(set(input_form).intersection(cipai_form))
-            right_rate = right / len(set(input_form) | set(cipai_form))
+            # input_form = self._find_punctuation_positions(self.ci_comma)
+            right = len(set(self.ci_comma_pos).intersection(cipai_form))
+            right_rate = right / len(set(self.ci_comma_pos) | set(cipai_form))
             if zi_conunt <= 14:
                 set_rate = 0
             elif zi_conunt >= 100:

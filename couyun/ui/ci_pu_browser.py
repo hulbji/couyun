@@ -1,11 +1,18 @@
 import json
 import os
-import tkinter as tk
-from tkinter import ttk
-from PIL import Image, ImageTk
+
+from PyQt6 import sip
+from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtGui import QPixmap, QIcon
+from PyQt6.QtWidgets import (
+    QWidget, QLabel, QVBoxLayout, QHBoxLayout, QListWidget,
+    QLineEdit, QPushButton, QCheckBox, QFrame, QTextEdit, QApplication)
+
+from couyun import CI_TRAD, CI_LONG_TRAD, CI_ORIGIN, CI_LONG_ORIGIN, bg_pic, ICO_PATH
 from couyun.ui.core.logger_config import get_logger, log_exceptions
 
 logger = get_logger(__name__)
+
 
 def load_ci_index(json_path):
     """读取列表形式的 ci_index（每项为 {'name': [...], 'type': [...] }）"""
@@ -13,55 +20,27 @@ def load_ci_index(json_path):
         return json.load(f)
 
 
-# noinspection PyTypeChecker
-class CiPuBrowser(tk.Toplevel):
+class CiPuBrowser(QWidget):
     _instance = None
+    def __init__(self, parent, json_path, fonts, state):
+        super().__init__(parent)
+        CiPuBrowser._instance = self
 
-    def __init__(self, master, json_path, fonts, resource_path,
-                 state, origin_dir, long_dir, origin_trad_dir, long_trad_dir):
-        if CiPuBrowser._instance is not None and CiPuBrowser._instance.winfo_exists():
-            CiPuBrowser._instance.lift()
-            return
-        if CiPuBrowser._instance is not None:
-            CiPuBrowser._instance.destroy()
+        # ===== 关键：设置为独立窗口 =====
+        self.setWindowFlags(
+            Qt.WindowType.Window |
+            Qt.WindowType.WindowMinimizeButtonHint |
+            Qt.WindowType.WindowCloseButtonHint
+        )
 
-        super().__init__(master)
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
 
-        self.detail_text = None
-        self.current_show = 'qin'
-        self.long_raw = None
-        self.qin_raw = None
-        self.detail_frame = None
-        self.detail_title = None
-        self.qin_btn = None
-        self.long_btn = None
-        self.btn_frame = None
-
-        self.qin_raw_s = None
-        self.qin_raw_t = None
-        self.long_raw_s = None
-        self.long_raw_t = None
-        self.current_item = None
-
+        # ===== 状态与数据 =====
         self.is_trad = state.get('is_trad', False)
-
-        self.title("詞譜查詢" if self.is_trad else "词谱查询")
-        base_size = [860, 645]
-        self.scale = 1.5
-        scaled_size = [int(base_size[0] * self.scale), int(base_size[1] * self.scale)]
-        self.geometry(f'{scaled_size[0]}x{scaled_size[1]}')
-        self.iconbitmap(resource_path('picture', 'ei.ico'))
-        self.resizable(False, False)
-        self.fonts = fonts
-        self.resource_path = resource_path
         self.current_state = state
-        self.origin_dir = origin_dir
-        self.long_dir = long_dir
-        self.origin_trad_dir = origin_trad_dir
-        self.long_trad_dir = long_trad_dir
+        self.fonts = fonts
         self.sort_mode = state['sort_mode']
         self.indexed = load_ci_index(json_path)
-
         self.long_only_idx = {1, 10, 11, 22, 23, 24, 28, 29, 36, 47, 50, 52, 54, 57, 58, 60, 62, 64, 65, 67, 69, 74, 75,
                               79, 81, 85, 86, 90, 91, 96, 102, 104, 105, 106, 109, 110, 113, 116, 126, 127, 128, 129,
                               133, 138, 141, 145, 149, 150, 151, 157, 158, 161, 162, 175, 181, 183, 186, 187, 190, 225,
@@ -72,74 +51,183 @@ class CiPuBrowser(tk.Toplevel):
                               652, 658, 660, 662, 664, 667, 668, 678, 688, 697, 698, 706, 722, 728, 730, 738, 742, 765,
                               775, 781, 782, 795, 798, 800, 802, 804, 805, 806, 811, 812, 814}
 
-        # 背景图（按新窗口大小）
-        img_file = (state['bg_images'][state['bg_index']]
-                    if 'bg_images' in state else 'ei.jpg')
-        img_path = resource_path("picture", img_file)
-        bg_img = Image.open(img_path).resize((scaled_size[0], scaled_size[1]))
-        self.bg_image = ImageTk.PhotoImage(bg_img)
-        self.background_label = tk.Label(self, image=self.bg_image)
-        self.background_label.place(relwidth=1, relheight=1)
-
-        # 主框架（放在背景之上）
-        self.main_frame = ttk.Frame(self)
-        self.main_frame.place(relx=0.02, rely=0.03, relwidth=0.96, relheight=0.82)
-
-        # 搜索栏
-        search_frame = ttk.Frame(self.main_frame)
-        search_frame.pack(pady=8, fill=tk.X)
-        self.search_var = tk.StringVar()
-        self.search_hint = ttk.Label(search_frame,
-                                     text="輸入詞譜名/拼音：" if self.is_trad else "输入词谱名/拼音：",
-                                     font=fonts['default'])
-        self.search_hint.pack(side=tk.LEFT)
-        entry = ttk.Entry(search_frame, textvariable=self.search_var,
-                          font=fonts['default'], width=40)
-        entry.pack(side=tk.LEFT, padx=6)
-        entry.bind("<KeyRelease>", self.update_list)
-
-        # 列表区
-        list_frame = ttk.Frame(self.main_frame)
-        list_frame.pack(fill=tk.BOTH, expand=True, padx=6, pady=6)
-        self.result_box = tk.Listbox(list_frame, font=fonts['small'])
-        self.result_box.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-        self.result_box.bind('<Double-1>', self.open_detail)
-
-        vsb = ttk.Scrollbar(list_frame, orient=tk.VERTICAL, command=self.result_box.yview)
-        self.result_box.configure(yscrollcommand=vsb.set)
-        vsb.pack(side=tk.RIGHT, fill=tk.Y)
-
-        self.no_result_label = ttk.Label(self.main_frame, text="", font=fonts['default'])
-        self.no_result_label.pack(pady=4)
-
-        small_font = fonts['small']
-        self.sort_btn = tk.Button(self, text=self.sort_label(),
-                                  font=small_font, command=self.toggle_sort)
-        self.sort_btn.place(relx=0.02, rely=0.95, anchor='sw')
-
-        self.return_btn = tk.Button(self, text="返回",
-                                    font=small_font, command=self.back_to_main)
-        self.return_btn.place_forget()
-
-        self.toggle_btn = tk.Button(self, text=("简体" if self.is_trad else "繁體"),
-                                    font=small_font, command=self.toggle_lang)
-        self.toggle_btn.place(relx=0.98, rely=0.95, anchor='se')
-
+        self.current_show = 'qin'
+        self.current_item = None
         self.current_matched = []
-        self.result_box.insert(tk.END, "")  # 触发初始化
-        self.result_box.delete(0, tk.END)
 
-        self.long_only_var = tk.BooleanVar(value=False)
-        self.long_only_cb = tk.Checkbutton(
-            self,
-            text="只顯示龍譜" if self.is_trad else "只显示龙谱",
-            font=fonts['small'],
-            variable=self.long_only_var,
-            command=self.toggle_long_only
+        # ===== 窗口属性 =====
+        self.setWindowTitle("詞譜查詢" if self.is_trad else "词谱查询")
+        screen = QApplication.primaryScreen()
+        screen_size = screen.size()
+        screen_width, screen_height = screen_size.width(), screen_size.height()
+
+        win_width = int(screen_width * 0.65)
+        win_height = int(win_width * 3 / 4)  # 4:3
+        self.setFixedSize(win_width, win_height)
+
+        self.setWindowIcon(QIcon(ICO_PATH))
+
+        # ===== 背景 =====
+        img_path = bg_pic(state.get('bg_index', 0))
+
+        pix = QPixmap(img_path).scaled(
+            self.width(), self.height(),
+            Qt.AspectRatioMode.IgnoreAspectRatio,
+            Qt.TransformationMode.SmoothTransformation
         )
-        self.long_only_cb.place(relx=0.95, rely=0.05, anchor='ne')
+        self.bg_label = QLabel(self)
+        self.bg_label.setPixmap(pix)
+        self.bg_label.setGeometry(0, 0, self.width(), self.height())
+        self.bg_label.lower()
+
+        # ===== 灰色背景样式 =====
+        self.gray_style = "background-color: rgba(50, 50, 50, 150); color: white; padding: 5px 8px; border-radius: 3px;"
+
+        # ===== 主框架 =====
+        # 宽度95%，高度上方留5%、下方留10%
+        main_frame_width = int(self.width() * 0.95)
+        main_frame_height = int(self.height() * 0.85)  # 100% - 5% - 10%
+        main_frame_x = (self.width() - main_frame_width) // 2  # 水平居中
+        main_frame_y = int(self.height() * 0.05)  # 上方留5%
+
+        self.main_frame = QFrame(self)
+        self.main_frame.setGeometry(main_frame_x, main_frame_y,
+                                    main_frame_width, main_frame_height)
+
+        main_layout = QVBoxLayout(self.main_frame)
+        main_layout.setSpacing(8)
+        main_layout.setContentsMargins(6, 6, 6, 6)
+
+        # ===== 搜索栏 =====
+        search_layout = QHBoxLayout()
+        search_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)  # 左对齐
+
+        self.search_hint = QLabel("輸入詞譜名/拼音：" if self.is_trad else "输入词谱名/拼音：")
+        self.search_hint.setFont(fonts['default'])
+        self.search_hint.setStyleSheet(self.gray_style)
+
+        self.search_var = QLineEdit()
+        self.search_var.setFont(fonts['default'])
+        self.search_var.setFixedWidth(200)  # 固定宽度，更紧凑
+        self.search_var.textChanged.connect(lambda: self.update_list())
+
+        search_layout.addWidget(self.search_hint)
+        search_layout.addWidget(self.search_var)
+        search_layout.addStretch()  # 右侧填充，保持左对齐效果
+        main_layout.addLayout(search_layout)
+
+        # ===== 列表区 =====
+        self.result_box = QListWidget()
+        self.result_box.setFont(fonts['small'])
+        self.result_box.itemDoubleClicked.connect(lambda: self.open_detail())
+        # 设置更紧凑的列表项高度
+        self.result_box.setStyleSheet("""
+            QListWidget::item { 
+                height: 20px; 
+                padding: 2px;
+            }
+        """)
+        main_layout.addWidget(self.result_box)
+
+        # ===== 无结果提示 =====
+        self.no_result_label = QLabel("")
+        self.no_result_label.setFont(fonts['default'])
+        self.no_result_label.setStyleSheet(self.gray_style)
+        self.no_result_label.hide()  # 初始隐藏
+        main_layout.addWidget(self.no_result_label)
+
+        # ===== 底部按钮区域 =====
+        self.bottom_bar = QFrame(self)
+        bar_height = 50
+        self.bottom_bar.setGeometry(
+            self.main_frame.x(),
+            self.main_frame.y() + self.main_frame.height() + 5,
+            self.main_frame.width(),
+            bar_height
+        )
+        self.bottom_bar.show()
+
+        btn_w = 90
+        btn_h = 32
+
+        self.sort_btn = QPushButton(self.sort_label(), self.bottom_bar)
+        self.sort_btn.setFont(fonts['small'])
+        self.sort_btn.setStyleSheet(self.gray_style)
+        self.sort_btn.setFixedSize(btn_w, btn_h)
+        self.sort_btn.clicked.connect(lambda: self.toggle_sort())
+        self.sort_btn.show()
+
+        self.return_btn = QPushButton("返回", self.bottom_bar)
+        self.return_btn.setFont(fonts['small'])
+        self.return_btn.setStyleSheet(self.gray_style)
+        self.return_btn.setFixedSize(btn_w, btn_h)
+        self.return_btn.clicked.connect(lambda: self.back_to_main())
+        self.return_btn.hide()  # 初始隐藏
+        # self.return_btn.show()
+
+        self.toggle_btn = QPushButton("简体" if self.is_trad else "繁體", self.bottom_bar)
+        self.toggle_btn.setFont(fonts['small'])
+        self.toggle_btn.setStyleSheet(self.gray_style)
+        self.toggle_btn.setFixedSize(btn_w, btn_h)
+        self.toggle_btn.clicked.connect(lambda: self.toggle_lang())
+        self.toggle_btn.show()
+
+        QTimer.singleShot(0, self._init_bottom_btn_pos)
+
+        btn_w = 90
+        btn_h = 32
+        self.sort_btn.setFixedSize(btn_w, btn_h)
+        self.return_btn.setFixedSize(btn_w, btn_h)
+        self.toggle_btn.setFixedSize(btn_w, btn_h)
+
+        # ===== 右上角复选框（在主框架外，绝对定位）=====
+        self.long_only_cb = QCheckBox("只顯示龍譜" if self.is_trad else "只显示龙谱", self)
+        self.long_only_cb.setFont(fonts['small'])
+        self.long_only_cb.stateChanged.connect(lambda: self.update_list())
+        self.long_only_cb.setStyleSheet("""
+            QCheckBox {
+                background-color: rgba(50, 50, 50, 150);
+                color: white;
+                padding: 5px 8px;
+                border-radius: 3px;
+            }
+            QCheckBox::indicator {
+                width: 15px;
+                height: 15px;
+            }
+        """)
+        self.long_only_cb.adjustSize()
+        # 右上角，距离顶部10px，距离右边10px
+        self.long_only_cb.move(self.width() - self.long_only_cb.width() - 10, 10)
+
+        # 初始化变量
+        self.detail_text = None
+        self.long_raw = None
+        self.qin_raw = None
+        self.detail_frame = None
+        self.detail_title = None
+        self.qin_btn_detail = None  # 详情页的钦谱按钮
+        self.long_btn_detail = None  # 详情页的龙谱按钮
+        self.btn_frame = None
+        self.qin_raw_s = None
+        self.qin_raw_t = None
+        self.long_raw_s = None
+        self.long_raw_t = None
+        self.detail_widget = None
 
         self.update_list()
+        self.show()
+
+    def _init_bottom_btn_pos(self):
+        bar_w = self.bottom_bar.width()
+        bar_h = self.bottom_bar.height()
+
+        btn_w = self.sort_btn.width()
+        btn_h = self.sort_btn.height()
+
+        self.sort_btn.move(int(bar_w * 0.10 - btn_w / 2), int(bar_h / 2 - btn_h / 2))
+        self.return_btn.move(int(bar_w * 0.50 - btn_w / 2), int(bar_h / 2 - btn_h / 2))
+        self.toggle_btn.move(int(bar_w * 0.90 - btn_w / 2), int(bar_h / 2 - btn_h / 2))
 
     @log_exceptions
     def toggle_long_only(self):
@@ -147,67 +235,78 @@ class CiPuBrowser(tk.Toplevel):
         self.update_list()
 
     @staticmethod
-    def show_ci_pu(text_area: tk.Text, raw_text: str):
-        """
-        在指定 Text 控件中显示词谱内容。
-        raw_text 必须是未经过繁简转换的原文。
-        """
+    def show_ci_pu(text_area: QTextEdit, raw_text: str):
+        """在指定 QTextEdit 控件中显示词谱内容"""
         if raw_text is None:
             return
-        text_area.config(state=tk.NORMAL)
-        text_area.delete('1.0', tk.END)
-        text_area.insert(tk.END, raw_text)
-        text_area.config(state=tk.DISABLED)
+        text_area.setReadOnly(False)
+        text_area.clear()
+        text_area.setPlainText(raw_text)
+        text_area.setReadOnly(True)
 
     @log_exceptions
     def toggle_lang(self):
-        """翻转简繁状态并全局刷新：主界面 + 详情页（若已打开）"""
+        """翻转简繁状态并全局刷新"""
         self.is_trad = not self.is_trad
-        self.title("詞譜查詢" if self.is_trad else "词谱查询")
-        self.toggle_btn.config(text="简体" if self.is_trad else "繁體",
-                               font=self.fonts['small'])
-        self.sort_btn.config(text=self.sort_label())
-        self.search_hint.config(text="輸入詞譜名/拼音：" if self.is_trad else "输入词谱名/拼音：")
-        self.long_only_cb.config(text="只顯示龍譜" if self.is_trad else "只显示龙谱")  # 新增
-        self.return_btn.config(text="返回")
-        if getattr(self, 'detail_frame', None) is not None and self.detail_frame.winfo_exists():
+
+        # 窗口标题
+        self.setWindowTitle("詞譜查詢" if self.is_trad else "词谱查询")
+
+        # 搜索提示
+        self.search_hint.setText("輸入詞譜名/拼音：" if self.is_trad else "输入词谱名/拼音：")
+
+        # 按钮文本
+        self.toggle_btn.setText("简体" if self.is_trad else "繁體")
+        self.sort_btn.setText(self.sort_label())
+        self.long_only_cb.setText("只顯示龍譜" if self.is_trad else "只显示龙谱")
+        self.return_btn.setText("返回")
+
+        # 刷新详情页语言
+        if getattr(self, 'detail_widget', None) is not None and not sip.isdeleted(self.detail_widget):
             self._refresh_detail_lang()
+
         self.update_list()
 
     def _refresh_detail_lang(self):
-        # t0 = time.perf_counter()
+        """刷新详情页中的语言"""
         self.qin_raw = self.qin_raw_t if self.is_trad else self.qin_raw_s
         self.long_raw = self.long_raw_t if self.is_trad else self.long_raw_s
 
-        self.detail_title.config(
-            text=self.current_item['names_trad'][0] if self.is_trad else self.current_item['names'][0]
+        # 标题
+        self.detail_title.setText(
+            self.current_item['names_trad'][0] if self.is_trad else self.current_item['names'][0]
         )
-        self.qin_btn.config(text='欽譜' if self.is_trad else '钦谱',
-                            command=self._on_qin)
-        if self.long_btn is not None:
-            self.long_btn.config(text='龍譜' if self.is_trad else '龙谱',
-                                 command=self._on_long)
 
+        # 按钮
+        if hasattr(self, 'qin_btn_detail') and self.qin_btn_detail is not None:
+            self.qin_btn_detail.setText('欽譜' if self.is_trad else '钦谱')
+            self.qin_btn_detail.clicked.disconnect()
+            self.qin_btn_detail.clicked.connect(lambda: self._on_qin())
+
+        if hasattr(self, 'long_btn_detail') and self.long_btn_detail is not None:
+            self.long_btn_detail.setText('龍譜' if self.is_trad else '龙谱')
+            self.long_btn_detail.clicked.disconnect()
+            self.long_btn_detail.clicked.connect(lambda: self._on_long())
+
+        # 文本刷新
         raw = self.qin_raw if self.current_show == 'qin' else self.long_raw
         self.show_ci_pu(self.detail_text, raw)
-        # t1 = time.perf_counter()
-        # print(f"[_refresh_detail_lang] time {t1 - t0:.3f}s")
 
     def sort_label(self):
         return ["排序:拼音", "排序:字數", "排序:類型"][self.sort_mode] if self.is_trad else \
-        ["排序:拼音", "排序:字数", "排序:类型"][self.sort_mode]
+            ["排序:拼音", "排序:字数", "排序:类型"][self.sort_mode]
 
     @log_exceptions
     def toggle_sort(self):
         self.sort_mode = (self.sort_mode + 1) % 3
         self.current_state['sort_mode'] = self.sort_mode
-        self.sort_btn.config(text=self.sort_label())
+        self.sort_btn.setText(self.sort_label())
         self.update_list()
 
     @log_exceptions
     def update_list(self, _=None):
-        key = self.search_var.get().strip().lower()
-        self.result_box.delete(0, tk.END)
+        key = self.search_var.text().strip().lower()
+        self.result_box.clear()
 
         def sort_key(ci_pais):
             t = ci_pais['type']
@@ -223,8 +322,8 @@ class CiPuBrowser(tk.Toplevel):
 
         ordered = sorted(self.indexed, key=sort_key)
 
-        # 添加龙谱过滤逻辑
-        if self.long_only_var.get():
+        # 龙谱过滤逻辑
+        if self.long_only_cb.isChecked():
             ordered = [item for item in ordered if item['idx'] in self.long_only_idx]
 
         matched = []
@@ -238,29 +337,23 @@ class CiPuBrowser(tk.Toplevel):
         self.current_matched = matched
 
         if not matched:
-            self.no_result_label.config(text="找不到符合條件的詞譜"if self.is_trad else "找不到符合条件的词谱")
+            self.no_result_label.setText("找不到符合條件的詞譜" if self.is_trad else "找不到符合条件的词谱")
+            self.no_result_label.show()
             return
         else:
-            self.no_result_label.config(text="")
-        # t3 = time.perf_counter()
+            self.no_result_label.hide()
+            self.no_result_label.setText("")
 
         displays = [it['display_t'] if self.is_trad else it['display_s'] for it in matched]
 
-        self.result_box.pack_forget()
-        self.result_box.delete(0, tk.END)
-        self.result_box.insert(tk.END, *displays)
-        self.result_box.update_idletasks()
-        self.result_box.pack(fill='both', expand=True)
+        self.result_box.addItems(displays)
 
-        # t4 = time.perf_counter()
-        # print(f"[update_list] time {t1 - t0:.3f}s {t2 - t1:.3f}s {t3 - t2:.3f}s {t4 - t3:.3f}s")
-        # print(f"[update_list] displays count: {len(displays)}")
-
+    @log_exceptions
     def open_detail(self, _=None):
-        sel = self.result_box.curselection()
-        if not sel:
+        selected_items = self.result_box.selectedIndexes()
+        if not selected_items:
             return
-        idx_in_matched = sel[0]
+        idx_in_matched = selected_items[0].row()
         item = self.current_matched[idx_in_matched]
         self.show_detail(item)
 
@@ -273,17 +366,12 @@ class CiPuBrowser(tk.Toplevel):
             return None
 
     def load_ci_files(self, item):
-        """
-        根据 idx 一次性把 4 个文件读出来，返回 dict。
-        键：qin_raw_s / qin_raw_t / long_raw_s / long_raw_t
-        读不到返回 None。
-        """
         idx = item['idx']
         return {
-            'qin_raw_s': self.read_file(os.path.join(self.origin_dir, f'cipai_{idx}.txt')),
-            'qin_raw_t': self.read_file(os.path.join(self.origin_trad_dir, f'cipai_{idx}_trad.txt')),
-            'long_raw_s': self.read_file(os.path.join(self.long_dir, f'cipai_{idx}_long.txt')),
-            'long_raw_t': self.read_file(os.path.join(self.long_trad_dir, f'cipai_{idx}_long_trad.txt')),
+            'qin_raw_s': self.read_file(os.path.join(CI_ORIGIN, f'cipai_{idx}.txt')),
+            'qin_raw_t': self.read_file(os.path.join(CI_TRAD, f'cipai_{idx}_trad.txt')),
+            'long_raw_s': self.read_file(os.path.join(CI_LONG_ORIGIN, f'cipai_{idx}_long.txt')),
+            'long_raw_t': self.read_file(os.path.join(CI_LONG_TRAD, f'cipai_{idx}_long_trad.txt')),
         }
 
     def _on_qin(self):
@@ -297,16 +385,9 @@ class CiPuBrowser(tk.Toplevel):
         self.show_ci_pu(self.detail_text, raw)
 
     @log_exceptions
-    def show_detail_body(self, detail, text_area, btn_frame, files_dict):
-        """
-        根据已读到的文件内容，完成：
-        1. 按当前繁/简模式给 self.qin_raw / self.long_raw 赋值
-        2. 创建“钦谱/龙谱”按钮并绑定事件
-        3. 默认显示钦谱
-        """
-        small_font = self.fonts['small']
-
-        # 按当前模式选取简体 or 繁体
+    def show_detail_body(self, detail_widget: QWidget, btn_layout: QHBoxLayout, files_dict: dict):
+        """根据已读文件显示词谱内容，并创建钦谱/龙谱按钮"""
+        # 按当前模式选取简/繁体
         self.qin_raw_s = files_dict['qin_raw_s']
         self.qin_raw_t = files_dict['qin_raw_t']
         self.long_raw_s = files_dict['long_raw_s']
@@ -314,108 +395,159 @@ class CiPuBrowser(tk.Toplevel):
         self.qin_raw = self.qin_raw_t if self.is_trad else self.qin_raw_s
         self.long_raw = self.long_raw_t if self.is_trad else self.long_raw_s
 
+        small_font = self.fonts['small']
+
         # 钦谱按钮
-        self.qin_btn = tk.Button(btn_frame,
-                  text='欽譜' if self.is_trad else '钦谱',
-                  font=small_font,
-                  command=self._on_qin
-                  )
-        self.qin_btn.pack(side=tk.LEFT, padx=int(4*self.scale))
+        self.qin_btn_detail = QPushButton('欽譜' if self.is_trad else '钦谱')
+        self.qin_btn_detail.setFont(small_font)
+        self.qin_btn_detail.setStyleSheet("""
+            QPushButton {
+                background-color: #c9a6eb;
+                color: white;
+                padding: 8px 20px;
+                border-radius: 5px;
+                min-width: 60px;
+                max-width: 80px;
+            }
+            QPushButton:hover {
+                background-color: #b893d8;
+            }
+        """)
+        self.qin_btn_detail.clicked.connect(self._on_qin)
+        btn_layout.addWidget(self.qin_btn_detail)
 
         # 龙谱按钮（有内容才显示）
         if self.long_raw is not None:
-            self.long_btn = tk.Button(btn_frame,
-                      text='龍譜' if self.is_trad else '龙谱',
-                      font=small_font,
-                      command=self._on_long
-                      )
-            self.long_btn.pack(padx=int(4*self.scale))
+            self.long_btn_detail = QPushButton('龍譜' if self.is_trad else '龙谱')
+            self.long_btn_detail.setFont(small_font)
+            self.long_btn_detail.setStyleSheet("""
+                QPushButton {
+                    background-color: #c9a6eb;
+                    color: white;
+                    padding: 8px 20px;
+                    border-radius: 5px;
+                    min-width: 60px;
+                    max-width: 80px;
+                }
+                QPushButton:hover {
+                    background-color: #b893d8;
+                }
+            """)
+            self.long_btn_detail.clicked.connect(self._on_long)
+            btn_layout.addWidget(self.long_btn_detail)
 
-        # 默认显示钦谱
-        self.show_ci_pu(text_area, self.qin_raw)
-        # 把 detail 保存到实例变量，方便返回按钮销毁
-        self.detail_frame = detail
+        # 注意：这里不再调用 show_ci_pu，由调用者负责
+        self.detail_frame = detail_widget
 
     @log_exceptions
-    def show_detail(self, item):
-        """原函数只保留界面骨架，逻辑部分通过上面两个新函数完成。"""
-        # t0 = time.perf_counter()
-        self.main_frame.place_forget()
-        self.sort_btn.place_forget()
+    def show_detail(self, item: dict):
+        """显示词谱详情（修复版）"""
+        # 根据"只显示龙谱"选项决定默认显示的内容
+        self.current_show = 'long' if self.long_only_cb.isChecked() else 'qin'
+
+        self.main_frame.hide()
+        self.sort_btn.hide()  # 隐藏排序按钮
+        self.long_only_cb.hide()  # 隐藏龙谱复选框
+        self.return_btn.show()  # 显示返回按钮
+
         self.current_item = item
 
-        small_font = self.fonts['small']
-        self.return_btn.place(relx=0.5, rely=0.95, anchor='s')
-        self.return_btn.config(font=small_font, text="返回")
+        geo = self.main_frame.geometry()
+        self.detail_widget = QWidget(self)
+        self.detail_widget.setGeometry(geo.x(), geo.y(), geo.width(), geo.height() - 60)
 
-        detail = ttk.Frame(self)
-        detail.place(relx=0.02, rely=0.03, relwidth=0.96, relheight=0.82)
+        layout = QVBoxLayout(self.detail_widget)
+        layout.setSpacing(10)
+        layout.setContentsMargins(10, 10, 10, 10)
 
-        self.detail_title = ttk.Label(detail,
-                                      text=item['names_trad'][0] if self.is_trad else item['names'][0],
-                                      font=self.fonts['bigger'])
-        self.detail_title.pack(pady=6)
+        # ===== 标题（居中，灰色背景）=====
+        title_layout = QHBoxLayout()
+        title_layout.addStretch()
 
-        self.btn_frame = ttk.Frame(detail)
-        self.btn_frame.pack(pady=6)
+        self.detail_title = QLabel(item['names_trad'][0] if self.is_trad else item['names'][0])
+        self.detail_title.setFont(self.fonts['bigger'])
+        self.detail_title.setStyleSheet("""
+            background-color: rgba(50, 50, 50, 150);
+            color: white;
+            padding: 10px 30px;
+            border-radius: 5px;
+        """)
+        self.detail_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        text_frame = ttk.Frame(detail)
-        text_frame.pack(fill=tk.BOTH, expand=True, padx=6, pady=6)
+        title_layout.addWidget(self.detail_title)
+        title_layout.addStretch()
+        layout.addLayout(title_layout)
 
-        y_scroll = ttk.Scrollbar(text_frame, orient=tk.VERTICAL)
-        text_area = tk.Text(text_frame, wrap=tk.CHAR, font=self.fonts['small'])
-        text_area.configure(yscrollcommand=y_scroll.set)
-        self.detail_text = text_area
-        y_scroll.config(command=text_area.yview)
+        # ===== 按钮区域（居中，紫色）=====
+        btn_layout = QHBoxLayout()
+        btn_layout.addStretch()
 
-        text_area.grid(row=0, column=0, sticky="nsew")
-        y_scroll.grid(row=0, column=1, sticky="ns")
-
-        text_frame.grid_rowconfigure(0, weight=1)
-        text_frame.grid_columnconfigure(0, weight=1)
+        self.btn_frame = QWidget(self.detail_widget)
+        btn_inner_layout = QHBoxLayout(self.btn_frame)
+        btn_inner_layout.setSpacing(15)
 
         files_dict = self.load_ci_files(item)
+        self.show_detail_body(self.detail_widget, btn_inner_layout, files_dict)
 
-        # 修改默认显示逻辑
-        self.show_detail_body(detail, text_area, self.btn_frame, files_dict)
+        btn_layout.addWidget(self.btn_frame)
+        btn_layout.addStretch()
+        layout.addLayout(btn_layout)
 
-        # 在long_only模式下且龙谱存在时，优先显示龙谱
-        if self.long_only_var.get() and self.long_raw is not None:
-            self.current_show = 'long'
-            raw = self.long_raw_t if self.is_trad else self.long_raw_s
-            self.show_ci_pu(self.detail_text, raw)
-        else:
-            self.current_show = 'qin'
+        # ===== 文本区域 =====
+        self.detail_text = QTextEdit(self.detail_widget)
+        self.detail_text.setReadOnly(True)
+        self.detail_text.setFont(self.fonts['small'])
+        self.detail_text.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
+        layout.addWidget(self.detail_text)
 
-        # t1 = time.perf_counter()
-        # print(f"[show_detail] time {t1 - t0:.3f}s")
+        # 现在显示正确的内容
+        raw = self.qin_raw if self.current_show == 'qin' else self.long_raw
+        self.show_ci_pu(self.detail_text, raw)
+
+        self.detail_widget.show()
 
     @log_exceptions
     def back_to_main(self):
-        if hasattr(self, 'detail_frame'):
-            self.qin_btn = None
-            self.long_btn = None
-            self.detail_frame.destroy()
-            del self.detail_frame
+        # 删除详情页相关控件和属性
+        if hasattr(self, 'detail_widget') and self.detail_widget is not None:
+            # 修复：检查对象是否被删除
+            try:
+                if not sip.isdeleted(self.detail_widget):
+                    if hasattr(self, 'qin_btn_detail') and self.qin_btn_detail is not None:
+                        if not sip.isdeleted(self.qin_btn_detail):
+                            self.qin_btn_detail.deleteLater()
+                        self.qin_btn_detail = None
+                    if hasattr(self, 'long_btn_detail') and self.long_btn_detail is not None:
+                        if not sip.isdeleted(self.long_btn_detail):
+                            self.long_btn_detail.deleteLater()
+                        self.long_btn_detail = None
 
-        # 清理与详情页相关的属性
-        for attr in ('detail_text', 'qin_raw', 'long_raw', 'current_show'):
+                    self.detail_widget.deleteLater()
+            except RuntimeError:
+                pass  # 对象已被删除，忽略
+            finally:
+                # 确保清理引用
+                if hasattr(self, 'detail_widget'):
+                    del self.detail_widget
+
+        for attr in ('detail_text', 'qin_raw', 'long_raw'):
             if hasattr(self, attr):
                 delattr(self, attr)
 
-        self.sort_btn.place(relx=0.02, rely=0.95, anchor='sw')
-        self.return_btn.place_forget()
-        self.main_frame.place(relx=0.02, rely=0.03, relwidth=0.96, relheight=0.82)
+        self.sort_btn.show()  # 显示排序按钮
+        self.long_only_cb.show()  # 显示龙谱复选框
+        self.return_btn.hide()  # 隐藏返回按钮
+        self.main_frame.show()
         self.update_list()
 
     @log_exceptions
     def on_window_close(self):
+        """关闭窗口时清理单例引用"""
         if hasattr(CiPuBrowser, '_instance'):
             CiPuBrowser._instance = None
-
-        # 2. 销毁窗口（确保窗口彻底关闭）
-        if self.winfo_exists():
-            self.destroy()
-
-        if hasattr(self.master, '_cipu_window'):
-            delattr(self.master, '_cipu_window')
+        if hasattr(self, '_main_window_ref'):
+            main_window = self._main_window_ref
+            if hasattr(main_window, '_cipu_window'):
+                delattr(main_window, '_cipu_window')
+        if self.isVisible():
+            self.close()
