@@ -25,6 +25,7 @@ from couyun.ui.core.logger_config import get_logger, log_exceptions
 
 logger = get_logger(__name__)
 
+@ log_exceptions
 def load_font(font_path: str) -> str:
     """加载 TTF 字体并返回字体 family 名称"""
     font_id = QFontDatabase.addApplicationFont(font_path)
@@ -36,11 +37,13 @@ def load_font(font_path: str) -> str:
     return families[0]
 
 
+@ log_exceptions
 def save_state(state: dict) -> None:
     with open(STATE_PATH, 'w', encoding='utf-8') as f:
         json.dump(state, f, ensure_ascii=False, indent=4)
 
 
+@ log_exceptions
 def on_close(state, window=None):
     """关闭窗口时的行为，卸载字体。将新状态写入json文件。"""
     save_state(state)
@@ -52,6 +55,7 @@ def on_close(state, window=None):
 class SingleCharInput(QTextEdit):
     """自定义单行文本输入框：阻止回车键 + 粘贴自动清理换行"""
 
+    @log_exceptions
     def __init__(self, parent=None):
         super().__init__(parent)
         # PyQt6 修正：使用 LineWrapMode 枚举
@@ -61,12 +65,14 @@ class SingleCharInput(QTextEdit):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
+    @log_exceptions
     def keyPressEvent(self, event):
         # PyQt6 修正：使用 Qt.Key.Key_Return 而不是 Qt.Key_Return
         if event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             return  # 阻止回车，不调用父类方法
         super().keyPressEvent(event)
 
+    @log_exceptions
     def insertFromMimeData(self, source):
         """粘贴时自动删除换行符"""
         if source.hasText():
@@ -83,6 +89,7 @@ class SingleCharInput(QTextEdit):
 
 # noinspection PyTypeChecker
 class RhythmCheckerGUI(QWidget):
+    @log_exceptions
     def __init__(self, current_state):
         super().__init__()
 
@@ -245,6 +252,7 @@ class RhythmCheckerGUI(QWidget):
         self._cipu_window = None
         self._memory_window = None
 
+    @log_exceptions
     def cc_convert(self, text, to_trad: bool):
         """根据目标模式转换文本"""
         return text.translate(self.s2t) if to_trad else text.translate(self.t2s)
@@ -274,6 +282,7 @@ class RhythmCheckerGUI(QWidget):
         )
         self._cipu_window.show()
 
+    @log_exceptions
     def box_toggle(self, boxes, single_map, current, to_traditional: bool):
         """安全处理简繁切换下拉框"""
         for cb in boxes:
@@ -297,40 +306,6 @@ class RhythmCheckerGUI(QWidget):
                 print(f"box_toggle 在对 {cb} 时出错: {e}")
 
     @log_exceptions
-    def validate_content(self, mode, content):
-        """从备忘录校验内容"""
-        self.return_to_main()
-
-        self.show()
-        self.raise_()
-        self.activateWindow()
-
-        if mode == 'poem':
-            self.open_poem_interface()
-            self._do_validate(content, 'poem')
-        else:
-            self.current_ci_pu = 1
-            self.open_ci_interface()
-            self._do_validate(content, 'ci')
-
-    def _do_validate(self, content, mode):
-        """可靠地填充和执行校验"""
-
-        if hasattr(self, 'current_input_text') and self.current_input_text:
-            # QTextEdit 替代 Tkinter Text
-            self.current_input_text.setReadOnly(False)
-            self.current_input_text.clear()
-            self.current_input_text.setPlainText(content)
-            self.current_input_text.setReadOnly(False)  # 如果想要可编辑，可改成 True
-
-            if mode == 'poem':
-                self.check_poem(self.current_input_text, self.current_output_text)
-            else:
-                self.cipai_var.setText("")  # 清空词牌名
-                self.check_ci(self.current_input_text, self.current_output_text)
-        else:
-            logger.error("未找到输入输出框")
-
     def translate_new_widgets(self, start_widgets, start_yun, start_ci):
         """新界面创建后，若当前是繁体模式，立即翻译新增控件和下拉框"""
         if not self.is_trad:
@@ -347,6 +322,7 @@ class RhythmCheckerGUI(QWidget):
         self.box_toggle(self.cipu_boxes[start_ci:], self.ci_pu_map, self.current_ci_pu, True)
 
     @staticmethod
+    @log_exceptions
     def display_result(ot, res):
         """统一输出结果到 QTextEdit 控件"""
         ot.show()
@@ -355,12 +331,14 @@ class RhythmCheckerGUI(QWidget):
         ot.insertPlainText(res)
         ot.setReadOnly(True)
 
+    @log_exceptions
     def my_warn(self, title, msg):
         if self.is_trad:
             title = title.translate(self.s2t)
             msg = msg.translate(self.s2t)
         QMessageBox.warning(self, title, msg)
 
+    @log_exceptions
     def register(self, widget):
         """注册需要翻译的控件"""
         self.widgets_to_translate.append(widget)
@@ -402,6 +380,7 @@ class RhythmCheckerGUI(QWidget):
         self.background_image = QPixmap(bg_pic(self.bg_index))
         self.bg_label.setPixmap(self.background_image)
 
+    @log_exceptions
     def create_generic_interface(self, title_text, hint_text, button_text, command_func, mode):
         old_widgets = len(self.widgets_to_translate)
         old_yun = len(self.yun_shu_boxes)
@@ -602,14 +581,15 @@ class RhythmCheckerGUI(QWidget):
         generic.show()
         return it, ot
 
+    @log_exceptions
     def get_ci_sample(self):
         ci_pai_name = self.cipai_var.text()  # QLineEdit 的内容用 .text()
         ci_form = self.cipai_form.text()  # QLineEdit 的内容用 .text()
         if not ci_pai_name:
             self.my_warn("找茬是吧？", "请输入词牌名！")
             return
-        if not ci_form.isnumeric():
-            self.my_warn("找茬是吧？", "请输入正确的格式！")
+        if not re.fullmatch(r'[0-9]+', ci_form):
+            self.my_warn("找茬是吧？", "请输入半角阿拉伯数字！")
             return
 
         cp = ci_pai_name.strip()
@@ -623,7 +603,7 @@ class RhythmCheckerGUI(QWidget):
 
         all_types = ci_type_extraction(ci_num, self.current_ci_pu)
         all_length = len(all_types)
-        if int(ci_form) > all_length:
+        if int(ci_form) > all_length or int(ci_form) < 1:  # 排除输入 0 的影响
             self.my_warn("找茬是吧？", "不存在此格式！")
             return
 
@@ -632,9 +612,8 @@ class RhythmCheckerGUI(QWidget):
         else:
             sample_ci = all_types[int(ci_form) - 1]['origin']
 
-        # QTextEdit 清空并插入
-        self.input_text.clear()  # Tk: delete("1.0", tk.END)
-        self.input_text.insertPlainText(sample_ci)  # Tk: insert(tk.END, sample_ci)
+        self.input_text.clear()
+        self.input_text.insertPlainText(sample_ci)
 
     @log_exceptions
     def on_yunshu_change(self):
@@ -784,6 +763,7 @@ class RhythmCheckerGUI(QWidget):
 
 APP_KEY = "RhythmChecker"
 
+@ log_exceptions
 def main():
     # 高 DPI 策略（跨平台，Qt 原生）
     QApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)

@@ -6,6 +6,7 @@ from couyun.ui.core.logger_config import get_logger, log_exceptions
 
 logger = get_logger(__name__)
 
+@log_exceptions
 def load_state() -> dict:
     if os.path.isfile(STATE_PATH):
         with open(STATE_PATH, 'r', encoding='utf-8') as f:

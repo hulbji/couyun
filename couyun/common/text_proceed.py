@@ -10,8 +10,11 @@ SYMBOL_PATTERN = re.compile(
     r"\uFF00-\uFFEF"   # 全角符号
     r"\u2600-\u26FF"   # 杂项符号
     r"\u2700-\u27BF"   # Dingbats
+    r"\u2460-\u2473"   # ①-⑳ 带圈数字
+    r"\u2776-\u277F"   # ❶-❿ 带圈数字（黑底）
+    r"\u2474-\u2487"   # ⑴-⒇ 带括号数字
     r"!\"#$%&'()*+,-./:;<=>?@[\\\]^_`{|}~"
-    r"\n\r\t\v\f"      # 控制字符
+    r"\r\t\v\f"      # 控制字符
     r" \u3000"         # 半角空格 + 全角空格
     r"]"
 )
@@ -31,9 +34,9 @@ def remove_any_brackets_content(text: str) -> str:
     删除任意类型括号及其内部内容（支持中英文、混用、非规范嵌套）
     只要遇到左括号就进入“丢弃模式”，直到遇到任意右括号为止
     """
-
-    left_brackets = set("([{（【《<")
-    right_brackets = set(")]}）】》>")
+    text = text.replace("\n", "。")
+    left_brackets = set("([{（【<")
+    right_brackets = set(")]}）】>")
 
     result = []
     in_bracket = False

@@ -13,7 +13,7 @@ from couyun.ui.core.logger_config import get_logger, log_exceptions
 
 logger = get_logger(__name__)
 
-
+@log_exceptions
 def load_ci_index(json_path):
     """读取列表形式的 ci_index（每项为 {'name': [...], 'type': [...] }）"""
     with open(json_path, 'r', encoding='utf-8') as f:
@@ -22,6 +22,8 @@ def load_ci_index(json_path):
 
 class CiPuBrowser(QWidget):
     _instance = None
+
+    @log_exceptions
     def __init__(self, parent, json_path, fonts, state):
         super().__init__(parent)
         CiPuBrowser._instance = self
@@ -218,6 +220,7 @@ class CiPuBrowser(QWidget):
         self.update_list()
         self.show()
 
+    @log_exceptions
     def _init_bottom_btn_pos(self):
         bar_w = self.bottom_bar.width()
         bar_h = self.bottom_bar.height()
@@ -235,6 +238,7 @@ class CiPuBrowser(QWidget):
         self.update_list()
 
     @staticmethod
+    @log_exceptions
     def show_ci_pu(text_area: QTextEdit, raw_text: str):
         """在指定 QTextEdit 控件中显示词谱内容"""
         if raw_text is None:
@@ -267,6 +271,7 @@ class CiPuBrowser(QWidget):
 
         self.update_list()
 
+    @log_exceptions
     def _refresh_detail_lang(self):
         """刷新详情页中的语言"""
         self.qin_raw = self.qin_raw_t if self.is_trad else self.qin_raw_s
@@ -292,6 +297,7 @@ class CiPuBrowser(QWidget):
         raw = self.qin_raw if self.current_show == 'qin' else self.long_raw
         self.show_ci_pu(self.detail_text, raw)
 
+    @log_exceptions
     def sort_label(self):
         return ["排序:拼音", "排序:字數", "排序:類型"][self.sort_mode] if self.is_trad else \
             ["排序:拼音", "排序:字数", "排序:类型"][self.sort_mode]
@@ -358,6 +364,7 @@ class CiPuBrowser(QWidget):
         self.show_detail(item)
 
     @staticmethod
+    @log_exceptions
     def read_file(path):
         try:
             with open(path, 'r', encoding='utf-8') as f:
@@ -365,6 +372,7 @@ class CiPuBrowser(QWidget):
         except FileNotFoundError:
             return None
 
+    @log_exceptions
     def load_ci_files(self, item):
         idx = item['idx']
         return {
@@ -374,11 +382,13 @@ class CiPuBrowser(QWidget):
             'long_raw_t': self.read_file(os.path.join(CI_LONG_TRAD, f'cipai_{idx}_long_trad.txt')),
         }
 
+    @log_exceptions
     def _on_qin(self):
         self.current_show = 'qin'
         raw = self.qin_raw_t if self.is_trad else self.qin_raw_s
         self.show_ci_pu(self.detail_text, raw)
 
+    @log_exceptions
     def _on_long(self):
         self.current_show = 'long'
         raw = self.long_raw_t if self.is_trad else self.long_raw_s

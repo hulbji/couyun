@@ -22,7 +22,7 @@ class ShiRhythm:
             8: ['0102012', '0102022']  # 平起不押韵（含拗句）
         }  # 一定要将拗句放在后检验
 
-        self.sh = ['〇', '●', '◎', '�']
+        self.sh = ['〇', '●', '◎', '✕']
         self.yun_shu = yun_shu
         self.poem = poem
         self.comma_pos = comma_pos

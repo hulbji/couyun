@@ -148,7 +148,7 @@ class CiRhythm:
         Returns:
             分割好的字符串平仄正误列表
         """
-        conversion = {True: '〇', 'duo': '◎', False: '●', 'pi': '�'}
+        conversion = {True: '〇', 'duo': '◎', False: '●', 'pi': '✕'}
         result_list = []
         ptr = 0
 
