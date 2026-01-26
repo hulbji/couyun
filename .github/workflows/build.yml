@@ -68,9 +68,29 @@ jobs:
         shell: bash
         run: |
           mkdir -p dist_release
-          cp -r dist/couyun dist_release/${{ matrix.os }}
-          cd dist_release
-          tar -czf ${{ matrix.zip_name }} ${{ matrix.os }}
+
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            # Windows 使用 zip 压缩
+            powershell Compress-Archive -Path dist\couyun\* -DestinationPath dist_release\couyun-Windows.zip
+          else
+            # Linux/macOS 使用 tar.gz
+            cd dist
+            tar -czf ../dist_release/${{ matrix.zip_name }} couyun
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            tar -rzf ../dist_release/${{ matrix.zip_name }} -C couyun couyun.desktop
+          fi
+
+            # Linux 自动生成 .desktop 文件（仅 Ubuntu）
+            if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+              echo "[Desktop Entry]" > couyun/couyun.desktop
+              echo "Name=Couyun" >> couyun/couyun.desktop
+              echo "Comment=Couyun Rhythm Tool" >> couyun/couyun.desktop
+              echo "Exec=$(pwd)/couyun/couyun" >> couyun/couyun.desktop
+              echo "Icon=$(pwd)/couyun/assets/picture/ei.png" >> couyun/couyun.desktop
+              echo "Terminal=false" >> couyun/couyun.desktop
+              echo "Type=Application" >> couyun/couyun.desktop
+              echo "Categories=Utility;" >> couyun/couyun.desktop
+            fi
 
       - name: Upload artifacts for Release
         if: startsWith(github.ref, 'refs/tags/')
