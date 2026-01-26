@@ -423,7 +423,7 @@ class CiPuBrowser(QWidget):
                 background-color: #b893d8;
             }
         """)
-        self.qin_btn_detail.clicked.connect(self._on_qin)
+        self.qin_btn_detail.clicked.connect(lambda: self._on_qin())
         btn_layout.addWidget(self.qin_btn_detail)
 
         # 龙谱按钮（有内容才显示）
@@ -443,7 +443,7 @@ class CiPuBrowser(QWidget):
                     background-color: #b893d8;
                 }
             """)
-            self.long_btn_detail.clicked.connect(self._on_long)
+            self.long_btn_detail.clicked.connect(lambda: self._on_long())
             btn_layout.addWidget(self.long_btn_detail)
 
         # 注意：这里不再调用 show_ci_pu，由调用者负责
