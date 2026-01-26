@@ -12,7 +12,6 @@ jobs:
   build:
     name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-
     strategy:
       fail-fast: false
       matrix:
@@ -20,11 +19,9 @@ jobs:
           - os: windows-latest
             artifact_name: couyun-windows
             zip_name: couyun-Windows.tar.gz
-
           - os: ubuntu-latest
             artifact_name: couyun-linux
             zip_name: couyun-Linux.tar.gz
-
           - os: macos-latest
             artifact_name: couyun-macos
             zip_name: couyun-macOS.tar.gz
@@ -39,65 +36,62 @@ jobs:
           python-version: '3.11'
           cache: 'pip'
 
-      # -------- Linux system deps --------
-      - name: Install system deps (Linux)
+      - name: Install Linux dependencies
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            patchelf \
-            libgl1 \
-            libglib2.0-0 \
-            libx11-6 \
-            libxcb1 \
-            libxrender1 \
-            libxext6 \
-            libsm6
+            patchelf libgl1 libglib2.0-0 libx11-6 libxcb1 libxrender1 libxext6 libsm6
 
-      # -------- Python deps --------
-      - name: Install Python deps
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pyinstaller
           pip install -r requirements.txt
 
-      # -------- Inject version for Windows --------
       - name: Inject version from tag (Windows)
         if: runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/')
         shell: bash
         run: |
           VERSION=${GITHUB_REF#refs/tags/v.}
           echo "Injecting version $VERSION into file_version.txt"
-
           IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
-
-          # 替换字符串版本
           sed -i "s/'[0-9]\+\.[0-9]\+\.[0-9]\+'/'$VERSION'/g" file_version.txt
-
-          # 替换 tuple 版本 (filevers / prodvers)
           sed -i "s/filevers=([0-9]\+, *[0-9]\+, *[0-9]\+, *[0-9]\+)/filevers=($MAJOR, $MINOR, $PATCH, 0)/" file_version.txt
           sed -i "s/prodvers=([0-9]\+, *[0-9]\+, *[0-9]\+, *[0-9]\+)/prodvers=($MAJOR, $MINOR, $PATCH, 0)/" file_version.txt
-      
 
-      # -------- Build --------
       - name: Build with PyInstaller
-        run: |
-          pyinstaller couyun.spec --clean --noconfirm
+        run: pyinstaller couyun.spec --clean --noconfirm
 
-      # -------- Package --------
       - name: Package artifact
         if: startsWith(github.ref, 'refs/tags/')
         shell: bash
         run: |
-          cd dist
-          tar -czf ${{ matrix.zip_name }} couyun
+          mkdir -p dist_release
+          cp -r dist/couyun dist_release/${{ matrix.os }}
+          cd dist_release
+          tar -czf ${{ matrix.zip_name }} ${{ matrix.os }}
 
-      # -------- Release --------
-      - name: Create GitHub Release
+      - name: Upload artifacts for Release
         if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v1
+        uses: actions/upload-artifact@v3
         with:
-          files: |
-            dist/couyun-Windows.tar.gz
-            dist/couyun-Linux.tar.gz
-            dist/couyun-macOS.tar.gz
+          name: ${{ matrix.artifact_name }}
+          path: dist_release/${{ matrix.zip_name }}
+
+  release:
+    name: Create GitHub Release with all platforms
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: dist_release_all
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: dist_release_all/**/*.tar.gz
