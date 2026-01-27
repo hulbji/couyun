@@ -81,7 +81,7 @@ jobs:
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             powershell -Command "
               New-Item -ItemType Directory -Force -Path dist_release;
-              Compress-Archive -Path 'dist\couyun\*' -DestinationPath 'dist_release\couyun-Windows.zip'
+              Compress-Archive -Path 'dist\couyun' -DestinationPath 'dist_release\couyun-Windows.zip'
             "
           else
             mkdir -p dist_release
