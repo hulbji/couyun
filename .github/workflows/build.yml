@@ -19,9 +19,19 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y pandoc wkhtmltopdf
+          
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get install -y \
+            patchelf libgl1 libglib2.0-0 libx11-6 libxcb1 libxrender1 libxext6 libsm6 \
+            fonts-noto-cjk
+
 
       - name: Generate README.pdf
-        run: pandoc README.md -o README.pdf --pdf-engine=wkhtmltopdf
+        run: |
+          pandoc README.md -o README.pdf \
+            --pdf-engine=wkhtmltopdf \
+            -V 'mainfont=Noto Sans CJK SC'
 
       - name: Upload README.pdf
         uses: actions/upload-artifact@v4
