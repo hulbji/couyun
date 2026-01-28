@@ -43,33 +43,82 @@ jobs:
           sudo apt-get install -y \
             patchelf libgl1 libglib2.0-0 libx11-6 libxcb1 libxrender1 libxext6 libsm6
 
+      - name: Generate file_version.txt from Git tag
+        if: startsWith(github.ref, 'refs/tags/v.')
+        shell: bash
+        run: |
+          RAW_TAG="${GITHUB_REF#refs/tags/}"
+          echo "Raw tag: $RAW_TAG"
+      
+          if [[ ! "$RAW_TAG" =~ ^v\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Tag must be in form v.X.Y.Z (e.g. v.2.0.0)"
+            exit 1
+          fi
+      
+          VERSION="${RAW_TAG#v.}"
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+          echo "Parsed: MAJOR=$MAJOR MINOR=$MINOR PATCH=$PATCH"
+
+          cat > file_version.txt <<EOF
+VSVersionInfo(
+  ffi=FixedFileInfo(
+    filevers=($MAJOR, $MINOR, $PATCH, 0),
+    prodvers=($MAJOR, $MINOR, $PATCH, 0),
+    mask=0x3f,
+    flags=0x0,
+    OS=0x40004,
+    fileType=0x1,
+    subtype=0x0,
+    date=(0, 0)
+  ),
+  kids=[
+    StringFileInfo([
+      StringTable(
+        '040904B0',
+        [
+          StringStruct('CompanyName', 'hulbji'),
+          StringStruct('FileDescription', 'Couyun Rhythm Tool'),
+          StringStruct('FileVersion', '$VERSION'),
+          StringStruct('InternalName', 'couyun'),
+          StringStruct('LegalCopyright', '© 2026 hulbji. All rights reserved.'),
+          StringStruct('OriginalFilename', 'couyun.exe'),
+          StringStruct('ProductName', 'Couyun'),
+          StringStruct('ProductVersion', '$VERSION')
+        ]
+      )
+    ]),
+    VarFileInfo([VarStruct('Translation', [1033, 1200])])
+  ]
+)
+EOF
+
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pyinstaller
           pip install -r requirements.txt
 
-      - name: Inject version from tag (Windows)
-        if: runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/v.')
-        shell: bash
+      - name: Install Pandoc & wkhtmltopdf (Windows)
+        if: runner.os == 'Windows'
         run: |
-          RAW_TAG="${GITHUB_REF#refs/tags/}"
-          echo "Raw tag: $RAW_TAG"
+          choco install pandoc -y
+          choco install wkhtmltopdf -y
 
-          if [[ ! "$RAW_TAG" =~ ^v\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Tag must be in form v.X.Y.Z (e.g. v.1.2.3)"
-            exit 1
-          fi
+      - name: Install Pandoc & wkhtmltopdf (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc wkhtmltopdf
 
-          VERSION="${RAW_TAG#v.}"
-          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+      - name: Install Pandoc & wkhtmltopdf (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install pandoc
+          brew install wkhtmltopdf
 
-          echo "Parsed: MAJOR=$MAJOR MINOR=$MINOR PATCH=$PATCH"
+      - name: Generate PDF from README.md
+        run: pandoc README.md -o README.pdf --pdf-engine=wkhtmltopdf
 
-          sed -i.bak "s/filevers=([0-9]\+, *[0-9]\+, *[0-9]\+, *[0-9]\+)/filevers=($MAJOR, $MINOR, $PATCH, 0)/" file_version.txt
-          sed -i.bak "s/prodvers=([0-9]\+, *[0-9]\+, *[0-9]\+, *[0-9]\+)/prodvers=($MAJOR, $MINOR, $PATCH, 0)/" file_version.txt
-          sed -i.bak "s/StringStruct('FileVersion', '[0-9]\+\.[0-9]\+\.[0-9]\+')/StringStruct('FileVersion', '$VERSION')/" file_version.txt
-          sed -i.bak "s/StringStruct('ProductVersion', '[0-9]\+\.[0-9]\+\.[0-9]\+')/StringStruct('ProductVersion', '$VERSION')/" file_version.txt
 
       - name: Build with PyInstaller
         run: pyinstaller couyun.spec --clean --noconfirm
@@ -86,16 +135,6 @@ jobs:
           else
             mkdir -p dist_release
             cd dist
-            if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-              echo "[Desktop Entry]" > couyun/couyun.desktop
-              echo "Name=Couyun" >> couyun/couyun.desktop
-              echo "Comment=Couyun Rhythm Tool" >> couyun/couyun.desktop
-              echo "Exec=$(pwd)/couyun/couyun" >> couyun/couyun.desktop
-              echo "Icon=$(pwd)/couyun/assets/picture/ei.png" >> couyun/couyun.desktop
-              echo "Terminal=false" >> couyun/couyun.desktop
-              echo "Type=Application" >> couyun/couyun.desktop
-              echo "Categories=Utility;" >> couyun/couyun.desktop
-            fi
             tar -czf ../dist_release/${{ matrix.zip_name }} couyun
           fi
 

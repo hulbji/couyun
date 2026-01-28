@@ -4,3 +4,5 @@ test/
 build/
 dist/
 build_nuikta.py
+file_version.txt
+README.pdf

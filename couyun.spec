@@ -39,7 +39,6 @@ a = Analysis(
 
 pyz = PYZ(a.pure)
 
-# ---- 平台差异处理 ----
 icon = None
 version = None
 
@@ -75,9 +74,10 @@ coll = COLLECT(
     name='couyun',
 )
 
-# ---- 可选：拷贝 README.pdf（若存在）----
 import shutil
 build_dir = os.path.join('dist', 'couyun')
-if os.path.exists('README.pdf'):
+readme_pdf = os.path.join(os.getcwd(), 'README.pdf')
+
+if os.path.exists(readme_pdf):
     os.makedirs(build_dir, exist_ok=True)
-    shutil.copy2('README.pdf', build_dir)
+    shutil.copy2(readme_pdf, build_dir)
