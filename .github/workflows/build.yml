@@ -2,8 +2,6 @@ name: Build & Release Couyun
 
 on:
   push:
-    branches:
-      - master
     tags:
       - 'v.*'
   workflow_dispatch:
@@ -58,39 +56,36 @@ jobs:
           VERSION="${RAW_TAG#v.}"
           IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
           echo "Parsed: MAJOR=$MAJOR MINOR=$MINOR PATCH=$PATCH"
-
-          cat > file_version.txt <<EOF
-VSVersionInfo(
-  ffi=FixedFileInfo(
-    filevers=($MAJOR, $MINOR, $PATCH, 0),
-    prodvers=($MAJOR, $MINOR, $PATCH, 0),
-    mask=0x3f,
-    flags=0x0,
-    OS=0x40004,
-    fileType=0x1,
-    subtype=0x0,
-    date=(0, 0)
-  ),
-  kids=[
-    StringFileInfo([
-      StringTable(
-        '040904B0',
-        [
-          StringStruct('CompanyName', 'hulbji'),
-          StringStruct('FileDescription', 'Couyun Rhythm Tool'),
-          StringStruct('FileVersion', '$VERSION'),
-          StringStruct('InternalName', 'couyun'),
-          StringStruct('LegalCopyright', '© 2026 hulbji. All rights reserved.'),
-          StringStruct('OriginalFilename', 'couyun.exe'),
-          StringStruct('ProductName', 'Couyun'),
-          StringStruct('ProductVersion', '$VERSION')
-        ]
-      )
-    ]),
-    VarFileInfo([VarStruct('Translation', [1033, 1200])])
-  ]
-)
-EOF
+          echo "VSVersionInfo(" > file_version.txt
+          echo "  ffi=FixedFileInfo(" >> file_version.txt
+          echo "    filevers=($MAJOR, $MINOR, $PATCH, 0)," >> file_version.txt
+          echo "    prodvers=($MAJOR, $MINOR, $PATCH, 0)," >> file_version.txt
+          echo "    mask=0x3f," >> file_version.txt
+          echo "    flags=0x0," >> file_version.txt
+          echo "    OS=0x40004," >> file_version.txt
+          echo "    fileType=0x1," >> file_version.txt
+          echo "    subtype=0x0," >> file_version.txt
+          echo "    date=(0, 0)" >> file_version.txt
+          echo "  )," >> file_version.txt
+          echo "  kids=[" >> file_version.txt
+          echo "    StringFileInfo([" >> file_version.txt
+          echo "      StringTable(" >> file_version.txt
+          echo "        '040904B0'," >> file_version.txt
+          echo "        [" >> file_version.txt
+          echo "          StringStruct('CompanyName', 'hulbji')," >> file_version.txt
+          echo "          StringStruct('FileDescription', 'Couyun Rhythm Tool')," >> file_version.txt
+          echo "          StringStruct('FileVersion', '$VERSION')," >> file_version.txt
+          echo "          StringStruct('InternalName', 'couyun')," >> file_version.txt
+          echo "          StringStruct('LegalCopyright', '© 2026 hulbji. All rights reserved.')," >> file_version.txt
+          echo "          StringStruct('OriginalFilename', 'couyun.exe')," >> file_version.txt
+          echo "          StringStruct('ProductName', 'Couyun')," >> file_version.txt
+          echo "          StringStruct('ProductVersion', '$VERSION')" >> file_version.txt
+          echo "        ]" >> file_version.txt
+          echo "      )" >> file_version.txt
+          echo "    ])," >> file_version.txt
+          echo "    VarFileInfo([VarStruct('Translation', [1033, 1200])])" >> file_version.txt
+          echo "  ]" >> file_version.txt
+          echo ")" >> file_version.txt
 
       - name: Install Python dependencies
         run: |
