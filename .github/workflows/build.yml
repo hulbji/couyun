@@ -7,9 +7,32 @@ on:
   workflow_dispatch:
 
 jobs:
+  # 先生成 PDF
+  generate_pdf:
+    name: Generate README.pdf
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Pandoc & wkhtmltopdf
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc wkhtmltopdf
+
+      - name: Generate README.pdf
+        run: pandoc README.md -o README.pdf --pdf-engine=wkhtmltopdf
+
+      - name: Upload README.pdf
+        uses: actions/upload-artifact@v4
+        with:
+          name: readme-pdf
+          path: README.pdf
+
   build:
     name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    needs: generate_pdf
     strategy:
       fail-fast: false
       matrix:
@@ -28,18 +51,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 下载 PDF
+      - name: Download README.pdf
+        uses: actions/download-artifact@v4
+        with:
+          name: readme-pdf
+          path: .
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: 'pip'
-
-      - name: Install Linux dependencies
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            patchelf libgl1 libglib2.0-0 libx11-6 libxcb1 libxrender1 libxext6 libsm6
 
       - name: Generate file_version.txt from Git tag
         if: startsWith(github.ref, 'refs/tags/v.')
@@ -56,6 +79,7 @@ jobs:
           VERSION="${RAW_TAG#v.}"
           IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
           echo "Parsed: MAJOR=$MAJOR MINOR=$MINOR PATCH=$PATCH"
+
           echo "VSVersionInfo(" > file_version.txt
           echo "  ffi=FixedFileInfo(" >> file_version.txt
           echo "    filevers=($MAJOR, $MINOR, $PATCH, 0)," >> file_version.txt
@@ -92,30 +116,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller
           pip install -r requirements.txt
-
-      - name: Install Pandoc & wkhtmltopdf (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y pandoc wkhtmltopdf
-
-      - name: Generate README.pdf (Linux only)
-        if: runner.os == 'Linux'
-        run: pandoc README.md -o README.pdf --pdf-engine=wkhtmltopdf
-
-      - name: Upload README.pdf
-        if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v4
-        with:
-          name: readme-pdf
-          path: README.pdf
-
-      - name: Download README.pdf
-        if: runner.os != 'Linux'
-        uses: actions/download-artifact@v4
-        with:
-          name: readme-pdf
-          path: .
 
       - name: Build with PyInstaller
         run: pyinstaller couyun.spec --clean --noconfirm
